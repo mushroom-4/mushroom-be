@@ -16,13 +16,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
 @Entity
 @Table(name = "`product`")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+public class Product extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
