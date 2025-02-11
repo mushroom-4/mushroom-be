@@ -30,17 +30,22 @@ public class User extends Timestamped {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "nickname")
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String email, String password, UserRole userRole) {
+    public User(Long id, String email, String password, String nickname, UserRole userRole) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
         this.userRole = userRole;
     }
+
 
     public static User fromAuthUser(AuthUser authUser) {
         return User.builder()
