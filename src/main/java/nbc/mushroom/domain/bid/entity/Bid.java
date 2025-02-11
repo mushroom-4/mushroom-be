@@ -52,4 +52,8 @@ public class Bid extends Timestamped {
         this.biddingPrice = biddingPrice;
         this.biddingStatus = BiddingStatus.BIDDING;
     }
+
+    public void updateBiddingPrice(Long biddingPrice) {
+        this.biddingPrice = biddingPrice;
+    }
 }
