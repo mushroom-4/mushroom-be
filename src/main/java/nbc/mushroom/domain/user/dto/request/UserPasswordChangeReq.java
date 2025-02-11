@@ -3,7 +3,7 @@ package nbc.mushroom.domain.user.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record UserPasswordChangeRequest(
+public record UserPasswordChangeReq(
     @NotBlank
     String oldPassword,
 
