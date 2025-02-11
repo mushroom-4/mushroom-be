@@ -7,8 +7,8 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.PasswordEncoder;
-import nbc.mushroom.domain.user.dto.request.UserPasswordChangeRequest;
-import nbc.mushroom.domain.user.dto.response.UserResponse;
+import nbc.mushroom.domain.user.dto.request.UserPasswordChangeReq;
+import nbc.mushroom.domain.user.dto.response.UserRes;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -22,27 +22,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserResponse getUser(long userId) {
+    public UserRes getUser(long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return UserResponse.toDto(user);
+        return UserRes.toDto(user);
     }
 
     @Transactional
-    public void changePassword(long userId, UserPasswordChangeRequest userPasswordChangeRequest) {
+    public void changePassword(long userId, UserPasswordChangeReq userPasswordChangeReq) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (passwordEncoder.matches(userPasswordChangeRequest.newPassword(),
+        if (passwordEncoder.matches(userPasswordChangeReq.newPassword(),
             user.getPassword())) {
             throw new CustomException(PASSWORD_SAME);
         }
 
-        if (!passwordEncoder.matches(userPasswordChangeRequest.oldPassword(),
+        if (!passwordEncoder.matches(userPasswordChangeReq.oldPassword(),
             user.getPassword())) {
             throw new CustomException(PASSWORD_NOT_MATCH);
         }
 
-        user.changePassword(passwordEncoder.encode(userPasswordChangeRequest.newPassword()));
+        user.changePassword(passwordEncoder.encode(userPasswordChangeReq.newPassword()));
     }
 }
