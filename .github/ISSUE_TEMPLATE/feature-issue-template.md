@@ -1,7 +1,7 @@
 ---
 name: Feature Issue Template
 about: 어떤 기능을 추가할 건지
-title: "[Feature(도메인)] 사용자는 ~를 할 수 있다"
+title: "[Feature(도메인)] 사용자는 를 할 수 있다"
 labels: "✨ Feature"
 assignees: ''
 
