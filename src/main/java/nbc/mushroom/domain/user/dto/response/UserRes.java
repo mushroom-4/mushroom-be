@@ -7,7 +7,7 @@ public record UserRes(
     String email
 ) {
 
-    public static UserRes toDto(User user) {
+    public static UserRes from(User user) {
         return new UserRes(user.getId(), user.getEmail());
     }
 }
