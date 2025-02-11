@@ -63,7 +63,7 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ProductStatus status;
+    private ProductStatus status = ProductStatus.INSPECTING;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
