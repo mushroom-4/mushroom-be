@@ -41,7 +41,7 @@ public class ProductControllerV1 {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Product>> createProductApi(
+    public ResponseEntity<ApiResponse<Product>> PostProduct(
         @RequestPart("image_file") MultipartFile imageFile,
         @RequestPart("createProductReq") CreateProductReq req,
         @Auth AuthUser authUser
