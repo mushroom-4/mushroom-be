@@ -89,7 +89,8 @@ public class Product extends Timestamped {
 
 
     }
-    //
 
-    //
+    public void updateStatus(ProductStatus status) {
+        this.status = status;
+    }
 }

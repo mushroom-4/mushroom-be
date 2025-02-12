@@ -26,6 +26,11 @@ public enum ExceptionType {
     //Product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "존재하지 않는 상품입니다."),
 
+    //Product Admin
+    INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "PA01", "잘못된 상태 변경 요청입니다."),
+    PRODUCT_ALREADY_INSPECTED(HttpStatus.BAD_REQUEST, "PA02", "이미 검수가 완료된 상품입니다."),
+
+
     // Bid
 
     // Like
