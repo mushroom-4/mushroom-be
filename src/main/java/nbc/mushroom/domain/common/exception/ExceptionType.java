@@ -32,6 +32,7 @@ public enum ExceptionType {
 
 
     // Bid
+    SELF_BIDDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "B01", "본인 상품을 입찰할 수 없습니다."),
 
     // Like
 
