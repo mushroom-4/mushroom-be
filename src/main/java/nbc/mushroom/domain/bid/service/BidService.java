@@ -29,7 +29,7 @@ public class BidService {
                 ExceptionType.PRODUCT_NOT_FOUND)); // 이 동작을 bid서비스에서 보여주고 싶지 않은데.. Product Repository에 디폴트 메서드 또는 Bid로 반환하는 메서드 생기면 변경하기로
 
         Bid findBid = bidRepository.findBidByUserAndProduct(loginUser, findProduct)
-            .orElseGet(() -> createBid(loginUser, findProduct));
+            .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice()));
 
         findBid.updateBiddingPrice(createBidReq.biddingPrice());
 
@@ -37,9 +37,10 @@ public class BidService {
     }
 
     @Transactional(readOnly = false)
-    public Bid createBid(User bidder, Product product) {
+    public Bid createBid(User bidder, Product product, Long biddingPrice) {
         Bid bid = Bid.builder()
             .product(product)
+            .biddingPrice(biddingPrice)
             .bidder(bidder)
             .build();
 
