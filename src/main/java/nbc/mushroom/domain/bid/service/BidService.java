@@ -32,6 +32,10 @@ public class BidService {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
         }
 
+        if (findProduct.getStartPrice() > createBidReq.biddingPrice()) {
+            throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
+        }
+
         Bid findBid = bidRepository.findBidByUserAndProduct(loginUser, findProduct)
             .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice())
             ); // 좀 더 생각.. Bid 생성까지 Repository에서 처리하는건 아닌듯..
