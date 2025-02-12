@@ -28,13 +28,7 @@ public class BidService {
 
         Product findProduct = productRepository.findProductById(productId);
 
-        if (loginUser == findProduct.getSeller()) {
-            throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
-        }
-
-        if (findProduct.getStartPrice() > createBidReq.biddingPrice()) {
-            throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
-        }
+        validateBidRequest(loginUser, findProduct, createBidReq.biddingPrice());
 
         Bid findBid = bidRepository.findBidByUserAndProduct(loginUser, findProduct)
             .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice())
@@ -55,5 +49,14 @@ public class BidService {
             .build();
 
         return bidRepository.save(bid);
+    }
+
+    private void validateBidRequest(User bidder, Product product, Long biddingPrice) {
+        if (bidder == product.getSeller()) {
+            throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
+        }
+        if (product.getStartPrice() > biddingPrice) {
+            throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
+        }
     }
 }
