@@ -13,16 +13,25 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.common.util.JwtUtil;
-import nbc.mushroom.domain.user.entity.UserRole;
+import org.springframework.util.AntPathMatcher;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final Map<String, List<String>> excludePatterns = Map.of(
+        "/api/*/products/*/info", List.of("GET"),
+        "/api/*/products/search", List.of("GET"),
+        "/api/*/users/*/info", List.of("GET"),
+        "/api/*/auth/**", List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+    );
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -35,9 +44,10 @@ public class JwtFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String url = httpRequest.getRequestURI();
+        String uri = httpRequest.getRequestURI();
+        String method = httpRequest.getMethod();
 
-        if (url.startsWith("/api/v1/auth")) {
+        if (!uri.startsWith("/api") || isExcludedPath(uri, method)) {
             chain.doFilter(request, response);
             return;
         }
@@ -60,22 +70,10 @@ public class JwtFilter implements Filter {
                 return;
             }
 
-            UserRole userRole = UserRole.valueOf(claims.get("userRole", String.class));
-
             httpRequest.setAttribute("userId", Long.parseLong(claims.getSubject()));
             httpRequest.setAttribute("email", claims.get("email"));
             httpRequest.setAttribute("userRole", claims.get("userRole"));
             httpRequest.setAttribute("nickname", claims.get("nickname"));
-
-            if (url.startsWith("/admin")) {
-                // 관리자 권한이 없는 경우 403을 반환합니다.
-                if (!UserRole.ADMIN.equals(userRole)) {
-                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "관리자 권한이 없습니다.");
-                    return;
-                }
-                chain.doFilter(request, response);
-                return;
-            }
 
             chain.doFilter(request, response);
         } catch (SecurityException | MalformedJwtException e) {
@@ -96,5 +94,11 @@ public class JwtFilter implements Filter {
     @Override
     public void destroy() {
         Filter.super.destroy();
+    }
+
+    private boolean isExcludedPath(String uri, String method) {
+        return excludePatterns.entrySet().stream()
+            .anyMatch(entry -> pathMatcher.match(entry.getKey(), uri)
+                && entry.getValue().contains(method));
     }
 }
