@@ -2,7 +2,7 @@ package nbc.mushroom.domain.common.util.image;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class ImageS3 implements Image {
+public class ImageUtilS3 implements ImageUtil {
 
     @Override
     public String upload(MultipartFile image) {

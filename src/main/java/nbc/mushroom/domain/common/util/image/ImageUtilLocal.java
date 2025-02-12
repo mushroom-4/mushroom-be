@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
-public class ImageLocal implements Image {
+public class ImageUtilLocal implements ImageUtil {
 
     @Override
     public String upload(MultipartFile image) {

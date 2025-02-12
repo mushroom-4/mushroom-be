@@ -3,7 +3,7 @@ package nbc.mushroom.domain.common.util.image;
 import org.springframework.web.multipart.MultipartFile;
 
 
-public interface Image {
+public interface ImageUtil {
 
     String upload(MultipartFile image);
 
