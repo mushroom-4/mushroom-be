@@ -46,7 +46,7 @@ public class ProductControllerV1 {
     ) {
         Long userId = authUser.id();
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.CREATED)
             .body(productService.createProduct(userId, createProductReq));
     }
 
@@ -58,7 +58,7 @@ public class ProductControllerV1 {
     ) {
         Long userId = authUser.id();
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.OK)
             .body(productService.updateProduct(userId, productId, createProductReq));
     }
 
@@ -68,7 +68,8 @@ public class ProductControllerV1 {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        return ResponseEntity.ok(productService.solfDeleteProduct(userId, productId));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .body(productService.solfDeleteProduct(userId, productId));
     }
 
 }
