@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.common.dto;
+package nbc.mushroom.domain.product.dto.request;
 
 
 import java.time.LocalDateTime;

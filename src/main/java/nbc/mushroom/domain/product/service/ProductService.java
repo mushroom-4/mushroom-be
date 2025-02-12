@@ -3,11 +3,11 @@ package nbc.mushroom.domain.product.service;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.product.dto.response.SearchProductRes;
-import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.common.dto.ApiResponse;
-import nbc.mushroom.domain.common.dto.CreateProductReq;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.product.dto.request.CreateProductReq;
+import nbc.mushroom.domain.product.dto.response.CreateProductRes;
+import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.product.entity.ProductCategory;
 import nbc.mushroom.domain.product.entity.ProductSize;
@@ -32,7 +32,8 @@ public class ProductService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ApiResponse<Product> createProduct(Long userId, CreateProductReq req, String imageUrl) {
+    public ApiResponse<CreateProductRes> createProduct(Long userId, CreateProductReq req,
+        String imageUrl) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
@@ -50,6 +51,6 @@ public class ProductService {
             .build();
 
         productRepository.save(product);
-        return ApiResponse.success("상품 등록에 성공했습니다.", product);
+        return ApiResponse.success("상품 등록에 성공했습니다.", CreateProductRes.from(product));
     }
 }

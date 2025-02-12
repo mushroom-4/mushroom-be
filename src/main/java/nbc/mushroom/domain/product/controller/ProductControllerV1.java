@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
-import nbc.mushroom.domain.common.dto.CreateProductReq;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
+import nbc.mushroom.domain.product.dto.request.CreateProductReq;
+import nbc.mushroom.domain.product.dto.response.CreateProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
-import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.product.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,12 +40,13 @@ public class ProductControllerV1 {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<Product>> PostProduct(
+    public ResponseEntity<ApiResponse<CreateProductRes>> PostProduct(
         @ModelAttribute CreateProductReq createProductReq,
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        String imageUrl = imageUtil.upload(createProductReq.image());
+        String filename = imageUtil.upload(createProductReq.image());
+        String imageUrl = imageUtil.getImageUrl(filename);
         return ResponseEntity.ok()
             .body(productService.createProduct(userId, createProductReq, imageUrl));
     }

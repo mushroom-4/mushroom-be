@@ -41,7 +41,7 @@ public class Product extends Timestamped {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "image_url", length = 100)
+    @Column(name = "image_url", length = 150)
     private String image_url;
 
     @Enumerated(EnumType.STRING)

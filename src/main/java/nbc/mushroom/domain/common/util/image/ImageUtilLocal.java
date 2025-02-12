@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+//@Primary
 @Component
 @RequiredArgsConstructor
 public class ImageUtilLocal implements ImageUtil {
