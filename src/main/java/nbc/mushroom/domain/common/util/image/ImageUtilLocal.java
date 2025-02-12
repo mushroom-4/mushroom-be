@@ -1,6 +1,6 @@
 package nbc.mushroom.domain.common.util.image;
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.IMAGE_UPLOAD_FAIL;
+import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_IMAGE_FAIL;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,12 +9,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.exception.CustomException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
+@RequiredArgsConstructor
 public class ImageUtilLocal implements ImageUtil {
+
+    @Value("${image.file.endpoint}")
+    private String endpoint;
 
     @Override
     public String upload(MultipartFile image) {
@@ -22,25 +28,24 @@ public class ImageUtilLocal implements ImageUtil {
         if (image == null) {
             return null;
         }
+        String ext = "";
+        int i = image.getOriginalFilename().lastIndexOf('.');
+        if (i > 0) {
+            ext = image.getOriginalFilename().substring(i);
+        }
+        String filename = UUID.randomUUID() + ext; // "랜덤파일명.확장자"
+
         try {
-            String ext = "";
-            int i = image.getOriginalFilename().lastIndexOf('.');
-            if (i > 0) {
-                ext = image.getOriginalFilename().substring(i);
-            }
-            String filename = UUID.randomUUID() + ext; // "랜덤파일명.확장자"
-
             Path path = Paths.get("src/main/webapp/images/");
-
             Files.createDirectories(path);
 
             Path filePath = path.resolve(filename);
 
             Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return "/images/" + filename;
+            return filename;
         } catch (IOException e) {
-            throw new CustomException(IMAGE_UPLOAD_FAIL);
+            throw new CustomException(SERVER_IMAGE_FAIL);
         }
     }
 
@@ -52,12 +57,12 @@ public class ImageUtilLocal implements ImageUtil {
                 file.delete();
             }
         } catch (Exception e) {
-            throw new CustomException(IMAGE_UPLOAD_FAIL);
+            throw new CustomException(SERVER_IMAGE_FAIL);
         }
     }
 
     @Override
     public String getImageUrl(String filename) {
-        return "http://localhost:8080/images/" + filename;
+        return endpoint + "/" + filename;
     }
 }

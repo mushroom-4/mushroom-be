@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ExceptionType {
 
     //Server
+    SERVER_IMAGE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV01", "이미지 서버에 문제가 생겼습니다."),
 
     //Auth
     AUTH_WRONG_USED(HttpStatus.INTERNAL_SERVER_ERROR, "A01", "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
@@ -24,7 +25,6 @@ public enum ExceptionType {
 
     //Product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "존재하지 않는 상품입니다."),
-    IMAGE_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, "P02", "이미지 형식에 맞지 않습니다.")
 
     // Bid
 
