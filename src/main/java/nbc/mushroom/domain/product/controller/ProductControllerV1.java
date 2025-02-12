@@ -2,7 +2,7 @@ package nbc.mushroom.domain.product.controller;
 
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.dto.ApiResponse;
-import nbc.mushroom.domain.product.dto.response.searchProductRes;
+import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +20,9 @@ public class ProductControllerV1 {
 
     // 상품 상세 조회
     @GetMapping("/{productId}/info")
-    public ResponseEntity<ApiResponse<searchProductRes>> searchProduct(
+    public ResponseEntity<ApiResponse<SearchProductRes>> searchProduct(
         @PathVariable long productId) {
-        searchProductRes searchProductRes = productService.searchProductRes(productId);
+        SearchProductRes searchProductRes = productService.searchProduct(productId);
 
         return ResponseEntity
             .status(HttpStatus.OK)

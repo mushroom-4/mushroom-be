@@ -6,7 +6,7 @@ import nbc.mushroom.domain.product.entity.ProductCategory;
 import nbc.mushroom.domain.product.entity.ProductSize;
 import nbc.mushroom.domain.product.entity.ProductStatus;
 
-public record searchProductRes(
+public record SearchProductRes(
     Long productId,
     String name,
     String description,
@@ -20,8 +20,8 @@ public record searchProductRes(
     ProductStatus status
 ) {
 
-    public static searchProductRes from(Product searchProduct) {
-        return new searchProductRes(
+    public static SearchProductRes from(Product searchProduct) {
+        return new SearchProductRes(
             searchProduct.getId(),
             searchProduct.getName(),
             searchProduct.getDescription(),

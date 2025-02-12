@@ -23,7 +23,7 @@ public enum ExceptionType {
     INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "U05", "유효하지 않은 UserRole"),
 
     //Product
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "해당 상품을 찾을 수 없습니다.")
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "해당 상품을 찾을 수 없습니다."),
 
     // Bid
 
