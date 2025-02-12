@@ -35,4 +35,14 @@ public class BidService {
 
         return CreateBidRes.from(findBid);
     }
+
+    @Transactional(readOnly = false)
+    public Bid createBid(User bidder, Product product) {
+        Bid bid = Bid.builder()
+            .product(product)
+            .bidder(bidder)
+            .build();
+
+        return bidRepository.save(bid);
+    }
 }
