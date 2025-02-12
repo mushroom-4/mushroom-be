@@ -8,6 +8,7 @@ import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.product.entity.Product;
+import nbc.mushroom.domain.product.entity.ProductStatus;
 import nbc.mushroom.domain.product.repository.ProductRepository;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,9 @@ public class BidService {
     }
 
     private void validateBidRequest(User bidder, Product product, Long biddingPrice) {
+        if (product.getStatus() != ProductStatus.PROGRESSING) {
+            throw new CustomException(ExceptionType.PRODUCT_NOT_IN_PROGRESS);
+        }
         if (bidder == product.getSeller()) {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
         }
