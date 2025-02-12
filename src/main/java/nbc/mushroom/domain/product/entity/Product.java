@@ -19,6 +19,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.common.entity.Timestamped;
+import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -90,7 +92,16 @@ public class Product extends Timestamped {
 
     }
 
-    public void updateStatus(ProductStatus status) {
-        this.status = status;
+    public void updateStatus(ProductStatus newStatus) {
+
+        if (this.status != ProductStatus.INSPECTING) {
+            throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
+        }
+
+        if (newStatus != ProductStatus.WAITING && newStatus != ProductStatus.REJECTED) {
+            throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+        }
+
+        this.status = newStatus;
     }
 }
