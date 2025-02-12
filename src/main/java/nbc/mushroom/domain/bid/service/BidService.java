@@ -23,13 +23,18 @@ public class BidService {
 
     @Transactional(readOnly = false)
     public CreateBidRes createOrUpdateBid(User loginUser, Long productId,
+        // 메서드 명 updateBid로 바꾸고 find 관련된 로직 다 추출해버릴까..
         CreateBidReq createBidReq) {
-        Product findProduct = productRepository.findById(productId)
-            .orElseThrow(() -> new CustomException(
-                ExceptionType.PRODUCT_NOT_FOUND)); // 이 동작을 bid서비스에서 보여주고 싶지 않은데.. Product Repository에 디폴트 메서드 또는 Bid로 반환하는 메서드 생기면 변경하기로
+
+        Product findProduct = productRepository.findProductById(productId);
+
+        if (loginUser == findProduct.getSeller()) {
+            throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
+        }
 
         Bid findBid = bidRepository.findBidByUserAndProduct(loginUser, findProduct)
-            .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice()));
+            .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice())
+            ); // 좀 더 생각.. Bid 생성까지 Repository에서 처리하는건 아닌듯..
 
         if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
             findBid.updateBiddingPrice(createBidReq.biddingPrice());
@@ -38,8 +43,7 @@ public class BidService {
         return CreateBidRes.from(findBid);
     }
 
-    @Transactional(readOnly = false)
-    public Bid createBid(User bidder, Product product, Long biddingPrice) {
+    private Bid createBid(User bidder, Product product, Long biddingPrice) {
         Bid bid = Bid.builder()
             .product(product)
             .biddingPrice(biddingPrice)
