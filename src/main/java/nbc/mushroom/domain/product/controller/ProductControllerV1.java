@@ -19,7 +19,7 @@ public class ProductControllerV1 {
     private final ProductService productService;
 
     // 상품 상세 조회
-    @GetMapping("/{productId}")
+    @GetMapping("/{productId}/info")
     public ResponseEntity<ApiResponse<searchProductRes>> searchProduct(
         @PathVariable long productId) {
         searchProductRes searchProductRes = productService.searchProductRes(productId);
