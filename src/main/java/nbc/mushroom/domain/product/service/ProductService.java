@@ -18,5 +18,4 @@ public class ProductService {
         Product searchProduct = productRepository.findProductById(productId);
         return SearchProductRes.from(searchProduct);
     }
-
 }

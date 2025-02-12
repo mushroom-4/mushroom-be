@@ -28,5 +28,4 @@ public class ProductControllerV1 {
             .status(HttpStatus.OK)
             .body(ApiResponse.success("상품이 정상적으로 조회되었습니다.", searchProductRes));
     }
-
 }
