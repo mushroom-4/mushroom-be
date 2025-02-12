@@ -23,7 +23,7 @@ public class UserControllerV1 {
 
     private final UserService userService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/{userId}/info")
     public ResponseEntity<ApiResponse<UserRes>> getUser(@PathVariable long userId) {
         UserRes userRes = userService.getUser(userId);
 
