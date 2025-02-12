@@ -24,6 +24,7 @@ public enum ExceptionType {
 
     //Product
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "해당 상품을 찾을 수 없습니다."),
+    IMAGE_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, "P02", "이미지 형식에 맞지 않습니다.")
 
     // Bid
 

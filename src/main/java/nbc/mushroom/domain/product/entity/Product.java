@@ -1,5 +1,7 @@
 package nbc.mushroom.domain.product.entity;
 
+import static nbc.mushroom.domain.product.entity.ProductStatus.INSPECTING;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,7 +66,7 @@ public class Product extends Timestamped {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ProductStatus status = ProductStatus.INSPECTING;
+    private ProductStatus status = INSPECTING;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
@@ -72,7 +74,7 @@ public class Product extends Timestamped {
     @Builder
     public Product(Long id, User seller, String name, String description, String image_url,
         ProductSize size, ProductCategory category, String brand, Long startPrice,
-        LocalDateTime startTime, LocalDateTime endTime, ProductStatus status, Boolean isDeleted) {
+        LocalDateTime startTime, LocalDateTime endTime) {
         this.id = id;
         this.seller = seller;
         this.name = name;
@@ -84,7 +86,10 @@ public class Product extends Timestamped {
         this.startPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.status = status;
-        this.isDeleted = isDeleted;
+
+
     }
+    //
+
+    //
 }
