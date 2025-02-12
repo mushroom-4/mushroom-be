@@ -45,12 +45,15 @@ public class Bid extends Timestamped {
     private BiddingStatus biddingStatus;
 
     @Builder
-    public Bid(Long id, Product product, User bidder, Long biddingPrice,
-        BiddingStatus biddingStatus) {
+    public Bid(Long id, Product product, User bidder, Long biddingPrice) {
         this.id = id;
         this.product = product;
         this.bidder = bidder;
         this.biddingPrice = biddingPrice;
-        this.biddingStatus = biddingStatus;
+        this.biddingStatus = BiddingStatus.BIDDING;
+    }
+
+    public void updateBiddingPrice(Long biddingPrice) {
+        this.biddingPrice = biddingPrice;
     }
 }
