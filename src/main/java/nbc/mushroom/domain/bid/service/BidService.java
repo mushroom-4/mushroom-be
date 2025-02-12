@@ -31,7 +31,9 @@ public class BidService {
         Bid findBid = bidRepository.findBidByUserAndProduct(loginUser, findProduct)
             .orElseGet(() -> createBid(loginUser, findProduct, createBidReq.biddingPrice()));
 
-        findBid.updateBiddingPrice(createBidReq.biddingPrice());
+        if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
+            findBid.updateBiddingPrice(createBidReq.biddingPrice());
+        }
 
         return CreateBidRes.from(findBid);
     }
