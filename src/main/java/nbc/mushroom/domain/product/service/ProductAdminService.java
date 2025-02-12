@@ -19,8 +19,7 @@ public class ProductAdminService {
     @Transactional
     public void approveProduct(Long productId) {
 
-        Product product = productRepository.findById(productId)
-            .orElseThrow(() -> new CustomException(ExceptionType.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findProductById(productId);
 
         validateStatusChange(product.getStatus(), ProductStatus.WAITING);
         product.updateStatus(ProductStatus.WAITING);
@@ -33,17 +32,32 @@ public class ProductAdminService {
      * @param newStatus     변경할 상태
      */
     public void validateStatusChange(ProductStatus currentStatus, ProductStatus newStatus) {
-        if (currentStatus == ProductStatus.INSPECTING && newStatus == ProductStatus.WAITING
-            || newStatus == ProductStatus.REJECTED) {
-            return;
-        }
-        // 상품의 상태가 inspecting이 아닌 경우 이미 검수가 완료된 상품이라고 가정
         if (currentStatus != ProductStatus.INSPECTING) {
+            // 상품 상태가 INSPECTING이 아닌 경우
             throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
         }
-
-        throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+        if (newStatus != ProductStatus.WAITING && newStatus != ProductStatus.REJECTED) {
+            // 유효하지 않은 상태로 변경하려는 경우
+            throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+        }
     }
 
     // 물품 검수 불합격 -> status 실패 (rejected)
+    @Transactional
+    public void rejectProduct(Long productId) {
+
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new CustomException(ExceptionType.PRODUCT_NOT_FOUND));
+
+        validateStatusChange(product.getStatus(), ProductStatus.REJECTED);
+        product.updateStatus(ProductStatus.REJECTED);
+    }
+
+    /**
+     * 상품 ID로 Product 를 조회하는 메서드
+     */
+    private Product findProductById(Long productId) {
+        return productRepository.findById(productId)
+            .orElseThrow(() -> new CustomException(ExceptionType.PRODUCT_NOT_FOUND));
+    }
 }

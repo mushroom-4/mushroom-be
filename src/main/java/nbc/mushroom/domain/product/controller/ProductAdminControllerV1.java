@@ -27,4 +27,16 @@ public class ProductAdminControllerV1 {
             ApiResponse.success("관리자가 상품을 승인했습니다.")
         );
     }
+
+    @PatchMapping("/{product_id}/reject")
+    public ResponseEntity<ApiResponse<Void>> adminRejectProduct(
+        @PathVariable("product_id") Long productId) {
+
+        productAdminService.rejectProduct(productId);
+
+        return ResponseEntity.ok(
+            ApiResponse.success("관리자가 상품을 반려했습니다.")
+        );
+    }
+
 }
