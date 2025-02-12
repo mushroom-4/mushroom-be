@@ -4,18 +4,19 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
-import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
-import nbc.mushroom.domain.product.dto.response.CreateProductRes;
+import nbc.mushroom.domain.product.dto.response.ProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductControllerV1 {
 
     private final ProductService productService;
-    private final ImageUtil imageUtil;
 
     // 상품 상세 조회
     @GetMapping("/{productId}/info")
@@ -40,15 +40,35 @@ public class ProductControllerV1 {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<CreateProductRes>> PostProduct(
+    public ResponseEntity<ApiResponse<ProductRes>> PostProduct(
         @ModelAttribute CreateProductReq createProductReq,
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        String filename = imageUtil.upload(createProductReq.image());
-        String imageUrl = imageUtil.getImageUrl(filename);
+
         return ResponseEntity.ok()
-            .body(productService.createProduct(userId, createProductReq, imageUrl));
+            .body(productService.createProduct(userId, createProductReq));
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<ApiResponse<ProductRes>> PutProduct(
+        @ModelAttribute CreateProductReq createProductReq,
+        @PathVariable("productId") Long productId,
+        @Auth AuthUser authUser
+    ) {
+        Long userId = authUser.id();
+
+        return ResponseEntity.ok()
+            .body(productService.updateProduct(userId, productId, createProductReq));
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(
+        @PathVariable("productId") Long productId,
+        @Auth AuthUser authUser
+    ) {
+        Long userId = authUser.id();
+        return ResponseEntity.ok(productService.solfDeleteProduct(userId, productId));
     }
 
 }

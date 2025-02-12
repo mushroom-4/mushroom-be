@@ -93,4 +93,8 @@ public class Product extends Timestamped {
     public void updateStatus(ProductStatus status) {
         this.status = status;
     }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }
