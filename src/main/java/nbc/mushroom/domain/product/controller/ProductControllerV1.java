@@ -45,9 +45,10 @@ public class ProductControllerV1 {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
+        ProductRes productRes = productService.createProduct(userId, createProductReq);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(productService.createProduct(userId, createProductReq));
+            .body(ApiResponse.success("상품 등록에 성공했습니다.", productRes));
     }
 
     @PutMapping("/{productId}")
@@ -57,9 +58,10 @@ public class ProductControllerV1 {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
+        ProductRes productRes = productService.updateProduct(userId, productId, createProductReq);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(productService.updateProduct(userId, productId, createProductReq));
+            .body(ApiResponse.success("상품 수정에 성공했습니다.", productRes));
     }
 
     @DeleteMapping("/{productId}")
@@ -68,8 +70,11 @@ public class ProductControllerV1 {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
+
+        productService.solfDeleteProduct(userId, productId);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
-            .body(productService.solfDeleteProduct(userId, productId));
+            .body(ApiResponse.success("상품 삭제에 성공했습니다."));
     }
 
 }

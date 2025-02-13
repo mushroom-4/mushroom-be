@@ -4,7 +4,6 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.PRODUCT_NOT_USE
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
@@ -35,7 +34,7 @@ public class ProductService {
 
 
     @Transactional
-    public ApiResponse<ProductRes> createProduct(Long userId,
+    public ProductRes createProduct(Long userId,
         CreateProductReq createProductReq) {
         User user = validateUserById(userId);
 
@@ -56,11 +55,12 @@ public class ProductService {
             .build();
 
         productRepository.save(product);
-        return ApiResponse.success("상품 등록에 성공했습니다.", ProductRes.from(product, imageUrl));
+
+        return ProductRes.from(product, imageUrl);
     }
 
     @Transactional
-    public ApiResponse<ProductRes> updateProduct(Long userId, Long productId,
+    public ProductRes updateProduct(Long userId, Long productId,
         CreateProductReq createProductReq) {
 
         Product product = validateProdById(userId, productId);
@@ -88,20 +88,17 @@ public class ProductService {
 
         productRepository.save(updateProduct);
 
-        return ApiResponse.success("상품 수정에 성공했습니다.",
-            ProductRes.from(updateProduct, updateImageUrl));
+        return ProductRes.from(updateProduct, updateImageUrl);
     }
 
     @Transactional
-    public ApiResponse<Void> solfDeleteProduct(Long userId, Long productId) {
+    public void solfDeleteProduct(Long userId, Long productId) {
 
         Product product = validateProdById(userId, productId);
 
         validateUserById(userId);
 
         product.softDelete();
-
-        return ApiResponse.success("상품 삭제에 성공했습니다.");
     }
 
     private Product validateProdById(Long userId, Long productId) {
