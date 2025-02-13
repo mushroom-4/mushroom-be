@@ -13,6 +13,8 @@ import nbc.mushroom.domain.product.dto.response.ProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,9 @@ public class ProductService {
         return SearchProductRes.from(searchProduct);
     }
 
+    public Page<SearchProductRes> findAllProducts(Pageable pageable) {
+        return productRepository.findAllProducts(pageable);
+    }
 
     @Transactional
     public ProductRes createProduct(Long userId,
