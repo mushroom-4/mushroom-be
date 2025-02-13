@@ -280,4 +280,17 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         List<AuctionItem> content = query.fetch();
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
+
+    @Override
+    public List<AuctionItem> findAuctionItemsByStatusAndEndTime(AuctionItemStatus auctionItemStatus,
+        LocalDateTime now) {
+        return queryFactory.select(auctionItem)
+            .from(auctionItem)
+            .where(
+                auctionItem.status.eq(auctionItemStatus),
+                auctionItem.endTime.eq(now),
+                auctionItem.isDeleted.isFalse()
+            )
+            .fetch();
+    }
 }
