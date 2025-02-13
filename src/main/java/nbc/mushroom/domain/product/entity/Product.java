@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.product.entity;
 
 import static nbc.mushroom.domain.product.entity.ProductStatus.INSPECTING;
+import static nbc.mushroom.domain.product.entity.ProductStatus.WAITING;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -111,5 +112,12 @@ public class Product extends Timestamped {
 
     public void softDelete() {
         this.isDeleted = true;
+    }
+
+    public void start() {
+        if (this.status != WAITING) {
+            throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+        }
+        this.status = ProductStatus.PROGRESSING;
     }
 }
