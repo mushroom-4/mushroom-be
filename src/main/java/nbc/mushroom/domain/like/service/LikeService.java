@@ -27,6 +27,11 @@ public class LikeService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        if (likeRepository.getLikeByUserAndAuctionItem(user,
+            auctionItem) != null) {
+            return;
+        }
+
         Like like = Like.builder()
             .auctionItem(auctionItem)
             .user(user)
