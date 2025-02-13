@@ -8,4 +8,6 @@ import nbc.mushroom.domain.user.entity.User;
 public interface BidRepositoryCustom {
 
     Optional<Bid> findBidByUserAndAuctionItem(User bidder, AuctionItem auctionItem);
+
+    Bid findPotentiallysucceedBidByAuctionItem(AuctionItem auctionItem);
 }

@@ -29,4 +29,15 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
                 .fetchOne()
         );
     }
+
+    @Override
+    public Bid findPotentiallysucceedBidByAuctionItem(AuctionItem auctionItem) {
+        return queryFactory
+            .select(bid)
+            .from(bid)
+            .where(bid.auctionItem.eq(auctionItem))
+            .orderBy(bid.biddingPrice.desc())
+            .limit(1)
+            .fetchOne();
+    }
 }
