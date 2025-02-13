@@ -24,7 +24,6 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
             .from(like)
             .innerJoin(QUser.user).on(like.user.id.eq(user.getId()))
             .innerJoin(QAuctionItem.auctionItem).on(like.auctionItem.id.eq(auctionItem.getId()))
-            .fetchJoin()
             .fetchOne();
     }
 }
