@@ -120,8 +120,4 @@ public class Product extends Timestamped {
         }
         this.status = ProductStatus.PROGRESSING;
     }
-
-    public void start() {
-        this.status = ProductStatus.PROGRESSING;
-    }
 }
