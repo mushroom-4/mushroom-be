@@ -26,7 +26,7 @@ public class ProductStatusService {
             ProductStatus.WAITING, now);
 
         for (Product product : waitingProducts) {
-            product.updateStatus(ProductStatus.PROGRESSING);
+            product.start();
         }
     }
 }

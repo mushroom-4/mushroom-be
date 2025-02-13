@@ -112,4 +112,8 @@ public class Product extends Timestamped {
     public void softDelete() {
         this.isDeleted = true;
     }
+
+    public void start() {
+        this.status = ProductStatus.PROGRESSING;
+    }
 }
