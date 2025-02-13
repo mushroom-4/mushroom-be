@@ -12,6 +12,8 @@ import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.product.entity.ProductCategory;
 import nbc.mushroom.domain.product.entity.ProductSize;
 import nbc.mushroom.domain.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     public SearchProductRes searchProduct(long productId) {
         Product searchProduct = productRepository.findProductById(productId);
         return SearchProductRes.from(searchProduct);
     }
 
-    private final UserRepository userRepository;
+    public Page<SearchProductRes> findAllProducts(Pageable pageable) {
+        return productRepository.findAllProducts(pageable);
+    }
 
     @Transactional
     public ApiResponse<CreateProductRes> createProduct(Long userId, CreateProductReq req,
