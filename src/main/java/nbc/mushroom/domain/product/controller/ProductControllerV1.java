@@ -57,7 +57,7 @@ public class ProductControllerV1 {
 
     // 상품 전체 조회 (페이징 조회 포함)
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<SearchProductRes>>> findAllProducts(
+    public ResponseEntity<ApiResponse<Page<SearchProductRes>>> searchAllProducts(
         @RequestParam(value = "page", defaultValue = "1") int page
     ) {
         Pageable pageable = PageRequest.of(page - 1, 10);
