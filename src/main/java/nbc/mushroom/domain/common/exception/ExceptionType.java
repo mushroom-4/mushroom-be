@@ -35,7 +35,7 @@ public enum ExceptionType {
 
     // Bid
     SELF_BIDDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "B01", "본인 물품을 입찰할 수 없습니다."),
-    INVALID_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "B02", "입찰 금액은 경매 시작 금액 이상이어야 합니다."),
+    INVALID_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "B02", "입찰 금액은 현재 최고 입찰가 이상이어야 합니다."),
 
     // Like
     EXIST_LIKE_BY_AUCTION_ITEM(HttpStatus.BAD_REQUEST, "L01", "좋아요는 경매 물품 하나 당 한 번만 가능합니다."),
