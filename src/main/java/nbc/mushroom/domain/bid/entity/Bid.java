@@ -65,4 +65,11 @@ public class Bid extends Timestamped {
         }
         this.biddingStatus = BiddingStatus.FAILED;
     }
+
+    public void succeed() {
+        if (this.biddingStatus != BiddingStatus.BIDDING) {
+            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+        }
+        this.biddingStatus = BiddingStatus.SUCCEED;
+    }
 }
