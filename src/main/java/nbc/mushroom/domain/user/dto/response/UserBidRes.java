@@ -4,15 +4,15 @@ import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 
-public record GetUserBidRes(
+public record UserBidRes(
     Long bidId,
     Long biddingPrice,
     BiddingStatus biddingStatus,
     SearchAuctionItemRes searchAuctionItemRes
 ) {
 
-    public static GetUserBidRes from(Bid bid, SearchAuctionItemRes searchAuctionItemRes) {
-        return new GetUserBidRes(
+    public static UserBidRes from(Bid bid, SearchAuctionItemRes searchAuctionItemRes) {
+        return new UserBidRes(
             bid.getId(),
             bid.getBiddingPrice(),
             bid.getBiddingStatus(),
