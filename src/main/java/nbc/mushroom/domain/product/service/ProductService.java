@@ -69,8 +69,8 @@ public class ProductService {
 
         imageUtil.delete(product.getImage_url());
 
-        String newFileName = imageUtil.upload(createProductReq.image());
-        String newImageUrl = imageUtil.getImageUrl(newFileName);
+        String updateFileName = imageUtil.upload(createProductReq.image());
+        String updateImageUrl = imageUtil.getImageUrl(updateFileName);
 
         Product updateProduct = Product.builder()
             .id(productId)
@@ -78,7 +78,7 @@ public class ProductService {
             .name(createProductReq.name())
             .description(createProductReq.description())
             .brand(createProductReq.brand())
-            .image_url(newFileName)
+            .image_url(updateFileName)
             .size(ProductSize.valueOf(createProductReq.productSize()))
             .category(ProductCategory.valueOf(createProductReq.productCategory()))
             .startPrice(createProductReq.startPrice())
@@ -89,7 +89,7 @@ public class ProductService {
         productRepository.save(updateProduct);
 
         return ApiResponse.success("상품 수정에 성공했습니다.",
-            ProductRes.from(updateProduct, newImageUrl));
+            ProductRes.from(updateProduct, updateImageUrl));
     }
 
     @Transactional

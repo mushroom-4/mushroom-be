@@ -40,7 +40,7 @@ public class ProductControllerV1 {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<ProductRes>> PostProduct(
+    public ResponseEntity<ApiResponse<ProductRes>> postProduct(
         @ModelAttribute CreateProductReq createProductReq,
         @Auth AuthUser authUser
     ) {
@@ -51,7 +51,7 @@ public class ProductControllerV1 {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductRes>> PutProduct(
+    public ResponseEntity<ApiResponse<ProductRes>> putProduct(
         @ModelAttribute CreateProductReq createProductReq,
         @PathVariable("productId") Long productId,
         @Auth AuthUser authUser
