@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.like.service;
 
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.EXIST_LIKE_BY_AUCTION_ITEM;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class LikeService {
 
         if (likeRepository.getLikeByUserAndAuctionItem(user,
             auctionItem) != null) {
-            return;
+            throw new CustomException(EXIST_LIKE_BY_AUCTION_ITEM);
         }
 
         Like like = Like.builder()
