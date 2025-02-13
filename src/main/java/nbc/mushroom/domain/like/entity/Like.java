@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nbc.mushroom.domain.product.entity.Product;
+import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -25,8 +25,8 @@ public class Like {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "auction_item_id", nullable = false)
+    private AuctionItem auctionItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

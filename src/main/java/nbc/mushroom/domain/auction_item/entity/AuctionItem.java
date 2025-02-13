@@ -1,7 +1,7 @@
-package nbc.mushroom.domain.product.entity;
+package nbc.mushroom.domain.auction_item.entity;
 
-import static nbc.mushroom.domain.product.entity.ProductStatus.INSPECTING;
-import static nbc.mushroom.domain.product.entity.ProductStatus.WAITING;
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTING;
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,9 +26,9 @@ import nbc.mushroom.domain.user.entity.User;
 
 @Getter
 @Entity
-@Table(name = "`product`")
+@Table(name = "`auction_item`")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product extends Timestamped {
+public class AuctionItem extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,15 +45,15 @@ public class Product extends Timestamped {
     private String description;
 
     @Column(name = "image_url", length = 150)
-    private String image_url;
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "size", nullable = false)
-    private ProductSize size;
+    private AuctionItemSize size;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
-    private ProductCategory category;
+    private AuctionItemCategory category;
 
     @Column(name = "brand", length = 50, nullable = false)
     private String brand;
@@ -69,45 +69,42 @@ public class Product extends Timestamped {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private ProductStatus status = INSPECTING;
+    private AuctionItemStatus status = INSPECTING;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
     @Builder
-    public Product(Long id, User seller, String name, String description, String image_url,
-        ProductSize size, ProductCategory category, String brand, Long startPrice,
+    public AuctionItem(Long id, User seller, String name, String description, String imageUrl,
+        AuctionItemSize size, AuctionItemCategory category, String brand, Long startPrice,
         LocalDateTime startTime, LocalDateTime endTime) {
         this.id = id;
         this.seller = seller;
         this.name = name;
         this.description = description;
-        this.image_url = image_url;
+        this.imageUrl = imageUrl;
         this.size = size;
         this.category = category;
         this.brand = brand;
         this.startPrice = startPrice;
         this.startTime = startTime;
         this.endTime = endTime;
-
-
     }
 
-    // 메서드 혼용 방지를 위해 approve와 reject 분리
     public void approve() {
-        if (this.status != ProductStatus.INSPECTING) {
-            throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
+        if (this.status != AuctionItemStatus.INSPECTING) {
+            throw new CustomException(ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED);
         }
 
-        this.status = ProductStatus.WAITING;
+        this.status = AuctionItemStatus.WAITING;
     }
 
     public void reject() {
-        if (this.status != ProductStatus.INSPECTING) {
-            throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
+        if (this.status != AuctionItemStatus.INSPECTING) {
+            throw new CustomException(ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED);
         }
 
-        this.status = ProductStatus.REJECTED;
+        this.status = AuctionItemStatus.REJECTED;
     }
 
     public void softDelete() {
@@ -116,8 +113,8 @@ public class Product extends Timestamped {
 
     public void start() {
         if (this.status != WAITING) {
-            throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+            throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
         }
-        this.status = ProductStatus.PROGRESSING;
+        this.status = AuctionItemStatus.PROGRESSING;
     }
 }
