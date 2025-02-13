@@ -1,10 +1,12 @@
 package nbc.mushroom.domain.product.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
+import nbc.mushroom.domain.product.dto.request.PutProductReq;
 import nbc.mushroom.domain.product.dto.response.ProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.service.ProductService;
@@ -41,7 +43,7 @@ public class ProductControllerV1 {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProductRes>> postProduct(
-        @ModelAttribute CreateProductReq createProductReq,
+        @Valid @ModelAttribute CreateProductReq createProductReq,
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
@@ -53,12 +55,12 @@ public class ProductControllerV1 {
 
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProductRes>> putProduct(
-        @ModelAttribute CreateProductReq createProductReq,
+        @ModelAttribute PutProductReq putProductReq,
         @PathVariable("productId") Long productId,
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        ProductRes productRes = productService.updateProduct(userId, productId, createProductReq);
+        ProductRes productRes = productService.updateProduct(userId, productId, putProductReq);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("상품 수정에 성공했습니다.", productRes));

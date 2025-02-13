@@ -8,11 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
+import nbc.mushroom.domain.product.dto.request.PutProductReq;
 import nbc.mushroom.domain.product.dto.response.ProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.entity.Product;
-import nbc.mushroom.domain.product.entity.ProductCategory;
-import nbc.mushroom.domain.product.entity.ProductSize;
 import nbc.mushroom.domain.product.repository.ProductRepository;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
@@ -49,8 +48,8 @@ public class ProductService {
             .description(createProductReq.description())
             .brand(createProductReq.brand())
             .image_url(fileName)
-            .size(ProductSize.valueOf(createProductReq.productSize()))
-            .category(ProductCategory.valueOf(createProductReq.productCategory()))
+            .size(createProductReq.productSize())
+            .category(createProductReq.productCategory())
             .startPrice(createProductReq.startPrice())
             .startTime(createProductReq.startTime())
             .endTime(createProductReq.endTime())
@@ -63,7 +62,7 @@ public class ProductService {
 
     @Transactional
     public ProductRes updateProduct(Long userId, Long productId,
-        CreateProductReq createProductReq) {
+        PutProductReq putProductReq) {
 
         Product product = validateProdById(userId, productId);
 
@@ -71,23 +70,33 @@ public class ProductService {
 
         User user = validateUserById(userId);
 
-        imageUtil.delete(product.getImage_url());
+        String updateFileName = "";
+        String updateImageUrl = "";
 
-        String updateFileName = imageUtil.upload(createProductReq.image());
-        String updateImageUrl = imageUtil.getImageUrl(updateFileName);
+        if (!(putProductReq.image().isEmpty())) {
+            imageUtil.delete(product.getImage_url());
+            updateFileName = imageUtil.upload(
+                putProductReq.image().get());
+            updateImageUrl = imageUtil.getImageUrl(updateFileName);
+        }
+        if (putProductReq.image().isEmpty()) {
+            imageUtil.delete(product.getImage_url());
+            updateFileName = product.getImage_url();
+            updateImageUrl = imageUtil.getImageUrl(updateFileName);
+        }
 
         Product updateProduct = Product.builder()
             .id(productId)
             .seller(user)
-            .name(createProductReq.name())
-            .description(createProductReq.description())
-            .brand(createProductReq.brand())
+            .name(putProductReq.name().orElse(product.getName()))
+            .description(putProductReq.description().orElse(product.getDescription()))
+            .brand(putProductReq.brand().orElse(product.getBrand()))
             .image_url(updateFileName)
-            .size(ProductSize.valueOf(createProductReq.productSize()))
-            .category(ProductCategory.valueOf(createProductReq.productCategory()))
-            .startPrice(createProductReq.startPrice())
-            .startTime(createProductReq.startTime())
-            .endTime(createProductReq.endTime())
+            .size(putProductReq.productSize().orElse(product.getSize()))
+            .category(putProductReq.productCategory().orElse(product.getCategory()))
+            .startPrice(putProductReq.startPrice().orElse(product.getStartPrice()))
+            .startTime(putProductReq.startTime().orElse(product.getStartTime()))
+            .endTime(putProductReq.endTime().orElse(product.getEndTime()))
             .build();
 
         productRepository.save(updateProduct);
