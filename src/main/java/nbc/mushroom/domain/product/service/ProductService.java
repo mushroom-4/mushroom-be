@@ -70,6 +70,10 @@ public class ProductService {
 
         User user = validateUserById(userId);
 
+        if (putProductReq.image() != null) {
+            imageUtil.delete(product.getImage_url());
+        }
+
         String fileName = imageUtil.upload(putProductReq.image());
         String updateImageUrl = imageUtil.getImageUrl(fileName);
 
