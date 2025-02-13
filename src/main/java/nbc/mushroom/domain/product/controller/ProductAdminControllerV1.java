@@ -38,5 +38,4 @@ public class ProductAdminControllerV1 {
             ApiResponse.success("관리자가 상품을 반려했습니다.")
         );
     }
-
 }
