@@ -70,33 +70,21 @@ public class ProductService {
 
         User user = validateUserById(userId);
 
-        String updateFileName = "";
-        String updateImageUrl = "";
-
-        if (!(putProductReq.image().isEmpty())) {
-            imageUtil.delete(product.getImage_url());
-            updateFileName = imageUtil.upload(
-                putProductReq.image().get());
-            updateImageUrl = imageUtil.getImageUrl(updateFileName);
-        }
-        if (putProductReq.image().isEmpty()) {
-            imageUtil.delete(product.getImage_url());
-            updateFileName = product.getImage_url();
-            updateImageUrl = imageUtil.getImageUrl(updateFileName);
-        }
+        String fileName = imageUtil.upload(putProductReq.image());
+        String updateImageUrl = imageUtil.getImageUrl(fileName);
 
         Product updateProduct = Product.builder()
             .id(productId)
             .seller(user)
-            .name(putProductReq.name().orElse(product.getName()))
-            .description(putProductReq.description().orElse(product.getDescription()))
-            .brand(putProductReq.brand().orElse(product.getBrand()))
-            .image_url(updateFileName)
-            .size(putProductReq.productSize().orElse(product.getSize()))
-            .category(putProductReq.productCategory().orElse(product.getCategory()))
-            .startPrice(putProductReq.startPrice().orElse(product.getStartPrice()))
-            .startTime(putProductReq.startTime().orElse(product.getStartTime()))
-            .endTime(putProductReq.endTime().orElse(product.getEndTime()))
+            .name(putProductReq.name())
+            .description(putProductReq.description())
+            .brand(putProductReq.brand())
+            .image_url(fileName)
+            .size(putProductReq.productSize())
+            .category(putProductReq.productCategory())
+            .startPrice(putProductReq.startPrice())
+            .startTime(putProductReq.startTime())
+            .endTime(putProductReq.endTime())
             .build();
 
         productRepository.save(updateProduct);
