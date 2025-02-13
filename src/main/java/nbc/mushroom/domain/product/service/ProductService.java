@@ -1,16 +1,17 @@
 package nbc.mushroom.domain.product.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.PRODUCT_NOT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.common.dto.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
-import nbc.mushroom.domain.product.dto.response.CreateProductRes;
+import nbc.mushroom.domain.product.dto.request.PutProductReq;
+import nbc.mushroom.domain.product.dto.response.ProductRes;
 import nbc.mushroom.domain.product.dto.response.SearchProductRes;
 import nbc.mushroom.domain.product.entity.Product;
-import nbc.mushroom.domain.product.entity.ProductCategory;
-import nbc.mushroom.domain.product.entity.ProductSize;
 import nbc.mushroom.domain.product.repository.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ImageUtil imageUtil;
 
     public SearchProductRes searchProduct(long productId) {
         Product searchProduct = productRepository.findProductById(productId);
@@ -37,25 +40,88 @@ public class ProductService {
     }
 
     @Transactional
-    public ApiResponse<CreateProductRes> createProduct(Long userId, CreateProductReq req,
-        String imageUrl) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    public ProductRes createProduct(Long userId,
+        CreateProductReq createProductReq) {
+        User user = validateUserById(userId);
+
+        String fileName = imageUtil.upload(createProductReq.image());
+        String imageUrl = imageUtil.getImageUrl(fileName);
 
         Product product = Product.builder()
             .seller(user)
-            .name(req.name())
-            .description(req.description())
-            .brand(req.brand())
-            .image_url(imageUrl)
-            .size(ProductSize.valueOf(req.productSize()))
-            .category(ProductCategory.valueOf(req.productCategory()))
-            .startPrice(req.startPrice())
-            .startTime(req.startTime())
-            .endTime(req.endTime())
+            .name(createProductReq.name())
+            .description(createProductReq.description())
+            .brand(createProductReq.brand())
+            .image_url(fileName)
+            .size(createProductReq.productSize())
+            .category(createProductReq.productCategory())
+            .startPrice(createProductReq.startPrice())
+            .startTime(createProductReq.startTime())
+            .endTime(createProductReq.endTime())
             .build();
 
         productRepository.save(product);
-        return ApiResponse.success("상품 등록에 성공했습니다.", CreateProductRes.from(product));
+
+        return ProductRes.from(product, imageUrl);
+    }
+
+    @Transactional
+    public ProductRes updateProduct(Long userId, Long productId,
+        PutProductReq putProductReq) {
+
+        Product product = validateProdById(userId, productId);
+
+        productRepository.findProductById(productId);
+
+        User user = validateUserById(userId);
+
+        if (putProductReq.image() != null) {
+            imageUtil.delete(product.getImage_url());
+        }
+
+        String fileName = imageUtil.upload(putProductReq.image());
+        String updateImageUrl = imageUtil.getImageUrl(fileName);
+
+        Product updateProduct = Product.builder()
+            .id(productId)
+            .seller(user)
+            .name(putProductReq.name())
+            .description(putProductReq.description())
+            .brand(putProductReq.brand())
+            .image_url(fileName)
+            .size(putProductReq.productSize())
+            .category(putProductReq.productCategory())
+            .startPrice(putProductReq.startPrice())
+            .startTime(putProductReq.startTime())
+            .endTime(putProductReq.endTime())
+            .build();
+
+        productRepository.save(updateProduct);
+
+        return ProductRes.from(updateProduct, updateImageUrl);
+    }
+
+    @Transactional
+    public void softDeleteProduct(Long userId, Long productId) {
+
+        Product product = validateProdById(userId, productId);
+
+        validateUserById(userId);
+
+        product.softDelete();
+    }
+
+    private Product validateProdById(Long userId, Long productId) {
+        Product product = productRepository.findProductById(productId);
+        if (!product.getSeller().getId().equals(userId)) {
+            throw new CustomException(PRODUCT_NOT_USER);
+        }
+        return product;
+    }
+
+    private User validateUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        return user;
     }
 }

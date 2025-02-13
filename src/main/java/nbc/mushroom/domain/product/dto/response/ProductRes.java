@@ -6,20 +6,20 @@ import nbc.mushroom.domain.product.entity.ProductCategory;
 import nbc.mushroom.domain.product.entity.ProductSize;
 import nbc.mushroom.domain.product.entity.ProductStatus;
 
-public record CreateProductRes(Long productId, String name,
-                               String description, String image_url,
-                               ProductSize size, ProductCategory category,
-                               String brand, Long startPrice,
-                               LocalDateTime startTime, LocalDateTime endTime,
-                               ProductStatus productStatus
+public record ProductRes(Long productId, String name,
+                         String description, String image_url,
+                         ProductSize size, ProductCategory category,
+                         String brand, Long startPrice,
+                         LocalDateTime startTime, LocalDateTime endTime,
+                         ProductStatus productStatus
 ) {
 
-    public static CreateProductRes from(Product searchProduct) {
-        return new CreateProductRes(
+    public static ProductRes from(Product searchProduct, String image_url) {
+        return new ProductRes(
             searchProduct.getId(),
             searchProduct.getName(),
             searchProduct.getDescription(),
-            searchProduct.getImage_url(),
+            image_url,
             searchProduct.getSize(),
             searchProduct.getCategory(),
             searchProduct.getBrand(),

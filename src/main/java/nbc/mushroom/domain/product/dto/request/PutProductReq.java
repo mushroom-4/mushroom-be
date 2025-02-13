@@ -8,7 +8,7 @@ import nbc.mushroom.domain.product.entity.ProductCategory;
 import nbc.mushroom.domain.product.entity.ProductSize;
 import org.springframework.web.multipart.MultipartFile;
 
-public record CreateProductReq(
+public record PutProductReq(
     @NotBlank(message = "상품 명은 필수이며, 공백일 수 없습니다.")
     String name,
 
