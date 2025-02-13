@@ -28,7 +28,7 @@ public class LikeService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (likeRepository.getLikeByUserAndAuctionItem(user,
+        if (likeRepository.findLikeByUserAndAuctionItem(user,
             auctionItem) != null) {
             throw new CustomException(EXIST_LIKE_BY_AUCTION_ITEM);
         }
@@ -47,7 +47,7 @@ public class LikeService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Like like = likeRepository.getLikeByUserAndAuctionItem(user,
+        Like like = likeRepository.findLikeByUserAndAuctionItem(user,
             auctionItem);
 
         likeRepository.delete(like);

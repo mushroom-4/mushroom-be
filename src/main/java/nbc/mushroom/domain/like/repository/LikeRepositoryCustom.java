@@ -6,5 +6,5 @@ import nbc.mushroom.domain.user.entity.User;
 
 public interface LikeRepositoryCustom {
 
-    Like getLikeByUserAndAuctionItem(User user, AuctionItem auctionItem);
+    Like findLikeByUserAndAuctionItem(User user, AuctionItem auctionItem);
 }

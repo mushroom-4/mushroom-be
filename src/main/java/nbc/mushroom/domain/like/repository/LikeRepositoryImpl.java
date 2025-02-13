@@ -19,7 +19,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Like getLikeByUserAndAuctionItem(User user, AuctionItem auctionItem) {
+    public Like findLikeByUserAndAuctionItem(User user, AuctionItem auctionItem) {
         return queryFactory.select(like)
             .from(like)
             .innerJoin(QUser.user).on(like.user.id.eq(user.getId()))

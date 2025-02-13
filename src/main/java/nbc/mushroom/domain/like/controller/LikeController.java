@@ -22,7 +22,7 @@ public class LikeController {
     private final LikeService likeService;
 
     @PostMapping("/{auction-items_id}/likes")
-    public ResponseEntity<ApiResponse<Void>> postLike(
+    public ResponseEntity<ApiResponse<Void>> likeItems(
         @PathVariable("auction-items_id") Long auctionItemId,
         @Auth AuthUser authUser
     ) {
@@ -34,7 +34,7 @@ public class LikeController {
     }
 
     @DeleteMapping("/{auction-items_id}/likes")
-    public ResponseEntity<ApiResponse<Void>> deleteLike(
+    public ResponseEntity<ApiResponse<Void>> cancelLikeItems(
         @PathVariable("auction-items_id") Long auctionItemId,
         @Auth AuthUser authUser
     ) {
