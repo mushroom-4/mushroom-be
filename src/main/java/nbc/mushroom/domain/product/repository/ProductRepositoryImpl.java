@@ -23,8 +23,6 @@ import org.springframework.stereotype.Repository;
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-    private final ProductRepository productRepository;
-
 
     @Override
     public Product findProductById(Long id) {
