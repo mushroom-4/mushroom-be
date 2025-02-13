@@ -5,6 +5,7 @@ import static nbc.mushroom.domain.product.entity.QProduct.product;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import nbc.mushroom.domain.product.entity.QProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import nbc.mushroom.domain.product.entity.ProductStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -67,5 +69,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         // Page 객체를 만들어서 반환
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public List<Product> findProductByStatusAndStartTime(ProductStatus productStatus,
+        LocalDateTime now) {
+        return queryFactory.select(product)
+            .from(product)
+            .where(
+                product.status.eq(productStatus),
+                product.startTime.eq(now),
+                product.isDeleted.isFalse()
+            )
+            .fetch();
     }
 }
