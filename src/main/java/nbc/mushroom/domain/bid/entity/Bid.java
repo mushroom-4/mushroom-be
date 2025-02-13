@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
+import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -55,5 +57,12 @@ public class Bid extends Timestamped {
 
     public void updateBiddingPrice(Long biddingPrice) {
         this.biddingPrice = biddingPrice;
+    }
+
+    public void failed() {
+        if (this.biddingStatus != BiddingStatus.BIDDING) {
+            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+        }
+        this.biddingStatus = BiddingStatus.FAILED;
     }
 }
