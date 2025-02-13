@@ -57,7 +57,7 @@ public class AuctionItemControllerV1 {
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ApiResponse.success("경매 물품이 전제 조회 되었습니다.", allAuctionItems));
+            .body(ApiResponse.success("경매 물품이 전체 조회 되었습니다.", allAuctionItems));
     }
 
     // 경매 물품 상세 조회
