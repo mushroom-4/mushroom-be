@@ -4,6 +4,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.PRODUCT_NOT_USE
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.product.dto.request.CreateProductReq;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -65,6 +67,8 @@ public class ProductService {
 
         Product product = validateProdById(userId, productId);
 
+        productRepository.findProductById(productId);
+
         User user = validateUserById(userId);
 
         imageUtil.delete(product.getImage_url());
@@ -103,7 +107,7 @@ public class ProductService {
 
     private Product validateProdById(Long userId, Long productId) {
         Product product = productRepository.findProductById(productId);
-        if (product.getSeller().getId() != userId) {
+        if (!product.getSeller().getId().equals(userId)) {
             throw new CustomException(PRODUCT_NOT_USER);
         }
         return product;

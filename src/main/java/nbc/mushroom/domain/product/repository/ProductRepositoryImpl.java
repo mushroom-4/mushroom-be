@@ -22,7 +22,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return Optional.ofNullable(queryFactory
             .select(product)
             .from(product)
-            .where(product.id.eq(id))
+            .where(product.id.eq(id).and(product.isDeleted.eq(false)))
             .fetchOne()
         ).orElseThrow(() -> new CustomException(ExceptionType.PRODUCT_NOT_FOUND));
     }
