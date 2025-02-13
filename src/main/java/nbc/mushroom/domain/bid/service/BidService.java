@@ -61,7 +61,11 @@ public class BidService {
         if (bidder == auctionItem.getSeller()) {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
         }
-        if (auctionItem.getStartPrice() > biddingPrice) {
+
+        Bid highestBid = bidRepository.findPotentiallysucceedBidByAuctionItem(auctionItem);
+
+        if (auctionItem.getStartPrice() > biddingPrice
+            && highestBid.getBiddingPrice() >= biddingPrice) {
             throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
         }
     }
