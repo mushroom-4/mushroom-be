@@ -23,18 +23,18 @@ public enum ExceptionType {
     PASSWORD_SAME(HttpStatus.BAD_REQUEST, "U04", "새 비밀번호는 기존 비밀번호와 같을 수 없습니다."),
     INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "U05", "유효하지 않은 UserRole"),
 
-    //Product
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P01", "존재하지 않는 상품입니다."),
-    PRODUCT_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "P02", "경매가 진행 중인 상품이 아닙니다."),
-    PRODUCT_NOT_USER(HttpStatus.FORBIDDEN, "P03", "사용자 본인의 상품이어야 합니다."),
+    //AuctionItem
+    AUCTION_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "AI01", "존재하지 않는 물품입니다."),
+    AUCTION_ITEM_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "AI02", "경매가 진행 중인 물품이 아닙니다."),
+    AUCTION_ITEM_NOT_USER(HttpStatus.FORBIDDEN, "AI03", "사용자 본인의 물품이어야 합니다."),
 
-    //Product Admin
-    INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "PA01", "잘못된 상태 변경 요청입니다."),
-    PRODUCT_ALREADY_INSPECTED(HttpStatus.BAD_REQUEST, "PA02", "이미 검수가 완료된 상품입니다."),
+    //AuctionItem Admin
+    INVALID_AUCTION_ITEM_STATUS(HttpStatus.BAD_REQUEST, "AIA01", "잘못된 상태 변경 요청입니다."),
+    AUCTION_ITEM_ALREADY_INSPECTED(HttpStatus.BAD_REQUEST, "AIA02", "이미 검수가 완료된 물품입니다."),
 
 
     // Bid
-    SELF_BIDDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "B01", "본인 상품을 입찰할 수 없습니다."),
+    SELF_BIDDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "B01", "본인 물품을 입찰할 수 없습니다."),
     INVALID_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "B02", "입찰 금액은 경매 시작 금액 이상이어야 합니다."),
 
     // Like

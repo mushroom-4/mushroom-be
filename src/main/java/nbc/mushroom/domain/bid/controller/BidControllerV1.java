@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/products/{productId}/bids")
+@RequestMapping("/api/v1/auction-items/{auctionItemId}/bids")
 public class BidControllerV1 {
 
     private final BidService bidService;
@@ -27,12 +27,14 @@ public class BidControllerV1 {
     @PostMapping
     public ResponseEntity<ApiResponse<CreateBidRes>> createOrUpdateBid(
         @Auth AuthUser authUser,
-        @PathVariable Long productId,
+        @PathVariable Long auctionItemId,
         @Valid @RequestBody CreateBidReq createBidReq
     ) {
-        CreateBidRes createBidRes = bidService.createOrUpdateBid(User.fromAuthUser(authUser),
-            productId,
+        CreateBidRes createBidRes = bidService.createOrUpdateBid(
+            User.fromAuthUser(authUser),
+            auctionItemId,
             createBidReq);
+
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success("입찰에 성공했습니다.", createBidRes));
     }

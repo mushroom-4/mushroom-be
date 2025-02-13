@@ -1,6 +1,6 @@
-package nbc.mushroom.domain.product.entity;
+package nbc.mushroom.domain.auction_item.entity;
 
-public enum ProductStatus {
+public enum AuctionItemStatus {
     INSPECTING,          // 검수중
     REJECTED,            // 검수실패
     WAITING,             // 대기중

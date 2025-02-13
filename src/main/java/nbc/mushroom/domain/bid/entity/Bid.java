@@ -15,8 +15,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
-import nbc.mushroom.domain.product.entity.Product;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -30,8 +30,8 @@ public class Bid extends Timestamped {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "auction_item_id", nullable = false)
+    private AuctionItem auctionItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -45,9 +45,9 @@ public class Bid extends Timestamped {
     private BiddingStatus biddingStatus;
 
     @Builder
-    public Bid(Long id, Product product, User bidder, Long biddingPrice) {
+    public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice) {
         this.id = id;
-        this.product = product;
+        this.auctionItem = auctionItem;
         this.bidder = bidder;
         this.biddingPrice = biddingPrice;
         this.biddingStatus = BiddingStatus.BIDDING;
