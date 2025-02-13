@@ -71,7 +71,7 @@ public class ProductControllerV1 {
     ) {
         Long userId = authUser.id();
 
-        productService.solfDeleteProduct(userId, productId);
+        productService.softDeleteProduct(userId, productId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("상품 삭제에 성공했습니다."));

@@ -96,7 +96,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void solfDeleteProduct(Long userId, Long productId) {
+    public void softDeleteProduct(Long userId, Long productId) {
 
         Product product = validateProdById(userId, productId);
 
