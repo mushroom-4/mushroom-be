@@ -19,7 +19,7 @@ public class ProductStatusService {
 
     @Scheduled(cron = "0 */5 * * * *") // 매 5분마다 (정각 기준)
     @Transactional(readOnly = false)
-    public void updateProductStatus() {
+    public void startAuctions() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
 
         List<Product> waitingProducts = productRepository.findProductByStatusAndStartTime(
