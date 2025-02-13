@@ -92,16 +92,20 @@ public class Product extends Timestamped {
 
     }
 
-    public void updateStatus(ProductStatus newStatus) {
-
+    // 메서드 혼용 방지를 위해 approve와 reject 분리
+    public void approve() {
         if (this.status != ProductStatus.INSPECTING) {
             throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
         }
 
-        if (newStatus != ProductStatus.WAITING && newStatus != ProductStatus.REJECTED) {
-            throw new CustomException(ExceptionType.INVALID_PRODUCT_STATUS);
+        this.status = ProductStatus.WAITING;
+    }
+
+    public void reject() {
+        if (this.status != ProductStatus.INSPECTING) {
+            throw new CustomException(ExceptionType.PRODUCT_ALREADY_INSPECTED);
         }
 
-        this.status = newStatus;
+        this.status = ProductStatus.REJECTED;
     }
 }
