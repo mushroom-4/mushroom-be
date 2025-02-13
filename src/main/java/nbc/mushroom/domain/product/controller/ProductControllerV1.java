@@ -51,7 +51,7 @@ public class ProductControllerV1 {
             .body(ApiResponse.success("상품 등록에 성공했습니다.", productRes));
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ProductRes>> putProduct(
         @ModelAttribute CreateProductReq createProductReq,
         @PathVariable("productId") Long productId,
@@ -64,7 +64,7 @@ public class ProductControllerV1 {
             .body(ApiResponse.success("상품 수정에 성공했습니다.", productRes));
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping(value = "/{productId}")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(
         @PathVariable("productId") Long productId,
         @Auth AuthUser authUser
