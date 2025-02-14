@@ -42,16 +42,16 @@ public class AuctionItemStatusService {
             AuctionItemStatus.PROGRESSING, now);
 
         for (AuctionItem auctionItem : progressingAuctionItems) {
-            auctionItem.completed();
+            auctionItem.complete();
 
-            Bid succedBid = bidRepository.findPotentiallysucceedBidByAuctionItem(auctionItem);
+            Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
             succedBid.succeed();
 
             List<Bid> failedBids = bidRepository.findPotentiallyFailedBidsByAuctionItem(
                 auctionItem);
-            
+
             for (Bid bid : failedBids) {
-                bid.failed();
+                bid.fail();
             }
         }
     }

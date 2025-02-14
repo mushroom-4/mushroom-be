@@ -34,7 +34,7 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
     }
 
     @Override
-    public Bid findPotentiallysucceedBidByAuctionItem(AuctionItem auctionItem) {
+    public Bid findPotentiallySucceededBidByAuctionItem(AuctionItem auctionItem) {
         return queryFactory
             .select(bid)
             .from(bid)

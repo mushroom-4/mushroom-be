@@ -120,7 +120,7 @@ public class AuctionItem extends Timestamped {
         this.status = AuctionItemStatus.PROGRESSING;
     }
 
-    public void completed() {
+    public void complete() {
         if (this.status != PROGRESSING) {
             throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
         }

@@ -59,7 +59,7 @@ public class Bid extends Timestamped {
         this.biddingPrice = biddingPrice;
     }
 
-    public void failed() {
+    public void fail() {
         if (this.biddingStatus != BiddingStatus.BIDDING) {
             throw new CustomException(ExceptionType.INVALID_BID_STATUS);
         }

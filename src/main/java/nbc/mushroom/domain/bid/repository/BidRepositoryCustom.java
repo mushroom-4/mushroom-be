@@ -10,7 +10,7 @@ public interface BidRepositoryCustom {
 
     Optional<Bid> findBidByUserAndAuctionItem(User bidder, AuctionItem auctionItem);
 
-    Bid findPotentiallysucceedBidByAuctionItem(AuctionItem auctionItem);
+    Bid findPotentiallySucceededBidByAuctionItem(AuctionItem auctionItem);
 
     List<Bid> findPotentiallyFailedBidsByAuctionItem(AuctionItem auctionItem);
 }
