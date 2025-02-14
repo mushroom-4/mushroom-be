@@ -62,7 +62,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false))
+            .where(auctionItem.isDeleted.eq(false), checkStatus())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
 
@@ -87,8 +87,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .where(
                 auctionItem.status.eq(auctionItemStatus),
                 auctionItem.startTime.eq(now),
-                auctionItem.isDeleted.isFalse(),
-                checkStatus()
+                auctionItem.isDeleted.isFalse()
             )
             .fetch();
     }
