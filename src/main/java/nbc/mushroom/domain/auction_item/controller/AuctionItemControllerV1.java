@@ -127,4 +127,17 @@ public class AuctionItemControllerV1 {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("경매 물품 삭제에 성공했습니다."));
     }
+
+//    // 인기 검색어 조회 -> 차순위 개발로 주석처리
+//    @GetMapping("/popular-keywords")
+//    public ResponseEntity<ApiResponse<List<String>>> getPopularKeywords() {
+//        List<String> keywords = auctionItemService.getPopularKeywords();
+//        return ResponseEntity.ok(ApiResponse.success("인기 검색어 조회에 성공했습니다.", keywords));
+//    }
+//
+//    // 저장된 캐시 내용 확인하는 API -> 인메모리 캐싱은 캐시 저장소에 데이터가 저장된 것을 확인하지 못하기 때문
+//    @GetMapping("/{storedCache}")
+//    public void printCache(@PathVariable String storedCache) {
+//        auctionItemService.printCacheContents(storedCache);
+//    }
 }

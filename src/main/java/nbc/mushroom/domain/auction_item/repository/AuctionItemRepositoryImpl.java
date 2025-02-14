@@ -257,4 +257,27 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             )
             .fetch();
     }
+
+    @Override
+    public Page<AuctionItem> findRegisteredAuctionItemsByUserId(Long userId, Pageable pageable) {
+        JPAQuery<AuctionItem> query = queryFactory
+            .selectFrom(auctionItem)
+            .where(
+                auctionItem.seller.id.eq(userId),  // seller userId가 일치하는 조건
+                auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
+            )
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize());
+
+        JPAQuery<Long> countQuery = queryFactory
+            .select(auctionItem.count())
+            .from(auctionItem)
+            .where(
+                auctionItem.seller.id.eq(userId),
+                auctionItem.isDeleted.isFalse()
+            );
+
+        List<AuctionItem> content = query.fetch();
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
 }
