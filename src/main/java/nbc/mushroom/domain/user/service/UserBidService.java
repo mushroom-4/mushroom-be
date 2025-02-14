@@ -22,4 +22,11 @@ public class UserBidService {
         return bidPage.map(bid ->
             UserBidRes.from(bid, SearchAuctionItemRes.from(bid.getAuctionItem())));
     }
+
+    public UserBidRes getUserBidDetail(User loginUser, Long bidId) {
+        Bid findBid = bidRepository.findBidByBidderAndId(loginUser, bidId);
+        SearchAuctionItemRes searchAuctionItemRes = SearchAuctionItemRes.from(
+            findBid.getAuctionItem());
+        return UserBidRes.from(findBid, searchAuctionItemRes);
+    }
 }
