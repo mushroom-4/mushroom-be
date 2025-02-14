@@ -227,8 +227,6 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         }
         return auctionItem.startPrice.loe(maxPrice); // startPrice가 maxPrice보다 작거나 같은 조건 반환
     }
-}
-
 
     @Override
     public boolean existsByUserAndAuctionItem(User user, Long auctionItemId) {
