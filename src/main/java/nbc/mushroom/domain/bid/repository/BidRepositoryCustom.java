@@ -19,4 +19,6 @@ public interface BidRepositoryCustom {
     Boolean existsBidByAuctionItem(AuctionItem auctionItem);
 
     Page<Bid> findBidsByUser(User user, Pageable pageable);
+
+    Bid findBidByBidderAndId(User bidder, Long bidId);
 }

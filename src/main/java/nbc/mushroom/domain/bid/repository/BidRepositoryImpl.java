@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.QBid;
+import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -95,5 +97,20 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             .where(bid.bidder.eq(user));
 
         return PageableExecutionUtils.getPage(content, pageable, queryCount::fetchOne);
+    }
+
+    @Override
+    public Bid findBidByBidderAndId(User bidder, Long bidId) {
+        Optional<Bid> optionalBid = Optional.ofNullable(queryFactory
+            .select(bid)
+            .from(bid)
+            .where(bid.bidder.eq(bidder),
+                bid.id.eq(bidId))
+            .fetchOne()
+        );
+
+        return optionalBid.orElseThrow(
+            () -> new CustomException(ExceptionType.BID_NOT_FOUND)
+        );
     }
 }
