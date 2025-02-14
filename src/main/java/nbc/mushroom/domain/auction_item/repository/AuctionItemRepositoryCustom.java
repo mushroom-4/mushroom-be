@@ -19,4 +19,7 @@ public interface AuctionItemRepositoryCustom {
         LocalDateTime now);
 
     boolean existsByUserAndAuctionItem(User user, Long auctionItemId);
+
+    List<AuctionItem> findAuctionItemsByStatusAndEndTime(AuctionItemStatus auctionItemStatus,
+        LocalDateTime now);
 }

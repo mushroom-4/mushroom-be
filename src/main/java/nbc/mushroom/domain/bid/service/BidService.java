@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.bid.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
@@ -61,7 +62,14 @@ public class BidService {
         if (bidder == auctionItem.getSeller()) {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
         }
-        if (auctionItem.getStartPrice() > biddingPrice) {
+
+        //  경매물품 Bid의 최고가 반환, 조회되는 bid 데이터가 없으면 acutionItem을 최고가로 설정
+        Long highestBiddingPrice = Optional.ofNullable(
+                bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem))
+            .map(Bid::getBiddingPrice)
+            .orElse(auctionItem.getStartPrice());
+
+        if (highestBiddingPrice >= biddingPrice) {
             throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
         }
     }

@@ -95,4 +95,17 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .fetchOne() != null;
 
     }
+
+    @Override
+    public List<AuctionItem> findAuctionItemsByStatusAndEndTime(AuctionItemStatus auctionItemStatus,
+        LocalDateTime now) {
+        return queryFactory.select(auctionItem)
+            .from(auctionItem)
+            .where(
+                auctionItem.status.eq(auctionItemStatus),
+                auctionItem.endTime.eq(now),
+                auctionItem.isDeleted.isFalse()
+            )
+            .fetch();
+    }
 }
