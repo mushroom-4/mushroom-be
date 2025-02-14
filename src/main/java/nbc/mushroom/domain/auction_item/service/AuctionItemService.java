@@ -3,6 +3,7 @@ package nbc.mushroom.domain.auction_item.service;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
@@ -10,6 +11,8 @@ import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
@@ -29,6 +32,15 @@ public class AuctionItemService {
     private final AuctionItemRepository auctionItemRepository;
     private final UserRepository userRepository;
     private final ImageUtil imageUtil;
+
+    public Page<SearchAuctionItemRes> searchKeywordAuctionItems(String sort,
+        String sortOrder, String keyword, String brand, AuctionItemCategory category,
+        AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
+        Long maxPrice, Pageable pageable) {
+        return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
+            sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
+            pageable);
+    }
 
     public SearchAuctionItemRes searchAuctionItem(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
