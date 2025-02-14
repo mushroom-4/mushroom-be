@@ -3,6 +3,7 @@ package nbc.mushroom.domain.auction_item.entity;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.COMPLETED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTING;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.UNTRADED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 
 import jakarta.persistence.Column;
@@ -125,5 +126,12 @@ public class AuctionItem extends Timestamped {
             throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
         }
         this.status = COMPLETED;
+    }
+
+    public void untrade() {
+        if (this.status != PROGRESSING) {
+            throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
+        }
+        this.status = UNTRADED;
     }
 }
