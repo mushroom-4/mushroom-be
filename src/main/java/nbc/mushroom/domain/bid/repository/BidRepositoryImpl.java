@@ -73,10 +73,10 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
     @Override
     public Boolean existsBidByAuctionItem(AuctionItem auctionItem) {
         return queryFactory
-            .select(bid.count())
+            .select(bid)
             .from(bid)
             .where(bid.auctionItem.eq(auctionItem))
-            .fetchOne() != null;
+            .fetchFirst() != null;
     }
 
     @Override

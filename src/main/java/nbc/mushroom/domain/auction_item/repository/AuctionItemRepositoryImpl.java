@@ -86,7 +86,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .from(auctionItem)
             .where(
                 auctionItem.status.eq(auctionItemStatus),
-                auctionItem.startTime.eq(now),
+                auctionItem.startTime.goe(now).and(auctionItem.startTime.loe(now.plusMinutes(1))),
                 auctionItem.isDeleted.isFalse()
             )
             .fetch();
@@ -252,7 +252,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .from(auctionItem)
             .where(
                 auctionItem.status.eq(auctionItemStatus),
-                auctionItem.endTime.eq(now),
+                auctionItem.endTime.goe(now).and(auctionItem.endTime.loe(now.plusMinutes(1))),
                 auctionItem.isDeleted.isFalse()
             )
             .fetch();
