@@ -87,7 +87,8 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .where(
                 auctionItem.status.eq(auctionItemStatus),
                 auctionItem.startTime.eq(now),
-                auctionItem.isDeleted.isFalse()
+                auctionItem.isDeleted.isFalse(),
+                checkStatus()
             )
             .fetch();
     }
@@ -130,7 +131,8 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 goeStartDate(startDate),
                 loeEndDate(endDate),
                 goeMinPrice(minPrice),
-                loeMaxPrice(maxPrice)
+                loeMaxPrice(maxPrice),
+                checkStatus()
             );
 
         List<SearchAuctionItemRes> content = query.fetch();
@@ -162,6 +164,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                     isAscending ? auctionItem.endTime.asc() : auctionItem.endTime.desc();
                 case "startPrice" ->
                     isAscending ? auctionItem.startPrice.asc() : auctionItem.startPrice.desc();
+                case "status" -> isAscending ? auctionItem.status.asc() : auctionItem.status.desc();
                 // 좋아요 정렬 순은 이후 추가해야 될 듯 합니다...
                 default -> auctionItem.name.asc();
             };
@@ -226,6 +229,11 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             return null;
         }
         return auctionItem.startPrice.loe(maxPrice); // startPrice가 maxPrice보다 작거나 같은 조건 반환
+    }
+
+    private BooleanExpression checkStatus() {
+        return auctionItem.status.eq(AuctionItemStatus.WAITING)
+            .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING));
     }
 
     @Override
