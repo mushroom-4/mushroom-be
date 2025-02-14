@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
@@ -31,4 +32,11 @@ public class Like {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Builder
+    public Like(Long id, AuctionItem auctionItem, User user) {
+        this.id = id;
+        this.auctionItem = auctionItem;
+        this.user = user;
+    }
 }

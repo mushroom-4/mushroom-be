@@ -15,6 +15,7 @@ import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.exception.ExceptionType;
+import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -83,5 +84,15 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.isDeleted.isFalse()
             )
             .fetch();
+    }
+
+    @Override
+    public boolean existsByUserAndAuctionItem(User user, Long auctionItemId) {
+        return queryFactory.select(auctionItem)
+            .from(auctionItem)
+            .where(QAuctionItem.auctionItem.seller.id.eq(user.getId())
+                .and(auctionItem.id.eq(auctionItemId)))
+            .fetchOne() != null;
+
     }
 }

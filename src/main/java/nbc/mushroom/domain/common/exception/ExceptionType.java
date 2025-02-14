@@ -38,7 +38,9 @@ public enum ExceptionType {
     INVALID_BIDDING_PRICE(HttpStatus.BAD_REQUEST, "B02", "입찰 금액은 경매 시작 금액 이상이어야 합니다."),
 
     // Like
-
+    EXIST_LIKE_BY_AUCTION_ITEM(HttpStatus.BAD_REQUEST, "L01", "좋아요는 경매 물품 하나 당 한 번만 가능합니다."),
+    NOT_SELF_LIKE(HttpStatus.BAD_REQUEST, "L02", "좋아요는 본인 경매 물품에 등록할 수 없습니다."),
+    LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "L03", "해당 경매 물품에 좋아요를 등록하지 않았습니다."),
     ;
     private final HttpStatus httpStatus;
     private final String code;
