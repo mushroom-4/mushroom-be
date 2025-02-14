@@ -69,7 +69,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         // 전체 데이터 수를 가져오기 위한 쿼리 (페이징을 위해 필요)
         JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false));
+            .where(auctionItem.isDeleted.eq(false), checkStatus());
 
         // 쿼리 실행 후, 결과 데이터를 리스트로 반환
         List<SearchAuctionItemRes> content = query.fetch();
@@ -114,7 +114,16 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false))
+            .where(auctionItem.isDeleted.eq(false),
+                eqKeyword(keyword),
+                eqBrand(brand),
+                eqCategory(category),
+                eqSize(size),
+                goeStartDate(startDate),
+                loeEndDate(endDate),
+                goeMinPrice(minPrice),
+                loeMaxPrice(maxPrice),
+                checkStatus())
             .orderBy(getSortOrders(pageable)) // 정렬 추가
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
