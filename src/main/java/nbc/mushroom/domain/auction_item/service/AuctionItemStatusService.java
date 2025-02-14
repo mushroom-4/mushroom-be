@@ -44,6 +44,11 @@ public class AuctionItemStatusService {
         for (AuctionItem auctionItem : progressingAuctionItems) {
             auctionItem.complete();
 
+            if (!bidRepository.existsBidByAuctionItem(auctionItem)) {
+                auctionItem.untrade();
+                continue;
+            }
+
             Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
             succedBid.succeed();
 
