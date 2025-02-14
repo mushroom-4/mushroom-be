@@ -2,6 +2,8 @@ package nbc.mushroom.domain.like.service;
 
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.EXIST_LIKE_BY_AUCTION_ITEM;
+import static nbc.mushroom.domain.common.exception.ExceptionType.LIKE_NOT_FOUND;
+import static nbc.mushroom.domain.common.exception.ExceptionType.NOT_SELF_LIKE;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,12 @@ public class LikeService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        if (auctionItemRepository.existsByUserAndAuctionItem(user, auctionItemId)) {
+            throw new CustomException(NOT_SELF_LIKE);
+        }
+
         if (likeRepository.findLikeByUserAndAuctionItem(user,
-            auctionItem) != null) {
+            auctionItem).isPresent()) {
             throw new CustomException(EXIST_LIKE_BY_AUCTION_ITEM);
         }
 
@@ -48,7 +54,7 @@ public class LikeService {
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         Like like = likeRepository.findLikeByUserAndAuctionItem(user,
-            auctionItem);
+            auctionItem).orElseThrow(() -> new CustomException(LIKE_NOT_FOUND));
 
         likeRepository.delete(like);
     }
