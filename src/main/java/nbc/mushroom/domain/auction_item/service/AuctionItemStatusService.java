@@ -52,12 +52,9 @@ public class AuctionItemStatusService {
             Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
             succedBid.succeed();
 
-            List<Bid> failedBids = bidRepository.findPotentiallyFailedBidsByAuctionItem(
-                auctionItem);
-
-            for (Bid bid : failedBids) {
-                bid.fail();
-            }
+            // 최고가 아닌 Bid들을 fail 처리
+            bidRepository.findPotentiallyFailedBidsByAuctionItem(auctionItem)
+                .forEach(Bid::fail);
         }
     }
 }
