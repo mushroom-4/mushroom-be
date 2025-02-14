@@ -32,6 +32,8 @@ public class AuctionItemService {
     private final AuctionItemRepository auctionItemRepository;
     private final UserRepository userRepository;
     private final ImageUtil imageUtil;
+//    private final CacheManager cacheManager;
+//    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
     public Page<SearchAuctionItemRes> searchKeywordAuctionItems(String sort,
         String sortOrder, String keyword, String brand, AuctionItemCategory category,
@@ -136,4 +138,33 @@ public class AuctionItemService {
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         return user;
     }
+
+//    // 인기 검색어 조회 // 차순위 개발
+//    public List<String> getPopularKeywords() {
+//        if (popularKeywordsMap.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        return getTopRankEntries().stream()
+//            .map(Map.Entry::getKey)
+//            .collect(Collectors.toList());
+//    }
+//
+//    // 인기 검색어 추출 메서드 (상위 10개)
+//    private List<Map.Entry<String, Integer>> getTopRankEntries() {
+//        return popularKeywordsMap.entrySet().stream()
+//            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
+//            .limit(10)
+//            .toList();
+//    }
+//
+//    // 인메모리 캐시 가시화 로직
+//    public void printCacheContents(String storedCache) {
+//        Cache cache = cacheManager.getCache(storedCache);
+//        if (cache != null) {
+//            log.info("현재 '{}' 저장된 캐시 : ", storedCache);
+//        } else {
+//            log.warn("'{}' 캐시가 존재하지 않습니다.", storedCache);
+//        }
+//    }
 }

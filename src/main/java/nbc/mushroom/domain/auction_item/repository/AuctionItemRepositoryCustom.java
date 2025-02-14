@@ -20,6 +20,8 @@ public interface AuctionItemRepositoryCustom {
     List<AuctionItem> findAuctionItemsByStatusAndStartTime(AuctionItemStatus auctionItemStatus,
         LocalDateTime now);
 
+    Page<AuctionItem> findRegisteredAuctionItemsByUserId(Long userId, Pageable pageable);
+
     boolean existsByUserAndAuctionItem(User user, Long auctionItemId);
 
     List<AuctionItem> findAuctionItemsByStatusAndEndTime(AuctionItemStatus auctionItemStatus,

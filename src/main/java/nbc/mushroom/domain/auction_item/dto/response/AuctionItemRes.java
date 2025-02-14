@@ -29,4 +29,20 @@ public record AuctionItemRes(Long auctionItemId, String name,
             searchAuctionItem.getStatus()
         );
     }
+
+    public static AuctionItemRes from(AuctionItem searchAuctionItem) {
+        return new AuctionItemRes(
+            searchAuctionItem.getId(),
+            searchAuctionItem.getName(),
+            searchAuctionItem.getDescription(),
+            searchAuctionItem.getImageUrl(),
+            searchAuctionItem.getSize(),
+            searchAuctionItem.getCategory(),
+            searchAuctionItem.getBrand(),
+            searchAuctionItem.getStartPrice(),
+            searchAuctionItem.getStartTime(),
+            searchAuctionItem.getEndTime(),
+            searchAuctionItem.getStatus()
+        );
+    }
 }
