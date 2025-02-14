@@ -5,6 +5,8 @@ import java.util.Optional;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BidRepositoryCustom {
 
@@ -15,4 +17,6 @@ public interface BidRepositoryCustom {
     List<Bid> findPotentiallyFailedBidsByAuctionItem(AuctionItem auctionItem);
 
     Boolean existsBidByAuctionItem(AuctionItem auctionItem);
+
+    Page<Bid> findBidsByUser(User user, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package nbc.mushroom.domain.bid.repository;
 import static nbc.mushroom.domain.bid.entity.QBid.bid;
 
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,9 @@ import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.QBid;
 import nbc.mushroom.domain.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -71,5 +75,25 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             .from(bid)
             .where(bid.auctionItem.eq(auctionItem))
             .fetchOne() != null;
+    }
+
+    @Override
+    public Page<Bid> findBidsByUser(User user, Pageable pageable) {
+
+        List<Bid> content = queryFactory
+            .select(bid)
+            .from(bid)
+            .where(bid.bidder.eq(user))
+            .orderBy(bid.createdAt.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> queryCount = queryFactory
+            .select(bid.count())
+            .from(bid)
+            .where(bid.bidder.eq(user));
+
+        return PageableExecutionUtils.getPage(content, pageable, queryCount::fetchOne);
     }
 }
