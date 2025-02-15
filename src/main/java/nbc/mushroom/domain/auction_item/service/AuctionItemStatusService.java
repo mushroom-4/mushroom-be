@@ -46,9 +46,12 @@ public class AuctionItemStatusService {
         for (AuctionItem auctionItem : progressingAuctionItems) {
             log.info("auction ID : {}", auctionItem.getId().toString());
             auctionItem.complete();
+            log.info("auction Status : {}", auctionItem.getStatus());
 
             if (Boolean.FALSE.equals(bidRepository.existsBidByAuctionItem(auctionItem))) {
                 auctionItem.untrade();
+                log.info("auction untrade id : {}", auctionItem.getId());
+                log.info("auction untrade Status : {}", auctionItem.getStatus());
                 continue;
             }
 
