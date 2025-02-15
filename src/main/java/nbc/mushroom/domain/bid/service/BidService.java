@@ -1,7 +1,9 @@
 package nbc.mushroom.domain.bid.service;
 
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
@@ -15,6 +17,7 @@ import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -59,7 +62,10 @@ public class BidService {
         if (auctionItem.getStatus() != AuctionItemStatus.PROGRESSING) {
             throw new CustomException(ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS);
         }
-        if (bidder == auctionItem.getSeller()) {
+
+        log.info("bidder id : {}", bidder.getId());
+        log.info("seller id : {}", auctionItem.getSeller().getId());
+        if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
         }
 
