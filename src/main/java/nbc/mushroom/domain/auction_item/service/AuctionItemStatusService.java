@@ -22,31 +22,34 @@ public class AuctionItemStatusService {
     private final AuctionItemRepository auctionItemRepository;
     private final BidRepository bidRepository;
 
-    @Scheduled(cron = "0 */5 * * * *") // 매 5분마다 (정각 기준)
+    @Scheduled(cron = "0 */1 * * * *") // 매 5분마다 (정각 기준)
     @Transactional(readOnly = false)
     public void startAuctions() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
+        log.info("startAuctions() start time: {}", now);
 
         List<AuctionItem> waitingAuctionItems = auctionItemRepository.findAuctionItemsByStatusAndStartTime(
             AuctionItemStatus.WAITING, now);
+        log.info("auctionItem count : {}", waitingAuctionItems.size());
 
         for (AuctionItem auctionItem : waitingAuctionItems) {
+            log.info("auctionItem ID : {}", auctionItem.getId());
             auctionItem.start();
+            log.info("auctionItem status : {}", auctionItem.getStatus());
         }
     }
 
-    @Scheduled(cron = "0 */5 * * * *") // 매 5분마다 (정각 기준)
+    @Scheduled(cron = "0 */1 * * * *") // 매 5분마다 (정각 기준)
     @Transactional(readOnly = false)
     public void completeAuctions() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
+        log.info("completeAuctions() start time: {}", now);
 
         List<AuctionItem> progressingAuctionItems = auctionItemRepository.findAuctionItemsByStatusAndEndTime(
             AuctionItemStatus.PROGRESSING, now);
 
         for (AuctionItem auctionItem : progressingAuctionItems) {
-            log.info("auction ID : {}", auctionItem.getId().toString());
-            auctionItem.complete();
-            log.info("auction Status : {}", auctionItem.getStatus());
+            log.info("auction endTime : {}", auctionItem.getEndTime());
 
             if (Boolean.FALSE.equals(bidRepository.existsBidByAuctionItem(auctionItem))) {
                 auctionItem.untrade();
@@ -54,6 +57,10 @@ public class AuctionItemStatusService {
                 log.info("auction untrade Status : {}", auctionItem.getStatus());
                 continue;
             }
+
+            log.info("auction ID : {}", auctionItem.getId().toString());
+            auctionItem.complete();
+            log.info("auction Status : {}", auctionItem.getStatus());
 
             Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
             log.info("succedBid ID : {}", succedBid.getId().toString());
