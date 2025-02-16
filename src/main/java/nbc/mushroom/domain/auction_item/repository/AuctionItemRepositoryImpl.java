@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.auction_item.repository;
 
 import static nbc.mushroom.domain.auction_item.entity.QAuctionItem.auctionItem;
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_FOUND;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -40,7 +41,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .from(auctionItem)
             .where(auctionItem.id.eq(id).and(auctionItem.isDeleted.eq(false)))
             .fetchOne()
-        ).orElseThrow(() -> new CustomException(ExceptionType.AUCTION_ITEM_NOT_FOUND));
+        ).orElseThrow(() -> new CustomException(AUCTION_ITEM_NOT_FOUND));
     }
 
     @Override
