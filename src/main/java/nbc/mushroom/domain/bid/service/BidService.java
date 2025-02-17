@@ -17,6 +17,7 @@ import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,9 +71,11 @@ public class BidService {
         log.info("bidder id : {}", bidder.getId());
         log.info("seller id : {}", auctionItem.getSeller().getId());
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
+            throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
+        }
+        if (bidder == auctionItem.getSeller()) {
             throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
-
         if (auctionItem.getStartPrice() > biddingPrice) {
             throw new CustomException(INVALID_BIDDING_PRICE);
         }
