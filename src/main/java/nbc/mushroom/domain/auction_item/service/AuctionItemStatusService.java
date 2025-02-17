@@ -1,12 +1,14 @@
 package nbc.mushroom.domain.auction_item.service;
 
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
-import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
@@ -28,8 +30,8 @@ public class AuctionItemStatusService {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
         log.info("startAuctions() start time: {}", now);
 
-        List<AuctionItem> waitingAuctionItems = auctionItemRepository.findAuctionItemsByStatusAndStartTime(
-            AuctionItemStatus.WAITING, now);
+        List<AuctionItem> waitingAuctionItems = auctionItemRepository
+            .findAuctionItemsByStatusAndStartTime(WAITING, now);
         log.info("auctionItem count : {}", waitingAuctionItems.size());
 
         for (AuctionItem auctionItem : waitingAuctionItems) {
@@ -46,7 +48,7 @@ public class AuctionItemStatusService {
         log.info("completeAuctions() start time: {}", now);
 
         List<AuctionItem> progressingAuctionItems = auctionItemRepository.findAuctionItemsByStatusAndEndTime(
-            AuctionItemStatus.PROGRESSING, now);
+            PROGRESSING, now);
 
         for (AuctionItem auctionItem : progressingAuctionItems) {
             log.info("auction endTime : {}", auctionItem.getEndTime());

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
+import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,6 @@ public interface BidRepositoryCustom {
     Page<Bid> findBidsByUser(User user, Pageable pageable);
 
     Bid findBidByBidderAndId(User bidder, Long bidId);
+
+    Long countBidsByBidderAndStatus(User bidder, BiddingStatus biddingStatus);
 }

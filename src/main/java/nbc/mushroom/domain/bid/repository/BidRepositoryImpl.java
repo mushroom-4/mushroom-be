@@ -10,6 +10,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
+import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.entity.QBid;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.exception.ExceptionType;
@@ -112,5 +113,15 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         return optionalBid.orElseThrow(
             () -> new CustomException(ExceptionType.BID_NOT_FOUND)
         );
+    }
+
+    @Override
+    public Long countBidsByBidderAndStatus(User bidder, BiddingStatus biddingStatus) {
+        return queryFactory
+            .select(bid.count())
+            .from(bid)
+            .where(bid.bidder.eq(bidder),
+                bid.biddingStatus.eq(biddingStatus))
+            .fetchOne();
     }
 }

@@ -1,5 +1,8 @@
 package nbc.mushroom.domain.bid.entity;
 
+import static nbc.mushroom.domain.bid.entity.BiddingStatus.BIDDING;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BID_STATUS;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +21,6 @@ import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -52,7 +54,7 @@ public class Bid extends Timestamped {
         this.auctionItem = auctionItem;
         this.bidder = bidder;
         this.biddingPrice = biddingPrice;
-        this.biddingStatus = BiddingStatus.BIDDING;
+        this.biddingStatus = BIDDING;
     }
 
     public void updateBiddingPrice(Long biddingPrice) {
@@ -60,16 +62,23 @@ public class Bid extends Timestamped {
     }
 
     public void fail() {
-        if (this.biddingStatus != BiddingStatus.BIDDING) {
-            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+        if (this.biddingStatus != BIDDING) {
+            throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.FAILED;
     }
 
     public void succeed() {
-        if (this.biddingStatus != BiddingStatus.BIDDING) {
-            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+        if (this.biddingStatus != BIDDING) {
+            throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.SUCCEED;
+    }
+
+    public void cancel() {
+        if (this.biddingStatus != BIDDING) {
+            throw new CustomException(INVALID_BID_STATUS);
+        }
+        this.biddingStatus = BiddingStatus.CANCELED;
     }
 }
