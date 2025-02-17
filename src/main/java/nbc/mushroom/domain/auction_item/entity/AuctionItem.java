@@ -5,6 +5,8 @@ import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTI
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.UNTRADED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_AUCTION_ITEM_STATUS;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +26,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -96,7 +97,7 @@ public class AuctionItem extends Timestamped {
 
     public void approve() {
         if (this.status != AuctionItemStatus.INSPECTING) {
-            throw new CustomException(ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED);
+            throw new CustomException(AUCTION_ITEM_ALREADY_INSPECTED);
         }
 
         this.status = AuctionItemStatus.WAITING;
@@ -104,7 +105,7 @@ public class AuctionItem extends Timestamped {
 
     public void reject() {
         if (this.status != AuctionItemStatus.INSPECTING) {
-            throw new CustomException(ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED);
+            throw new CustomException(AUCTION_ITEM_ALREADY_INSPECTED);
         }
 
         this.status = AuctionItemStatus.REJECTED;
@@ -116,21 +117,21 @@ public class AuctionItem extends Timestamped {
 
     public void start() {
         if (this.status != WAITING) {
-            throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
+            throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
         this.status = AuctionItemStatus.PROGRESSING;
     }
 
     public void complete() {
         if (this.status != PROGRESSING) {
-            throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
+            throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
         this.status = COMPLETED;
     }
 
     public void untrade() {
         if (this.status != PROGRESSING) {
-            throw new CustomException(ExceptionType.INVALID_AUCTION_ITEM_STATUS);
+            throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
         this.status = UNTRADED;
     }

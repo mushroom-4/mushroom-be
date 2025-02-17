@@ -1,6 +1,13 @@
 package nbc.mushroom.domain.bid.service;
 
+
 import java.util.Objects;
+
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BIDDING_PRICE;
+import static nbc.mushroom.domain.common.exception.ExceptionType.SELF_BIDDING_NOT_ALLOWED;
+
+
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +19,6 @@ import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,13 +66,19 @@ public class BidService {
 
     private void validateBidRequest(User bidder, AuctionItem auctionItem, Long biddingPrice) {
         if (auctionItem.getStatus() != AuctionItemStatus.PROGRESSING) {
-            throw new CustomException(ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS);
+            throw new CustomException(AUCTION_ITEM_NOT_IN_PROGRESS);
         }
 
         log.info("bidder id : {}", bidder.getId());
         log.info("seller id : {}", auctionItem.getSeller().getId());
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
+
+        if (bidder == auctionItem.getSeller()) {
+            throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
+        }
+        if (auctionItem.getStartPrice() > biddingPrice) {
+            throw new CustomException(INVALID_BIDDING_PRICE);
         }
 
         //  경매물품 Bid의 최고가 반환, 조회되는 bid 데이터가 없으면 acutionItem을 최고가로 설정
@@ -76,7 +88,7 @@ public class BidService {
             .orElse(auctionItem.getStartPrice());
 
         if (highestBiddingPrice >= biddingPrice) {
-            throw new CustomException(ExceptionType.INVALID_BIDDING_PRICE);
+            throw new CustomException(INVALID_BIDDING_PRICE);
         }
     }
 }
