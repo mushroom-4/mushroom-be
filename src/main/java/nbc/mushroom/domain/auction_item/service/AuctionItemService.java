@@ -8,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
+import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfo;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
+import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
+import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.user.entity.User;
@@ -32,6 +35,7 @@ public class AuctionItemService {
     private final AuctionItemRepository auctionItemRepository;
     private final UserRepository userRepository;
     private final ImageUtil imageUtil;
+    private final BidRepository bidRepository;
 //    private final CacheManager cacheManager;
 //    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
@@ -47,6 +51,17 @@ public class AuctionItemService {
     public SearchAuctionItemRes searchAuctionItem(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
         return SearchAuctionItemRes.from(searchAuctionItem);
+    }
+
+    public SearchAuctionItemBidRes searchAuctionItemV2(long auctionItemId) {
+        AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+        if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
+            AuctionItemBidInfo auctionItemBidInfo =
+                bidRepository.auctionItemBidInfoFind(auctionItemId);
+            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfo);
+        }
+
+        return SearchAuctionItemBidRes.from(searchAuctionItem, null);
     }
 
     public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {

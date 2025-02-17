@@ -1,13 +1,18 @@
 package nbc.mushroom.domain.bid.repository;
 
+import static nbc.mushroom.domain.auction_item.entity.QAuctionItem.auctionItem;
 import static nbc.mushroom.domain.bid.entity.QBid.bid;
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_FOUND;
+import static nbc.mushroom.domain.user.entity.QUser.user;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfo;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.QBid;
@@ -113,4 +118,23 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             () -> new CustomException(ExceptionType.BID_NOT_FOUND)
         );
     }
+
+    @Override
+    public AuctionItemBidInfo auctionItemBidInfoFind(Long id) {
+
+        return Optional.ofNullable(queryFactory
+            .select(Projections.constructor(
+                AuctionItemBidInfo.class,
+                user.nickname,
+                auctionItem.startPrice
+            ))
+            .from(bid)
+            .innerJoin(bid.auctionItem, auctionItem)
+            .join(bid.auctionItem.seller, user)
+            .where(bid.auctionItem.id.eq(id).and(auctionItem.isDeleted.eq(false)))
+            .orderBy(bid.biddingPrice.desc())
+            .fetchFirst()
+        ).orElseThrow(() -> new CustomException(AUCTION_ITEM_NOT_FOUND));
+    }
+
 }
