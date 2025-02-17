@@ -6,10 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.web.multipart.MultipartFile;
 
 public record CreateAuctionItemReq(
     @NotBlank(message = "경매 물품 명은 필수이며, 공백일 수 없습니다.")
+    @Length(message = "닉네임은 50자를 넘을 수 없습니다", max = 50)
     String name,
 
     String description,
@@ -19,6 +21,7 @@ public record CreateAuctionItemReq(
     @NotNull(message = "경매 물품 카테고리는 필수입니다.")
     AuctionItemCategory auctionItemCategory,
     @NotBlank(message = "경매 물품 브랜드 명은 필수이며, 공백일 수 없습니다.")
+    @Length(message = "브랜드 명은 50자를 넘을 수 없습니다.", max = 50)
     String brand,
     @NotNull(message = "경매 물품의 입찰 시작 금액은 필수입니다.")
     Long startPrice,
