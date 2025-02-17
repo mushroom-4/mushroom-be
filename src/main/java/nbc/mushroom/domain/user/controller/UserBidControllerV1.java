@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,5 +50,15 @@ public class UserBidControllerV1 {
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("입찰 내역 상세 조회에 성공했습니다.", userBidRes));
+    }
+
+    @DeleteMapping("/{bidId}/cancel")
+    public ResponseEntity<ApiResponse<Void>> deleteBid(
+        @Auth AuthUser authUser,
+        @PathVariable Long bidId
+    ) {
+        userBidService.deleteBid(User.fromAuthUser(authUser), bidId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .body(ApiResponse.success("입찰 취소에 성공했습니다."));
     }
 }
