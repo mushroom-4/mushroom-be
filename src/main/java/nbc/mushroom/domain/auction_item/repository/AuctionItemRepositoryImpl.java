@@ -3,6 +3,7 @@ package nbc.mushroom.domain.auction_item.repository;
 import static nbc.mushroom.domain.auction_item.entity.QAuctionItem.auctionItem;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_FOUND;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
+import nbc.mushroom.domain.admin.dto.response.QAuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
@@ -22,6 +25,7 @@ import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -32,6 +36,7 @@ import org.springframework.stereotype.Repository;
 public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public AuctionItem findAuctionItemById(Long id) {
@@ -267,13 +272,14 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .fetch();
     }
 
+    // 판매자 유저 ID로 등록된 경매 물품 조회 메서드
     @Override
     public Page<AuctionItem> findRegisteredAuctionItemsByUserId(Long userId, Pageable pageable) {
         JPAQuery<AuctionItem> query = queryFactory
             .selectFrom(auctionItem)
             .where(
-                auctionItem.seller.id.eq(userId),  // seller userId가 일치하는 조건
-                auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
+                auctionItem.seller.id.eq(userId),
+                auctionItem.isDeleted.isFalse()
             )
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
@@ -288,5 +294,78 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
         List<AuctionItem> content = query.fetch();
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    // 경매 물품 상태별 목록 필터링 조회 메서드
+    @Override
+    public Page<AuctionItemStatusRes> findAuctionItemsByStatus(List<AuctionItemStatus> status,
+        Pageable pageable) {
+
+        QAuctionItem auctionItem = QAuctionItem.auctionItem;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (status != null && !status.isEmpty()) {
+            builder.and(auctionItem.status.in(status));
+        }
+
+        List<AuctionItemStatusRes> results = queryFactory
+            .select(new QAuctionItemStatusRes(
+                auctionItem.id,
+                auctionItem.name,
+                auctionItem.description,
+                auctionItem.imageUrl,
+                auctionItem.size,
+                auctionItem.category,
+                auctionItem.brand,
+                auctionItem.startPrice,
+                auctionItem.startTime,
+                auctionItem.endTime,
+                auctionItem.status
+            ))
+            .from(auctionItem)
+            .where(builder)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        long total = queryFactory
+            .select(auctionItem.count())
+            .from(auctionItem)
+            .where(builder)
+            .fetchOne();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    // 경매 물품 상태 목록 전체 조회 메서드
+    @Override
+    public Page<AuctionItemStatusRes> findAllAuctionItemsByStatus(Pageable pageable) {
+
+        List<AuctionItemStatusRes> results = queryFactory
+            .select(new QAuctionItemStatusRes(
+                auctionItem.id,
+                auctionItem.name,
+                auctionItem.description,
+                auctionItem.imageUrl,
+                auctionItem.size,
+                auctionItem.category,
+                auctionItem.brand,
+                auctionItem.startPrice,
+                auctionItem.startTime,
+                auctionItem.endTime,
+                auctionItem.status
+            ))
+            .from(auctionItem)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        long total = queryFactory
+            .select(auctionItem.count())
+            .from(auctionItem)
+            .fetchOne();
+
+        return PageableExecutionUtils.getPage(results, pageable, () -> total);
     }
 }

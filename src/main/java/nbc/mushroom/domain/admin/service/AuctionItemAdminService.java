@@ -1,11 +1,18 @@
-package nbc.mushroom.domain.auction_item.service;
+package nbc.mushroom.domain.admin.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuctionItemAdminService {
@@ -28,5 +35,17 @@ public class AuctionItemAdminService {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
 
         auctionItem.reject();
+    }
+
+    // 관리자 경매 물품 상태 목록 전체 조회 + 상태별 필터링 조회
+    @Transactional(readOnly = true)
+    public Page<AuctionItemStatusRes> getAuctionItemsStatus(List<AuctionItemStatus> status,
+        Pageable pageable) {
+
+        if (status != null && !status.isEmpty()) {
+            return auctionItemRepository.findAuctionItemsByStatus(status, pageable);
+        } else {
+            return auctionItemRepository.findAllAuctionItemsByStatus(pageable);
+        }
     }
 }

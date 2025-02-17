@@ -72,7 +72,10 @@ public class BidService {
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
-
+        if (bidder == auctionItem.getSeller()) {
+            throw new CustomException(
+                SELF_BIDDING_NOT_ALLOWED); // todo 하영님이 고쳐서 주신다고 했음! PR때 고쳐져있는지 확인하기
+        }
         if (auctionItem.getStartPrice() > biddingPrice) {
             throw new CustomException(INVALID_BIDDING_PRICE);
         }
