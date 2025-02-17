@@ -3,6 +3,7 @@ package nbc.mushroom.domain.bid.service;
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BIDDING_PRICE;
+import static nbc.mushroom.domain.common.exception.ExceptionType.SELF_BIDDING_NOT_ALLOWED;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +17,6 @@ import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,7 +70,7 @@ public class BidService {
         log.info("bidder id : {}", bidder.getId());
         log.info("seller id : {}", auctionItem.getSeller().getId());
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
-            throw new CustomException(ExceptionType.SELF_BIDDING_NOT_ALLOWED);
+            throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
 
         if (auctionItem.getStartPrice() > biddingPrice) {

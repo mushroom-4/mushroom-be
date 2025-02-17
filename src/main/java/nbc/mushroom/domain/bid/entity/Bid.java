@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.bid.entity;
 
 import static nbc.mushroom.domain.bid.entity.BiddingStatus.BIDDING;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BID_STATUS;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,6 @@ import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -63,21 +63,21 @@ public class Bid extends Timestamped {
 
     public void fail() {
         if (this.biddingStatus != BIDDING) {
-            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+            throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.FAILED;
     }
 
     public void succeed() {
         if (this.biddingStatus != BIDDING) {
-            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+            throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.SUCCEED;
     }
 
     public void cancel() {
         if (this.biddingStatus != BIDDING) {
-            throw new CustomException(ExceptionType.INVALID_BID_STATUS);
+            throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.CANCELED;
     }
