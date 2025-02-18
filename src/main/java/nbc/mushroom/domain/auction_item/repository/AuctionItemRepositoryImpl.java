@@ -24,7 +24,6 @@ import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -221,13 +220,12 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .limit(pageable.getPageSize())
             .fetch();
 
-        long total = queryFactory
+        JPAQuery<Long> total = queryFactory
             .select(auctionItem.count())
             .from(auctionItem)
-            .where(builder)
-            .fetchOne();
+            .where(builder);
 
-        return new PageImpl<>(results, pageable, total);
+        return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
     }
 
     // 경매 물품 상태 목록 전체 조회 메서드
@@ -253,12 +251,11 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .limit(pageable.getPageSize())
             .fetch();
 
-        long total = queryFactory
+        JPAQuery<Long> total = queryFactory
             .select(auctionItem.count())
-            .from(auctionItem)
-            .fetchOne();
+            .from(auctionItem);
 
-        return PageableExecutionUtils.getPage(results, pageable, () -> total);
+        return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
     }
 
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
