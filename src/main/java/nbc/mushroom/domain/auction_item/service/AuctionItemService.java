@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
-import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfo;
+import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfoRes;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
@@ -53,12 +53,12 @@ public class AuctionItemService {
         return SearchAuctionItemRes.from(searchAuctionItem);
     }
 
-    public SearchAuctionItemBidRes searchAuctionItemV2(long auctionItemId) {
+    public SearchAuctionItemBidRes getAuctionItemWithMaxBid(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
         if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
-            AuctionItemBidInfo auctionItemBidInfo =
+            AuctionItemBidInfoRes auctionItemBidInfoRes =
                 bidRepository.auctionItemBidInfoFind(auctionItemId);
-            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfo);
+            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes);
         }
 
         return SearchAuctionItemBidRes.from(searchAuctionItem, null);

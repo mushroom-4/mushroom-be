@@ -22,7 +22,7 @@ public class AuctionItemControllerV2 {
     @GetMapping("/{auctionItemId}/info")
     public ResponseEntity<ApiResponse<SearchAuctionItemBidRes>> searchAuctionItem(
         @PathVariable long auctionItemId) {
-        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.searchAuctionItemV2(
+        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItemWithMaxBid(
             auctionItemId);
 
         return ResponseEntity

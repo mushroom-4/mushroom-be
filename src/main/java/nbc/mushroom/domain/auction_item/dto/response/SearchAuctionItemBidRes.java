@@ -18,11 +18,11 @@ public record SearchAuctionItemBidRes(
     LocalDateTime startTime,
     LocalDateTime endTime,
     AuctionItemStatus status,
-    AuctionItemBidInfo bid
+    AuctionItemBidInfoRes bid
 ) {
 
     public static SearchAuctionItemBidRes from(AuctionItem searchAuctionItem,
-        AuctionItemBidInfo bid) {
+        AuctionItemBidInfoRes bid) {
         return new SearchAuctionItemBidRes(
             searchAuctionItem.getId(),
             searchAuctionItem.getName(),
