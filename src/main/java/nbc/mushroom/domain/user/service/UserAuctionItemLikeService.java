@@ -16,7 +16,8 @@ public class UserAuctionItemLikeService {
     private final LikeRepository likeRepository;
 
     // 본인이 누른 경매 물품 좋아요
-    public Page<SearchUserAuctionItemLikeRes> searchUserLike(User user, Pageable pageable) {
+    public Page<SearchUserAuctionItemLikeRes> searchUserLikedAuctionItems(User user,
+        Pageable pageable) {
 
         return likeRepository.findAuctionItemLikeByUserId(
             user, pageable);

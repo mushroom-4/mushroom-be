@@ -33,11 +33,12 @@ public class UserAuctionItemLikeControllerV2 {
     ) {
         User user = User.fromAuthUser(authUser);
         Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<SearchUserAuctionItemLikeRes> searchUserAuctionItemLikeRes = userAuctionItemLikeService.searchUserLike(
+        Page<SearchUserAuctionItemLikeRes> searchUserAuctionItemLikeRes = userAuctionItemLikeService.searchUserLikedAuctionItems(
             user,
             pageable);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.success("조회에 성공했습니다.", searchUserAuctionItemLikeRes));
+            .body(
+                ApiResponse.success("사용자가 좋아요한 경매 물품에 조회 성공했습니다.", searchUserAuctionItemLikeRes));
     }
 }
