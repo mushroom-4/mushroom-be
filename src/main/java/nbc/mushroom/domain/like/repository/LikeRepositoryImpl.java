@@ -86,7 +86,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
                 // 현재 시간과 startTime 비교 // 현재 시간+10분 과 startTime 비교
                 auctionItem.startTime.gt(now).and(auctionItem.startTime.loe(nowPlus10)),
                 auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
-            ).fetch(); // Todo 조회할때 페이징 + 조회시 메세지 넣기
+            ).fetch();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
                 // 현재 시간과 endTime 비교 // 현재 시간+10분 과 endTime 비교
                 auctionItem.endTime.gt(now).and(auctionItem.endTime.loe(nowPlus10)),
                 auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
-            ).fetch(); // Todo 조회할때 페이징 + 조회시 메세지 넣기
+            ).fetch();
     }
 
     // like.id 오름 차순으로 정렬

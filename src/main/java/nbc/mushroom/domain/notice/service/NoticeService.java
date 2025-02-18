@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.like.repository.LikeRepository;
 import nbc.mushroom.domain.notice.dto.NoticeRes;
 import nbc.mushroom.domain.notice.entity.Notice;
+import nbc.mushroom.domain.notice.entity.NoticeType;
 import nbc.mushroom.domain.notice.repository.NoticeRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class NoticeService {
                 .auctionItem(noticeRes.auctionItem())
                 .user(noticeRes.user())
                 .like(noticeRes.like())
+                .noticeType(NoticeType.START_TIME)
                 .build());
         }
     }
@@ -55,9 +57,8 @@ public class NoticeService {
                 .auctionItem(noticeRes.auctionItem())
                 .user(noticeRes.user())
                 .like(noticeRes.like())
-                .build()); //Todo 조회시에 이건 최고가 넣기
-            // Todo 둘이 동시에 작동하면 하나만 생김 -> entity 에 타입을 넣을까?
-            // Todo 시간 설정이 무조건 필요
+                .noticeType(NoticeType.END_TIME)
+                .build());
         }
     }
 }
