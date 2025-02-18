@@ -187,7 +187,9 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         if (keyword == null) {
             return null;
         }
-        return auctionItem.name.eq(keyword);
+        return auctionItem.name.contains(keyword)
+            .or(auctionItem.description.contains(keyword))
+            .or(auctionItem.brand.contains(keyword));
     }
 
     private BooleanExpression eqBrand(String brand) {
