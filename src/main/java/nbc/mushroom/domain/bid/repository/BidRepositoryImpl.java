@@ -140,7 +140,7 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             ))
             .from(bid)
             .innerJoin(bid.auctionItem, auctionItem)
-            .join(bid.auctionItem.seller, user)
+            .innerJoin(bid.auctionItem.seller, user)
             .where(bid.auctionItem.id.eq(auctionItemId).and(auctionItem.isDeleted.eq(false)))
             .orderBy(bid.biddingPrice.desc())
             .fetchFirst()
