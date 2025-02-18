@@ -45,6 +45,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
     @Override
     public PageImpl<SearchUserAuctionItemLikeRes> findAuctionItemLikeByUserId(User user,
         Pageable pageable) {
+        // like.id, auctionItem 의 정보를 List 튜플 형태로 저장
         List<Tuple> likeIdAutionItemTuples = Optional.ofNullable(
             queryFactory.select(like.id, auctionItem)
                 .from(like)
@@ -57,6 +58,8 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .fetch()).orElseThrow(() -> new CustomException(ExceptionType.LIKE_NOT_FOUND));
 
+        // 저장한 List 튜플의 값들을 튜플로 꺼내서, 해당 값들을
+        // SearchUserAuctionItemLikeRes List 에 맞추어 저장
         List<SearchUserAuctionItemLikeRes> searchUserAuctionItemLikeResList = new ArrayList<>();
         for (Tuple likeIdAutionItemTuple : likeIdAutionItemTuples) {
             SearchUserAuctionItemLikeRes searchUserAuctionItemLikeRes = SearchUserAuctionItemLikeRes.from(
@@ -78,6 +81,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
         return new PageImpl<>(searchUserAuctionItemLikeResList, pageable, totalCount);
     }
 
+    // like.id 오름 차순으로 정렬
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
         List<OrderSpecifier<?>> orders = new ArrayList<>();
         for (Sort.Order order : pageable.getSort()) {
