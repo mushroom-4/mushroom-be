@@ -133,7 +133,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
         JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
             .from(auctionItem)
-            .where(builder);
+            .where(auctionItem.isDeleted.eq(false), builder);
 
         List<SearchAuctionItemRes> content = query.fetch();
 

@@ -98,7 +98,8 @@ public class AuctionItemControllerV1 {
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body((ApiResponse.success("해당 키워드를 가진 상품들이 모두 조회되었습니다.", searchKeywordAuctionItems)));
+            .body(
+                (ApiResponse.success("해당 키워드를 가진 경매 물품들이 모두 조회되었습니다.", searchKeywordAuctionItems)));
     }
 
     @PutMapping(value = "/{auctionItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
