@@ -39,4 +39,25 @@ public class NoticeService {
                 .build());
         }
     }
+
+    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
+    public void createNoticeEndTime() {
+        log.info("::::Create Notice End Time::::");
+        // 현재 시간
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
+        // 현재 시간에 10분 추가
+        LocalDateTime nowPlus10 = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+            .plusMinutes(10);
+        // findNoticeInfoForLike 매개변수로 경매 물품의 경매 시작 시간 비교군 now, nowPlus
+        List<NoticeRes> noticeResList = likeRepository.findNoticeInfoOfEndByLike(now, nowPlus10);
+        for (NoticeRes noticeRes : noticeResList) {
+            noticeRepository.save(Notice.builder()
+                .auctionItem(noticeRes.auctionItem())
+                .user(noticeRes.user())
+                .like(noticeRes.like())
+                .build()); //Todo 조회시에 이건 최고가 넣기
+            // Todo 둘이 동시에 작동하면 하나만 생김 -> entity 에 타입을 넣을까?
+            // Todo 시간 설정이 무조건 필요
+        }
+    }
 }

@@ -19,4 +19,6 @@ public interface LikeRepositoryCustom {
         Pageable pageable);
 
     List<NoticeRes> findNoticeInfoOfStartByLike(LocalDateTime now, LocalDateTime nowPlus);
+
+    List<NoticeRes> findNoticeInfoOfEndByLike(LocalDateTime now, LocalDateTime nowPlus10);
 }
