@@ -6,7 +6,6 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NO
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Repository;
 public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public AuctionItem findAuctionItemById(Long id) {
@@ -51,6 +49,13 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
     @Override
     public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {
         QAuctionItem auctionItem = QAuctionItem.auctionItem;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(
+            auctionItem.status.eq(AuctionItemStatus.WAITING)
+                .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING))
+        );
 
         JPAQuery<SearchAuctionItemRes> query = queryFactory
             .select(Projections.constructor(SearchAuctionItemRes.class,
@@ -67,14 +72,14 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), checkStatus())
+            .where(auctionItem.isDeleted.eq(false), builder)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
 
         // 전체 데이터 수를 가져오기 위한 쿼리 (페이징을 위해 필요)
         JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), checkStatus());
+            .where(auctionItem.isDeleted.eq(false), builder);
 
         // 쿼리 실행 후, 결과 데이터를 리스트로 반환
         List<SearchAuctionItemRes> content = query.fetch();
@@ -101,8 +106,11 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
     public Page<SearchAuctionItemRes> findAuctionItemsByKeywordAndFiltering(
         String sort, String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
-        Long maxPrice,
-        Pageable pageable) {
+        Long maxPrice, Pageable pageable) {
+
+        BooleanBuilder builder = auctionItemsBuilder(
+            keyword, brand, category, size, startDate, endDate, minPrice, maxPrice
+        );
 
         JPAQuery<SearchAuctionItemRes> query = queryFactory
             .select(Projections.constructor(SearchAuctionItemRes.class,
@@ -119,136 +127,18 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false),
-                eqKeyword(keyword),
-                eqBrand(brand),
-                eqCategory(category),
-                eqSize(size),
-                goeStartDate(startDate),
-                loeEndDate(endDate),
-                goeMinPrice(minPrice),
-                loeMaxPrice(maxPrice),
-                checkStatus())
-            .orderBy(getSortOrders(pageable)) // 정렬 추가
+            .where(auctionItem.isDeleted.eq(false), builder)
+            .orderBy(getSortOrders(pageable))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
 
         JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
             .from(auctionItem)
-            .where(
-                auctionItem.isDeleted.eq(false),
-                eqKeyword(keyword),
-                eqBrand(brand),
-                eqCategory(category),
-                eqSize(size),
-                goeStartDate(startDate),
-                loeEndDate(endDate),
-                goeMinPrice(minPrice),
-                loeMaxPrice(maxPrice),
-                checkStatus()
-            );
+            .where(builder);
 
         List<SearchAuctionItemRes> content = query.fetch();
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
-        if (!pageable.getSort().isSorted()) {
-            return new OrderSpecifier[]{auctionItem.name.asc()};
-
-        }
-
-        // 여러 정렬 조건 처리
-        List<OrderSpecifier<?>> orders = new ArrayList<>();
-        for (Sort.Order order : pageable.getSort()) {
-            String property = order.getProperty();
-            boolean isAscending = order.isAscending();
-
-            OrderSpecifier<?> orderSpecifier = switch (property) {
-                case "name" -> isAscending ? auctionItem.name.asc() : auctionItem.name.desc();
-                case "brand" -> isAscending ? auctionItem.brand.asc() : auctionItem.brand.desc();
-                case "category" ->
-                    isAscending ? auctionItem.category.asc() : auctionItem.category.desc();
-                case "size" -> isAscending ? auctionItem.size.asc() : auctionItem.size.desc();
-                case "startTime" ->
-                    isAscending ? auctionItem.startTime.asc() : auctionItem.startTime.desc();
-                case "endTime" ->
-                    isAscending ? auctionItem.endTime.asc() : auctionItem.endTime.desc();
-                case "startPrice" ->
-                    isAscending ? auctionItem.startPrice.asc() : auctionItem.startPrice.desc();
-                case "status" -> isAscending ? auctionItem.status.asc() : auctionItem.status.desc();
-                // 좋아요 정렬 순은 이후 추가해야 될 듯 합니다...
-                default -> auctionItem.name.asc();
-            };
-            orders.add(orderSpecifier);
-        }
-
-        return orders.toArray(new OrderSpecifier[]{});
-    }
-
-    // 동적 쿼리
-    private BooleanExpression eqKeyword(String keyword) {
-        if (keyword == null) {
-            return null;
-        }
-        return auctionItem.name.contains(keyword)
-            .or(auctionItem.description.contains(keyword))
-            .or(auctionItem.brand.contains(keyword));
-    }
-
-    private BooleanExpression eqBrand(String brand) {
-        if (brand == null) {
-            return null;
-        }
-        return auctionItem.brand.eq(brand);
-    }
-
-    private BooleanExpression eqCategory(AuctionItemCategory category) {
-        if (category == null) {
-            return null;
-        }
-        return auctionItem.category.eq(category);
-    }
-
-    private BooleanExpression eqSize(AuctionItemSize size) {
-        if (size == null) {
-            return null;
-        }
-        return auctionItem.size.eq(size);
-    }
-
-    private BooleanExpression goeStartDate(LocalDateTime startDate) {
-        if (startDate == null) {
-            return null;
-        }
-        return auctionItem.startTime.goe(startDate);
-    }
-
-    private BooleanExpression loeEndDate(LocalDateTime endDate) {
-        if (endDate == null) {
-            return null;
-        }
-        return auctionItem.startTime.loe(endDate); // endDate보다 전이거나 같은 startTime 조건 반환
-    }
-
-    private BooleanExpression goeMinPrice(Long minPrice) {
-        if (minPrice == null) {
-            return null;
-        }
-        return auctionItem.startPrice.goe(minPrice); // startPrice가 minPrice보다 크거나 같은 조건 반환
-    }
-
-    private BooleanExpression loeMaxPrice(Long maxPrice) {
-        if (maxPrice == null) {
-            return null;
-        }
-        return auctionItem.startPrice.loe(maxPrice); // startPrice가 maxPrice보다 작거나 같은 조건 반환
-    }
-
-    private BooleanExpression checkStatus() {
-        return auctionItem.status.eq(AuctionItemStatus.WAITING)
-            .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING));
     }
 
     @Override
@@ -369,5 +259,85 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .fetchOne();
 
         return PageableExecutionUtils.getPage(results, pageable, () -> total);
+    }
+
+    private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
+        if (!pageable.getSort().isSorted()) {
+            return new OrderSpecifier[]{auctionItem.name.asc()};
+        }
+
+        List<OrderSpecifier<?>> orders = new ArrayList<>();
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+            boolean isAscending = order.isAscending();
+
+            OrderSpecifier<?> orderSpecifier = switch (property) {
+                case "name" -> isAscending ? auctionItem.name.asc() : auctionItem.name.desc();
+                case "brand" -> isAscending ? auctionItem.brand.asc() : auctionItem.brand.desc();
+                case "category" ->
+                    isAscending ? auctionItem.category.asc() : auctionItem.category.desc();
+                case "size" -> isAscending ? auctionItem.size.asc() : auctionItem.size.desc();
+                case "startTime" ->
+                    isAscending ? auctionItem.startTime.asc() : auctionItem.startTime.desc();
+                case "endTime" ->
+                    isAscending ? auctionItem.endTime.asc() : auctionItem.endTime.desc();
+                case "startPrice" ->
+                    isAscending ? auctionItem.startPrice.asc() : auctionItem.startPrice.desc();
+                case "status" -> isAscending ? auctionItem.status.asc() : auctionItem.status.desc();
+
+                default -> auctionItem.name.asc();
+            };
+            orders.add(orderSpecifier);
+        }
+
+        return orders.toArray(new OrderSpecifier[0]);
+    }
+
+    // 동적 쿼리 Boolean Builder 사용
+    private BooleanBuilder auctionItemsBuilder(
+        String keyword, String brand, AuctionItemCategory category,
+        AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate,
+        Long minPrice, Long maxPrice) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.isBlank()) {
+            builder.or(auctionItem.name.contains(keyword)
+                .or(auctionItem.description.contains(keyword))
+                .or(auctionItem.brand.contains(keyword)));
+        }
+
+        if (brand != null && !brand.isBlank()) {
+            builder.and(auctionItem.brand.eq(brand));
+        }
+
+        if (category != null) {
+            builder.and(auctionItem.category.eq(category));
+        }
+
+        if (size != null) {
+            builder.and(auctionItem.size.eq(size));
+        }
+        if (startDate != null) {
+            builder.and(auctionItem.startTime.goe(startDate));
+        }
+
+        if (endDate != null) {
+            builder.and(auctionItem.startTime.loe(endDate));
+        }
+
+        if (minPrice != null) {
+            builder.and(auctionItem.startPrice.goe(minPrice));
+        }
+
+        if (maxPrice != null) {
+            builder.and(auctionItem.startPrice.loe(maxPrice));
+        }
+
+        builder.and(
+            auctionItem.status.eq(AuctionItemStatus.WAITING)
+                .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING))
+        );
+        return builder;
     }
 }
