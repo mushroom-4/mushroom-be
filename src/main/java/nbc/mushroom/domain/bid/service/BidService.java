@@ -17,6 +17,7 @@ import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,10 +73,7 @@ public class BidService {
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
-        if (bidder == auctionItem.getSeller()) {
-            throw new CustomException(
-                SELF_BIDDING_NOT_ALLOWED); // todo 하영님이 고쳐서 주신다고 했음! PR때 고쳐져있는지 확인하기
-        }
+        
         if (auctionItem.getStartPrice() > biddingPrice) {
             throw new CustomException(INVALID_BIDDING_PRICE);
         }
