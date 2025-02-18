@@ -21,7 +21,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final LikeRepository likeRepository;
 
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
     public void createNoticeStartTime() {
         log.info("::::Create Notice Start Time::::");
         // 현재 시간
@@ -30,7 +30,7 @@ public class NoticeService {
         LocalDateTime nowPlus10 = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
             .plusMinutes(10);
         // findNoticeInfoForLike 매개변수로 경매 물품의 경매 시작 시간 비교군 now, nowPlus
-        List<NoticeRes> noticeResList = likeRepository.findNoticeInfoForLike(now, nowPlus10);
+        List<NoticeRes> noticeResList = likeRepository.findNoticeInfoOfStartByLike(now, nowPlus10);
         for (NoticeRes noticeRes : noticeResList) {
             noticeRepository.save(Notice.builder()
                 .auctionItem(noticeRes.auctionItem())

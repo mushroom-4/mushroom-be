@@ -74,7 +74,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
     }
 
     @Override
-    public List<NoticeRes> findNoticeInfoForLike(LocalDateTime now, LocalDateTime nowPlus) {
+    public List<NoticeRes> findNoticeInfoOfStartByLike(LocalDateTime now, LocalDateTime nowPlus10) {
         return queryFactory
             .select(Projections.constructor(NoticeRes.class,
                 auctionItem, user, like))
@@ -84,7 +84,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
             .fetchJoin()
             .where(
                 // 현재 시간과 startTime 비교 // 현재 시간+10분 과 startTime 비교
-                auctionItem.startTime.gt(now).and(auctionItem.startTime.loe(nowPlus)),
+                auctionItem.startTime.gt(now).and(auctionItem.startTime.loe(nowPlus10)),
                 auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
             ).fetch(); // Todo 조회할때 페이징 + 조회시 메세지 넣기
     }

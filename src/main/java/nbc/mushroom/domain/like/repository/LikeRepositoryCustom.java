@@ -18,5 +18,5 @@ public interface LikeRepositoryCustom {
     PageImpl<SearchUserAuctionItemLikeRes> findAuctionItemLikeByUserId(User user,
         Pageable pageable);
 
-    List<NoticeRes> findNoticeInfoForLike(LocalDateTime now, LocalDateTime nowPlus);
+    List<NoticeRes> findNoticeInfoOfStartByLike(LocalDateTime now, LocalDateTime nowPlus);
 }
