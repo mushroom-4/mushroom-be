@@ -42,7 +42,7 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
     @Override
     public PageImpl<SearchUserAuctionItemLikeRes> findAuctionItemLikeByUserId(User user,
         Pageable pageable) {
-        // like, auctionItem 의 정보 담기
+
         List<SearchUserAuctionItemLikeRes> searchUserAuctionItemLikeResList =
             queryFactory.select(Projections.constructor(
                     SearchUserAuctionItemLikeRes.class,
