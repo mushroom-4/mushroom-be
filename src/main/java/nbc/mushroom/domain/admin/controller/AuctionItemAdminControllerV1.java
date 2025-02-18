@@ -1,16 +1,23 @@
-package nbc.mushroom.domain.auction_item.controller;
+package nbc.mushroom.domain.admin.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.auction_item.service.AuctionItemAdminService;
+import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
+import nbc.mushroom.domain.admin.service.AuctionItemAdminService;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.common.dto.ApiResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auction-items/admin")
+@RequestMapping("/api/v1/admin/auction-items")
 @RequiredArgsConstructor
 public class AuctionItemAdminControllerV1 {
 
@@ -37,5 +44,17 @@ public class AuctionItemAdminControllerV1 {
         return ResponseEntity.ok(
             ApiResponse.success("관리자가 경매 물품을 반려했습니다.")
         );
+    }
+
+    // 관리자 경매 물품 상태 목록 전체 조회 + 필터링 조회 기능 API
+    @GetMapping
+    public ResponseEntity<ApiResponse<Page<AuctionItemStatusRes>>> adminSearchAuctionItemsStatus(
+        @RequestParam(required = false) List<AuctionItemStatus> status, Pageable pageable) {
+
+        Page<AuctionItemStatusRes> auctionItemsStatus = auctionItemAdminService.getAuctionItemsStatus(
+            status, pageable);
+
+        return ResponseEntity.ok(
+            ApiResponse.success("경매 물품 상태 목록을 조회했습니다.", auctionItemsStatus));
     }
 }

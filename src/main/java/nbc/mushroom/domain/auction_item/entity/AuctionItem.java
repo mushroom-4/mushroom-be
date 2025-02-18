@@ -129,7 +129,7 @@ public class AuctionItem extends Timestamped {
         this.status = COMPLETED;
     }
 
-    public void untrade() {
+    public void untrade() { // TODO 메서드명도 non traded로 변경하기
         if (this.status != PROGRESSING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
