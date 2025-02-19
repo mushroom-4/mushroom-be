@@ -48,6 +48,7 @@ public class AuthService {
             savedUser.getId(),
             savedUser.getEmail(),
             savedUser.getNickname(),
+            savedUser.getImageUrl(),
             userRole
         );
 
@@ -66,6 +67,7 @@ public class AuthService {
             user.getId(),
             user.getEmail(),
             user.getNickname(),
+            user.getImageUrl(),
             user.getUserRole()
         );
 

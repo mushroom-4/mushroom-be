@@ -45,11 +45,13 @@ public class User extends Timestamped {
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String email, String password, String nickname, UserRole userRole) {
+    public User(Long id, String email, String password, String nickname, String imageUrl,
+        UserRole userRole) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.imageUrl = imageUrl;
         this.userRole = userRole;
     }
 
@@ -57,16 +59,13 @@ public class User extends Timestamped {
         return User.builder()
             .id(authUser.id())
             .email(authUser.email())
+            .imageUrl(authUser.imageUrl())
             .userRole(authUser.userRole())
             .build();
     }
 
     public void changePassword(String password) {
         this.password = password;
-    }
-
-    public void updateRole(UserRole userRole) {
-        this.userRole = userRole;
     }
 }
 
