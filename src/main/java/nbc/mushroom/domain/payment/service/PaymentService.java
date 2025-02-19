@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.payment.service;
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_PAYMENT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_CANCEL_FAIL;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_FAIL;
 
@@ -10,9 +11,11 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
+import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.payment.dto.request.PaymentReq;
 import nbc.mushroom.domain.payment.dto.response.PaymentRes;
+import nbc.mushroom.domain.user.entity.User;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -47,13 +50,18 @@ public class PaymentService {
     private final BidRepository bidRepository;
 
     @Transactional
-    public PaymentRes confirmPayment(PaymentReq paymentReq) {
+    public PaymentRes confirmPayment(AuthUser authUser, PaymentReq paymentReq) {
         PaymentRes paymentRes = PaymentRes.from(sendPayment(paymentReq));
 
         try {
+            User user = User.fromAuthUser(authUser);
             Long bidId = Long.valueOf(paymentRes.orderId().substring(20));
             Bid bid = bidRepository.findById(bidId)
                 .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
+
+            if (!user.getId().equals(bid.getBidder().getId())) {
+                throw new CustomException(INVALID_PAYMENT_USER);
+            }
 
             bid.paymentComplete(paymentRes.amount());
             return paymentRes;

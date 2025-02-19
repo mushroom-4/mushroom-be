@@ -1,7 +1,9 @@
 package nbc.mushroom.domain.payment.controller;
 
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
+import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.payment.dto.request.PaymentReq;
 import nbc.mushroom.domain.payment.dto.response.PaymentRes;
 import nbc.mushroom.domain.payment.service.PaymentService;
@@ -20,9 +22,10 @@ public class PaymentController {
 
     @PostMapping("/confirm/widget")
     public ResponseEntity<ApiResponse<PaymentRes>> confirmPayment(
+        @Auth AuthUser authUser,
         @RequestBody PaymentReq paymentReq
     ) {
-        PaymentRes paymentRes = paymentService.confirmPayment(paymentReq);
+        PaymentRes paymentRes = paymentService.confirmPayment(authUser, paymentReq);
 
         return ResponseEntity
             .ok(ApiResponse.success("결제가 정상적으로 완료되었습니다.", paymentRes));

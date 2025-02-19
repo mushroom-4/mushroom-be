@@ -49,6 +49,7 @@ public enum ExceptionType {
 
     // Payment
     INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "P01", "결제 금액이 입찰 가격과 일치하지 않습니다."),
+    INVALID_PAYMENT_USER(HttpStatus.FORBIDDEN, "P02", "다른 사람의 입찰품을 결제할 수 없습니다."),
 
     // Like
     EXIST_LIKE_BY_AUCTION_ITEM(HttpStatus.BAD_REQUEST, "L01", "좋아요는 경매 물품 하나 당 한 번만 가능합니다."),
