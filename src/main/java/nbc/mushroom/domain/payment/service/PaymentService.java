@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.payment.dto.PaymentReq;
-import nbc.mushroom.domain.payment.dto.PaymentRes;
+import nbc.mushroom.domain.payment.dto.request.PaymentReq;
+import nbc.mushroom.domain.payment.dto.response.PaymentRes;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -57,7 +57,7 @@ public class PaymentService {
 
             bid.paymentComplete(paymentRes.amount());
             return paymentRes;
-        } catch (CustomException e) {
+        } catch (Exception e) {
             cancelPayment(paymentRes.paymentKey(), e.getMessage(), paymentRes.amount());
             throw e;
         }

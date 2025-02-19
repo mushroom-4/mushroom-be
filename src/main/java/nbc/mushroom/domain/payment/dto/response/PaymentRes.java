@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.payment.dto;
+package nbc.mushroom.domain.payment.dto.response;
 
 import java.util.Map;
 

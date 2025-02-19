@@ -2,8 +2,8 @@ package nbc.mushroom.domain.payment.controller;
 
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.dto.ApiResponse;
-import nbc.mushroom.domain.payment.dto.PaymentReq;
-import nbc.mushroom.domain.payment.dto.PaymentRes;
+import nbc.mushroom.domain.payment.dto.request.PaymentReq;
+import nbc.mushroom.domain.payment.dto.response.PaymentRes;
 import nbc.mushroom.domain.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,7 @@ public class PaymentController {
         @RequestBody PaymentReq paymentReq
     ) {
         PaymentRes paymentRes = paymentService.confirmPayment(paymentReq);
-        
+
         return ResponseEntity
             .ok(ApiResponse.success("결제가 정상적으로 완료되었습니다.", paymentRes));
     }
