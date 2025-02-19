@@ -34,7 +34,7 @@ public class UserNoticeService {
         List<SearchPageNoticeRes> searchPageNoticeResList = new ArrayList<>();
         for (SearchNoticeRes searchNoticeRes : SearchNoticeResList) { // start 로 받아서 처리
             // 시작 시간 일때
-            // notice.user.name 님 좋아요 한신 notice.auctionItem.name 경매 상품이 10분 후 경매가 진행됩니다.
+            // notice.user.name 님 좋아요 하신 notice.auctionItem.name 경매 상품이 10분 후 경매가 진행됩니다.
             if (searchNoticeRes.notice().getNoticeType() == START_TIME) {
                 message = searchNoticeRes.user().getNickname() + "님! 좋아요 하신 " +
                     searchNoticeRes.auctionItem().getName() + "경매 물품이 10분 후 경매가 진행됩니다!";
