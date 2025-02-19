@@ -315,6 +315,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         if (size != null) {
             builder.and(auctionItem.size.eq(size));
         }
+
         if (startDate != null) {
             builder.and(auctionItem.startTime.goe(startDate));
         }
