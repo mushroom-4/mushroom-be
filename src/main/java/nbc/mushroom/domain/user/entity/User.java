@@ -59,7 +59,6 @@ public class User extends Timestamped {
         return User.builder()
             .id(authUser.id())
             .email(authUser.email())
-            .imageUrl(authUser.imageUrl())
             .userRole(authUser.userRole())
             .build();
     }

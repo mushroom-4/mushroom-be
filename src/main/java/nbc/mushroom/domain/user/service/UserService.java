@@ -5,6 +5,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.PASSWORD_SAME;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auth.dto.response.TokenRes;
 import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.common.exception.CustomException;
@@ -19,6 +20,7 @@ import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -55,20 +57,22 @@ public class UserService {
 
     @Transactional
     public TokenRes changeInfo(AuthUser authUser, UserInfoChangeReq userInfoChangeReq) {
-        User user = User.fromAuthUser(authUser);
+        User user = userRepository.findById(authUser.id())
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
+        log.info("dto: {}", userInfoChangeReq);
         String fileName = imageUtil.upload(userInfoChangeReq.image());
-        if (fileName != null) {
-            imageUtil.delete(fileName);
-        }
 
+        if (fileName != null) { // 새로 등록한 파일이 있다면, 이전 파일 삭제
+            imageUtil.delete(user.getImageUrl());
+        }
         user.updateInfo(userInfoChangeReq.nickname(), fileName);
 
         String bearerToken = jwtUtil.createToken(
             user.getId(),
             user.getEmail(),
             user.getNickname(),
-            imageUtil.getImageUrl(fileName),
+            imageUtil.getImageUrl(user.getImageUrl()),
             user.getUserRole()
         );
 
