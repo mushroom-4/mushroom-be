@@ -5,8 +5,13 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.PASSWORD_SAME;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.auth.dto.response.TokenRes;
+import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.common.util.JwtUtil;
 import nbc.mushroom.domain.common.util.PasswordEncoder;
+import nbc.mushroom.domain.common.util.image.ImageUtil;
+import nbc.mushroom.domain.user.dto.request.UserInfoChangeReq;
 import nbc.mushroom.domain.user.dto.request.UserPasswordChangeReq;
 import nbc.mushroom.domain.user.dto.response.UserRes;
 import nbc.mushroom.domain.user.entity.User;
@@ -21,6 +26,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ImageUtil imageUtil;
+    private final JwtUtil jwtUtil;
 
     public UserRes getUser(long userId) {
         User user = userRepository.findById(userId)
@@ -44,5 +51,27 @@ public class UserService {
         }
 
         user.changePassword(passwordEncoder.encode(userPasswordChangeReq.newPassword()));
+    }
+
+    @Transactional
+    public TokenRes changeInfo(AuthUser authUser, UserInfoChangeReq userInfoChangeReq) {
+        User user = User.fromAuthUser(authUser);
+
+        String fileName = imageUtil.upload(userInfoChangeReq.image());
+        if (fileName != null) {
+            imageUtil.delete(fileName);
+        }
+
+        user.updateInfo(userInfoChangeReq.nickname(), fileName);
+
+        String bearerToken = jwtUtil.createToken(
+            user.getId(),
+            user.getEmail(),
+            user.getNickname(),
+            imageUtil.getImageUrl(fileName),
+            user.getUserRole()
+        );
+
+        return new TokenRes(bearerToken);
     }
 }

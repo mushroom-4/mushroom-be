@@ -67,5 +67,12 @@ public class User extends Timestamped {
     public void changePassword(String password) {
         this.password = password;
     }
+
+    public void updateInfo(String nickname, String imageUrl) {
+        if (imageUrl != null) {
+            this.imageUrl = imageUrl;
+        }
+        this.nickname = nickname;
+    }
 }
 
