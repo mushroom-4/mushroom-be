@@ -32,6 +32,7 @@ public class JwtFilter implements Filter {
         "/api/*/auction-items/*/info", List.of("GET"),
         "/api/*/auction-items/search", List.of("GET"),
         "/api/*/users/*/info", List.of("GET"),
+        "/api/*/payments/**", List.of("POST"),
         "/api/*/auth/**", List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
     );
 
