@@ -18,20 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/users/notices")
-public class UserNoticeController {
+public class UserNoticeControllerV2 {
 
     private final UserNoticeService userNoticeService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<SearchPageNoticeRes>>> test(
         @Auth AuthUser authUser,
-        @RequestParam(value = "page", defaultValue = "0") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size
+        @RequestParam(value = "page", defaultValue = "0") int page
     ) {
         User user = User.fromAuthUser(authUser);
-        Page<SearchPageNoticeRes> searchNoticeResList = userNoticeService.testService(user, page,
-            size);
+        Page<SearchPageNoticeRes> searchNoticeResList = userNoticeService.searchUserNotice(user,
+            page);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(
-            "test", searchNoticeResList));
+            "사용자의 공지를 조회했습니다.", searchNoticeResList));
     }
 }

@@ -24,15 +24,15 @@ public class UserNoticeService {
 
     private final NoticeRepository noticeRepository;
 
-    public Page<SearchPageNoticeRes> testService(User user, int page, int size) {
+    public Page<SearchPageNoticeRes> searchUserNotice(User user, int page) {
         // 유저가 가지는 공지 List
-        log.info("::: testService ::: ");
-        List<SearchNoticeRes> noticeTypeIfoByNoticeList = noticeRepository.findNoticeTypeIfoByNoticeList(
+        List<SearchNoticeRes> SearchNoticeResList = noticeRepository.findNoticeTypeInfoByNoticeList(
             user);
-        log.info("::: noticeTypeIfoByNoticeList size : {} ::: ", noticeTypeIfoByNoticeList.size());
+
         String message = "";
+
         List<SearchPageNoticeRes> searchPageNoticeResList = new ArrayList<>();
-        for (SearchNoticeRes searchNoticeRes : noticeTypeIfoByNoticeList) { // start 로 받아서 처리
+        for (SearchNoticeRes searchNoticeRes : SearchNoticeResList) { // start 로 받아서 처리
             // 시작 시간 일때
             // notice.user.name 님 좋아요 한신 notice.auctionItem.name 경매 상품이 10분 후 경매가 진행됩니다.
             if (searchNoticeRes.notice().getNoticeType() == START_TIME) {
@@ -41,7 +41,7 @@ public class UserNoticeService {
                 searchPageNoticeResList.add(
                     SearchPageNoticeRes.from(message, searchNoticeRes.notice().getId()));
             }
-//             종료 시간 일때
+            //종료 시간 일때
             if (searchNoticeRes.notice().getNoticeType() == END_TIME) {
                 message = searchNoticeRes.user().getNickname() + "님! 좋아요 하신 " +
                     searchNoticeRes.auctionItem().getName() + "경매 물품이 10분 후 경매가  종료됩니다!";
@@ -49,6 +49,8 @@ public class UserNoticeService {
                     SearchPageNoticeRes.from(message, searchNoticeRes.notice().getId()));
             }
         }
+
+        int size = 10;
 
         Pageable pageable = PageRequest.of(page, size);
 

@@ -6,5 +6,5 @@ import nbc.mushroom.domain.user.entity.User;
 
 public interface NoticeRepositoryCustom {
 
-    List<SearchNoticeRes> findNoticeTypeIfoByNoticeList(User user);
+    List<SearchNoticeRes> findNoticeTypeInfoByNoticeList(User user);
 }

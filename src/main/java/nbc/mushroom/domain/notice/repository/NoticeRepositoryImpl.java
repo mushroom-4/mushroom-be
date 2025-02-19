@@ -19,7 +19,7 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<SearchNoticeRes> findNoticeTypeIfoByNoticeList(User user) {
+    public List<SearchNoticeRes> findNoticeTypeInfoByNoticeList(User user) {
 
         return queryFactory
             .select(Projections.constructor(SearchNoticeRes.class,
