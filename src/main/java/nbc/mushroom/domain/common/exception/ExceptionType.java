@@ -10,6 +10,8 @@ public enum ExceptionType {
 
     //Server
     SERVER_IMAGE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV01", "이미지 서버에 문제가 생겼습니다."),
+    SERVER_PAYMENT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV02", "결제가 정상적으로 되지 않았습니다."),
+    SERVER_PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV03", "결제 취소가 정상적으로 되지 않았습니다."),
 
     //Auth
     AUTH_WRONG_USED(HttpStatus.INTERNAL_SERVER_ERROR, "A01", "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
@@ -44,6 +46,10 @@ public enum ExceptionType {
     BID_CANCELLATION_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "B06",
         "입찰 취소 제한(3회)을 초과하여 더 이상 취소할 수 없습니다."),
     BID_CANNOT_CANCEL_NON_BIDDING(HttpStatus.BAD_REQUEST, "B07", "입찰이 진행 중일 때만 취소할 수 있습니다."),
+
+    // Payment
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "P01", "결제 금액이 입찰 가격과 일치하지 않습니다."),
+    INVALID_PAYMENT_USER(HttpStatus.FORBIDDEN, "P02", "다른 사람의 입찰품을 결제할 수 없습니다."),
 
     // Like
     EXIST_LIKE_BY_AUCTION_ITEM(HttpStatus.BAD_REQUEST, "L01", "좋아요는 경매 물품 하나 당 한 번만 가능합니다."),
