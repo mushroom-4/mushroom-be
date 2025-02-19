@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -25,7 +24,7 @@ import nbc.mushroom.domain.user.entity.User;
 @Entity
 @Table(name = "`notice`",
     uniqueConstraints = @UniqueConstraint(columnNames = {"like_id", "notice_type"}))
-// 유니크 제약 조건에서 notice_type 추가
+// 유니크 제약 조건에서 notice_type 추가 //Todo 올릴때 지우기
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice extends Timestamped {
 
@@ -40,8 +39,9 @@ public class Notice extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
-    @OneToOne(fetch = FetchType.LAZY)
+
+    // Todo notice bid 에 필요없으면 지우자
+    @ManyToOne(fetch = FetchType.LAZY) // 불필요 - 공지 생성시 like 를 디져서 만들기에...
     @JoinColumn(name = "like_id", nullable = false)
     private Like like;
 
