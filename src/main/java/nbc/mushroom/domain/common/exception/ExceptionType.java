@@ -11,6 +11,7 @@ public enum ExceptionType {
     //Server
     SERVER_IMAGE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV01", "이미지 서버에 문제가 생겼습니다."),
     SERVER_PAYMENT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV02", "결제가 정상적으로 되지 않았습니다."),
+    SERVER_PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV03", "결제 취소가 정상적으로 되지 않았습니다."),
 
     //Auth
     AUTH_WRONG_USED(HttpStatus.INTERNAL_SERVER_ERROR, "A01", "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),

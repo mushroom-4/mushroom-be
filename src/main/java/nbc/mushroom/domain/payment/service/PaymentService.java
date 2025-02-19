@@ -1,12 +1,12 @@
 package nbc.mushroom.domain.payment.service;
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
+import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_CANCEL_FAIL;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_FAIL;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
@@ -48,6 +48,23 @@ public class PaymentService {
 
     @Transactional
     public PaymentRes confirmPayment(PaymentReq paymentReq) {
+        PaymentRes paymentRes = PaymentRes.from(sendPayment(paymentReq));
+
+        try {
+            Long bidId = Long.valueOf(paymentRes.orderId().substring(20));
+            Bid bid = bidRepository.findById(bidId)
+                .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
+
+            bid.paymentComplete(paymentRes.amount());
+            return paymentRes;
+        } catch (CustomException e) {
+            cancelPayment(paymentRes.paymentKey(), e.getMessage(), paymentRes.amount());
+            throw e;
+        }
+    }
+
+    // 토스서버에 결제 승인 요청
+    private Map<String, Object> sendPayment(PaymentReq paymentReq) {
         // 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -65,28 +82,15 @@ public class PaymentService {
                 new ParameterizedTypeReference<>() {
                 } // 응답 타입을 Map<String, Object>로 설정
             );
-            // 응답 데이터가 null이 아닐 경우, PaymentRes 객체로 변환
-            PaymentRes paymentRes = PaymentRes.from(Objects.requireNonNull(response.getBody()));
 
-            // 서비스 로직
-            Long bidId = Long.valueOf(paymentRes.orderId().substring(20));
-            Bid bid = bidRepository.findById(bidId)
-                .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
-
-            bid.paymentComplete(paymentRes.amount());
-
-            return paymentRes;
-        } catch (Exception e) {
+            return response.getBody();
+        } catch (RestClientException e) {
             // 결제 승인 요청이 실패할 경우, 예외를 발생시킴
-            if (e instanceof RestClientException) {
-                throw new CustomException(SERVER_PAYMENT_FAIL);
-            }
-
-            cancelPayment(paymentReq.paymentKey(), e.getMessage(), paymentReq.amount());
-            throw e;
+            throw new CustomException(SERVER_PAYMENT_FAIL);
         }
     }
 
+    // 에러가 날 경우 결제를 취소
     private void cancelPayment(String paymentKey, String reason, Long cancelAmount) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -107,7 +111,7 @@ public class PaymentService {
                 }
             );
         } catch (RestClientException e) {
-            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.");
+            throw new CustomException(SERVER_PAYMENT_CANCEL_FAIL);
         }
     }
 }
