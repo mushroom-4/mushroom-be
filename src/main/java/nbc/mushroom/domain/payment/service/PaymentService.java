@@ -37,6 +37,9 @@ public class PaymentService {
     // 결제 승인 요청을 보낼 토스페이 API 엔드포인트 URL
     private static final String WIDGET_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
+    // 결제 취소 요청을 보낼 토스페이 API 엔드포인트 URL
+    private static final String CANCEL_URL = "https://api.tosspayments.com/v1/payments/{paymentKey}/cancel";
+
     // 토스페이 API에 인증을 위한 Base64 인코딩된 Secret Key (Basic Auth 방식)
     private static final String WIDGET_SECRET_KEY_ENCODED = Base64.getEncoder()
         .encodeToString((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
@@ -79,8 +82,32 @@ public class PaymentService {
                 throw new CustomException(SERVER_PAYMENT_FAIL);
             }
 
-            // TODO 여기는 비즈니스 에러이므로 결제 취소 기능 구현
+            cancelPayment(paymentReq.paymentKey(), e.getMessage(), paymentReq.amount());
             throw e;
+        }
+    }
+
+    private void cancelPayment(String paymentKey, String reason, Long cancelAmount) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Basic " + WIDGET_SECRET_KEY_ENCODED);
+
+        // 결제 취소 요청 본문 생성
+        Map<String, Object> body = Map.of(
+            "cancelReason", reason,
+            "cancelAmount", cancelAmount
+        );
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        try {
+            restTemplate.exchange(
+                CANCEL_URL.replace("{paymentKey}", paymentKey), // URL에 결제 키 삽입
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<>() {
+                }
+            );
+        } catch (RestClientException e) {
+            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.");
         }
     }
 }

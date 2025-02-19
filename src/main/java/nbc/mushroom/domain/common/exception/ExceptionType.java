@@ -47,7 +47,7 @@ public enum ExceptionType {
     BID_CANNOT_CANCEL_NON_BIDDING(HttpStatus.BAD_REQUEST, "B07", "입찰이 진행 중일 때만 취소할 수 있습니다."),
 
     // Payment
-    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "P08", "결제 금액이 입찰 가격과 일치하지 않습니다."),
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "P01", "결제 금액이 입찰 가격과 일치하지 않습니다."),
 
     // Like
     EXIST_LIKE_BY_AUCTION_ITEM(HttpStatus.BAD_REQUEST, "L01", "좋아요는 경매 물품 하나 당 한 번만 가능합니다."),
