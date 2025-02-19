@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.payment.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_FAIL;
 
 import java.nio.charset.StandardCharsets;
@@ -7,6 +8,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.bid.entity.Bid;
+import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.payment.dto.PaymentReq;
 import nbc.mushroom.domain.payment.dto.PaymentRes;
@@ -38,11 +41,12 @@ public class PaymentService {
     private static final String WIDGET_SECRET_KEY_ENCODED = Base64.getEncoder()
         .encodeToString((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
 
+    private final BidRepository bidRepository;
+
     @Transactional
     public PaymentRes confirmPayment(PaymentReq paymentReq) {
-        HttpHeaders headers = new HttpHeaders();
-
         // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Basic " + WIDGET_SECRET_KEY_ENCODED);
 
@@ -60,11 +64,23 @@ public class PaymentService {
             );
             // 응답 데이터가 null이 아닐 경우, PaymentRes 객체로 변환
             PaymentRes paymentRes = PaymentRes.from(Objects.requireNonNull(response.getBody()));
-            
+
+            // 서비스 로직
+            Long bidId = Long.valueOf(paymentRes.orderId().substring(20));
+            Bid bid = bidRepository.findById(bidId)
+                .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
+
+            bid.paymentComplete(paymentRes.amount());
+
             return paymentRes;
-        } catch (RestClientException e) {
+        } catch (Exception e) {
             // 결제 승인 요청이 실패할 경우, 예외를 발생시킴
-            throw new CustomException(SERVER_PAYMENT_FAIL);
+            if (e instanceof RestClientException) {
+                throw new CustomException(SERVER_PAYMENT_FAIL);
+            }
+
+            // TODO 여기는 비즈니스 에러이므로 결제 취소 기능 구현
+            throw e;
         }
     }
 }

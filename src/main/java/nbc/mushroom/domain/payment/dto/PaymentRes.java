@@ -6,7 +6,7 @@ public record PaymentRes(
     String orderName,
     String orderId,
     String paymentKey,
-    Integer amount
+    Long amount
 ) {
 
     public static PaymentRes from(Map<String, Object> paymentData) {
@@ -14,7 +14,7 @@ public record PaymentRes(
             (String) paymentData.get("orderName"),
             (String) paymentData.get("orderId"),
             (String) paymentData.get("paymentKey"),
-            (Integer) paymentData.get("totalAmount")
+            Long.valueOf((Integer) paymentData.get("totalAmount"))
         );
     }
 }
