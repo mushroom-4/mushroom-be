@@ -1,7 +1,9 @@
 package nbc.mushroom.domain.bid.entity;
 
 import static nbc.mushroom.domain.bid.entity.BiddingStatus.BIDDING;
+import static nbc.mushroom.domain.bid.entity.BiddingStatus.SUCCEED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BID_STATUS;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_PAYMENT_AMOUNT;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -80,5 +82,16 @@ public class Bid extends Timestamped {
             throw new CustomException(INVALID_BID_STATUS);
         }
         this.biddingStatus = BiddingStatus.CANCELED;
+    }
+
+    public void paymentComplete(Long paymentAmount) {
+        if (!biddingPrice.equals(paymentAmount)) {
+            throw new CustomException(INVALID_PAYMENT_AMOUNT);
+        }
+        
+        if (this.biddingStatus != SUCCEED) {
+            throw new CustomException(INVALID_BID_STATUS);
+        }
+        this.biddingStatus = BiddingStatus.PAYMENT_COMPLETED;
     }
 }
