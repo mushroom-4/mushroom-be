@@ -2,6 +2,7 @@ package nbc.mushroom.config.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
+    private final StompHandler stompHandler;
 
     // STOMP 엔드포인트 등록
     @Override
@@ -45,5 +47,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             "/pub"); // 클라이언트 -> 서버
         registry.enableSimpleBroker(
             "/sub"); //  서버 -> 클라이언트
+    }
+
+    /**
+     * STOMP 핸들러
+     * CONNECT, SUBSCRIBE 등의 STOMP 프로토콜 명령어가 발생하면
+     * 핸들러가 중간에 가로채서 어떠한 동작들을 수행하게 해줌
+     * @param registration
+     */
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompHandler);
     }
 }
