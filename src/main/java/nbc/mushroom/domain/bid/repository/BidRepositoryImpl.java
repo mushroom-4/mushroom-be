@@ -135,8 +135,8 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         return Optional.ofNullable(queryFactory
             .select(Projections.constructor(
                 AuctionItemBidInfoRes.class,
-                user.nickname,
-                auctionItem.startPrice
+                bid.bidder.nickname,
+                bid.biddingPrice
             ))
             .from(bid)
             .innerJoin(bid.auctionItem, auctionItem)
