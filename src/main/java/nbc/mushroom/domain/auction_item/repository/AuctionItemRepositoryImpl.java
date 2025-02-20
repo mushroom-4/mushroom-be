@@ -189,48 +189,17 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
     // 경매 물품 상태별 목록 필터링 조회 메서드
     @Override
-    public Page<AuctionItemStatusRes> findAuctionItemsByStatus(List<AuctionItemStatus> status,
-        Pageable pageable) {
-
-        QAuctionItem auctionItem = QAuctionItem.auctionItem;
-
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (status != null && !status.isEmpty()) {
-            builder.and(auctionItem.status.in(status));
+    public Page<AuctionItemStatusRes> findAuctionItemsByStatus(
+        List<AuctionItemStatus> status,
+        Pageable pageable
+    ) {
+        if (status == null || status.isEmpty()) {
+            return Page.empty(pageable);
         }
 
-        List<AuctionItemStatusRes> results = queryFactory
-            .select(new QAuctionItemStatusRes(
-                auctionItem.id,
-                auctionItem.name,
-                auctionItem.description,
-                auctionItem.imageUrl,
-                auctionItem.size,
-                auctionItem.category,
-                auctionItem.brand,
-                auctionItem.startPrice,
-                auctionItem.startTime,
-                auctionItem.endTime,
-                auctionItem.status
-            ))
-            .from(auctionItem)
-            .where(builder)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        JPAQuery<Long> total = queryFactory
-            .select(auctionItem.count())
-            .from(auctionItem)
-            .where(builder);
-
-        return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
-    }
-
-    // 경매 물품 상태 목록 전체 조회 메서드
-    @Override
-    public Page<AuctionItemStatusRes> findAllAuctionItemsByStatus(Pageable pageable) {
+        QAuctionItem auctionItem = QAuctionItem.auctionItem;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(auctionItem.status.in(status));
 
         List<AuctionItemStatusRes> results = queryFactory
             .select(new QAuctionItemStatusRes(
@@ -247,13 +216,16 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
+            .where(auctionItem.isDeleted.eq(false), builder)
+            .orderBy(auctionItem.createdAt.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
         JPAQuery<Long> total = queryFactory
             .select(auctionItem.count())
-            .from(auctionItem);
+            .from(auctionItem)
+            .where(auctionItem.isDeleted.eq(false), builder);
 
         return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
     }
