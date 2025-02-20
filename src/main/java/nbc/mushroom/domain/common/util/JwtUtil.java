@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 public class JwtUtil {
 
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final long TOKEN_TIME = 60 * 60 * 1000L; // 60분
+    private static final long TOKEN_TIME = 7 * 24 * 60 * 60 * 1000L; // 7일
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -35,7 +35,9 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Long userId, String email, String nickname, UserRole userRole) {
+    public String createToken(
+        Long userId, String email, String nickname, String imageUrl, UserRole userRole
+    ) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -44,6 +46,7 @@ public class JwtUtil {
                 .claim("email", email)
                 .claim("nickname", nickname)
                 .claim("userRole", userRole)
+                .claim("imageUrl", imageUrl)
                 .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                 .setIssuedAt(date) // 발급일
                 .signWith(key, signatureAlgorithm) // 암호화 알고리즘

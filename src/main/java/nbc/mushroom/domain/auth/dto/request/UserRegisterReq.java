@@ -3,6 +3,8 @@ package nbc.mushroom.domain.auth.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public record UserRegisterReq(
     @NotBlank
@@ -17,10 +19,17 @@ public record UserRegisterReq(
     String password,
 
     @NotBlank
+    @Pattern(
+        regexp = "^(?i)(admin|user)$", // (?i) 대소문자 구분 없이 허용
+        message = "userRole은 'admin' 또는 'user'만 가능합니다."
+    )
     String userRole,
 
     @NotBlank
-    String nickname
+    @Size(max = 10, message = "닉네임은 최대 10자까지 가능합니다.")
+    String nickname,
+
+    MultipartFile image
 ) {
 
 }
