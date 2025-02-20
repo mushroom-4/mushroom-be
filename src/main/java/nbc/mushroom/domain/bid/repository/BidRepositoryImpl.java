@@ -147,4 +147,14 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         ).orElseThrow(() -> new CustomException(BID_NOT_FOUND));
     }
 
+    @Override
+    public Boolean existBidByBidderIdAndAuctionItemId(Long bidderId, Long auctionItemId) {
+        return queryFactory
+            .select(bid)
+            .from(bid)
+            .where(
+                bid.auctionItem.id.eq(auctionItemId),
+                bid.bidder.id.eq(bidderId))
+            .fetchFirst() != null;
+    }
 }
