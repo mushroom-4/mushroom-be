@@ -13,7 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
     private final StompHandler stompHandler;
 
     // STOMP 엔드포인트 등록
@@ -22,13 +21,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // http 용
         registry.addEndpoint("/ws") // 엔트포인트. STOMP 접속 주소 url -> /ws (이 주소로 소켓 연결)
-            .addInterceptors(jwtHandshakeInterceptor)
             .setAllowedOriginPatterns("*")  // CORS 설정 부분. (* : 모든 도메인 허용) -> 추후 지정하든가 하자..
             .withSockJS(); // http 사용을 위해.
 
         // /ws 용
         registry.addEndpoint("/ws")
-            .addInterceptors(jwtHandshakeInterceptor)
             .setAllowedOriginPatterns("*");
     }
 
@@ -37,7 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
      *
      * 클라이언트가 메시지 주고 받을 경로 지정
      * /pub: 클라이언트가 메시지를 보낼 때 사용하는 접두사 ( @MessageMapping과 연결. /pub + /@MessageMapping 엔드포인트 )
-     * /sub: 클라이언트가 구독할 수 있는 주제(topic)의 접두사, 메시지 브로커를 통해 해당 주소를 구독하는 클라이언트로 전달 (라우팅)
+     * /sub: 클라이언트가 구독할 수 있는 주제(topic)의 접두사, 메시지 브로커를 통해 해당 주소를 구독하는 클라이언트로 전달 (브로드캐스트)
      *
      * @param registry
      */
