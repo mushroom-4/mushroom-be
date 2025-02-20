@@ -32,7 +32,7 @@ public class ChatService {
 
         ChatMessage chatMessage = ChatMessage.builder()
             .chatRoomId(chatRoomId)
-            .messageType(MessageType.USER_MESSAGE)
+            .messageType(MessageType.MESSAGE)
             .message(chatMessageReq.message())
             .sendDateTime(LocalDateTime.now())
             .sender(loginUser)
