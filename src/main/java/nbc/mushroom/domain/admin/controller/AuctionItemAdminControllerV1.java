@@ -7,6 +7,7 @@ import nbc.mushroom.domain.admin.service.AuctionItemAdminService;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,12 +50,14 @@ public class AuctionItemAdminControllerV1 {
     // 관리자 경매 물품 상태 목록 전체 조회 + 필터링 조회 기능 API
     @GetMapping
     public ResponseEntity<ApiResponse<Page<AuctionItemStatusRes>>> adminSearchAuctionItemsStatus(
-        @RequestParam(required = false) List<AuctionItemStatus> status, Pageable pageable) {
-
-        Page<AuctionItemStatusRes> auctionItemsStatus = auctionItemAdminService.getAuctionItemsStatus(
-            status, pageable);
+        @RequestParam(required = false) List<AuctionItemStatus> status,
+        @RequestParam(value = "page", defaultValue = "1") int page
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, 10);
+        Page<AuctionItemStatusRes> auctionItemsStatusRes = auctionItemAdminService
+            .getAuctionItemsStatus(status, pageable);
 
         return ResponseEntity.ok(
-            ApiResponse.success("경매 물품 상태 목록을 조회했습니다.", auctionItemsStatus));
+            ApiResponse.success("경매 물품 상태 목록을 조회했습니다.", auctionItemsStatusRes));
     }
 }
