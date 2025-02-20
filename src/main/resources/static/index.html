@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>STOMP 채팅 테스트</title>
+  <!-- SockJS와 stomp.js 라이브러리 로드 (CDN 사용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    #messages {
+      list-style: none;
+      padding: 0;
+    }
+
+    #messages li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+<h2>STOMP 채팅 테스트</h2>
+<label for="tokenInput">토큰:</label>
+<input type="text" id="tokenInput" placeholder="토큰 입력">
+<button onclick="connect()">🔗 연결</button> <!-- ✅ 연결 버튼 추가 -->
+<br><br>
+<label for="chatRoomId">채팅방 ID:</label>
+<input type="text" id="chatRoomId" value="1" size="3">
+<br><br>
+<label for="messageInput">메시지:</label>
+<input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+<button id="sendButton" onclick="sendMessage()" disabled>💬 전송</button> <!-- ✅ 초기에는 비활성화 -->
+<hr>
+<ul id="messages"></ul>
+
+<script>
+  let stompClient = null;
+
+  function connect() {
+    const token = document.getElementById('tokenInput').value;
+
+    if (!token) {
+      console.error("🚨 토큰이 없습니다!");
+      alert("토큰을 입력하세요!");
+      return;
+    }
+
+    console.log("📌 연결 요청: ws://localhost:8080/ws");
+    console.log("📌 보낼 토큰:", token);
+
+    const socket = new SockJS('/ws'); // 웹소켓 엔드포인트 지정
+    stompClient = Stomp.over(socket);
+
+    stompClient.debug = function (str) {
+      console.log("📌 [STOMP Debug]", str);
+    };
+
+    const headers = {'Authorization': 'Bearer ' + token};
+    console.log("[Header] : ", headers)
+
+    stompClient.connect(headers, function (frame) {
+      console.log('✅ STOMP 연결 성공:', frame);
+
+      const chatRoomId = document.getElementById("chatRoomId").value;
+      stompClient.subscribe('/sub/chats/' + chatRoomId, function (messageOutput) {
+        showMessage(JSON.parse(messageOutput.body));
+      });
+
+      // STOMP 연결 완료 후 전송 버튼 활성화
+      document.getElementById("sendButton").disabled = false;
+    }, function (error) {
+      console.error('🚨 STOMP 연결 오류:', error);
+      alert("STOMP 연결에 실패했습니다. 서버 상태를 확인하세요.");
+    });
+  }
+
+  function sendMessage() {
+    if (!stompClient || !stompClient.connected) {
+      console.error("🚨 STOMP 연결이 안 되어 있습니다! 먼저 connect()를 실행하세요.");
+      alert("STOMP 서버에 연결되지 않았습니다. 먼저 연결을 시도하세요!");
+      return;
+    }
+
+    const chatRoomId = document.getElementById("chatRoomId").value;
+    const message = document.getElementById("messageInput").value;
+
+    if (!message.trim()) {
+      console.warn("🚨 메시지가 비어 있습니다!");
+      return;
+    }
+
+    console.log(`📌 [Client] 메시지 전송: /pub/chats/${chatRoomId}`);
+
+    const payload = JSON.stringify({message: message});
+    stompClient.send("/pub/chats/" + chatRoomId, {}, payload);
+    document.getElementById("messageInput").value = '';
+  }
+
+  function showMessage(message) {
+    const messagesList = document.getElementById("messages");
+    const messageElement = document.createElement('li');
+    // ChatMessageRes의 nickname이 없으면 '익명'으로 표시
+    messageElement.textContent = `[${new Date().toLocaleTimeString()}] ${message.nickname
+    || '익명'}: ${message.message}`;
+    messagesList.appendChild(messageElement);
+  }
+
+  // 페이지 로드 시 연결 (연결 전에 토큰을 입력하고 싶다면 connect() 호출 시점을 조정)
+  connect();
+</script>
+</body>
+</html>
