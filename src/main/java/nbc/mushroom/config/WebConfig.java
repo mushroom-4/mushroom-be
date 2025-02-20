@@ -8,7 +8,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// @EnableCaching // 인기 검색어 캐싱 시 사용 예정
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {

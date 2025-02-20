@@ -56,10 +56,13 @@ dependencies {
     implementation 'at.favre.lib:bcrypt:0.10.2'
 
     // spring-cache
-    // implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // redis
-    // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // AWS
     implementation platform('software.amazon.awssdk:bom:2.20.114')
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:sqs'

@@ -4,6 +4,10 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NO
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
@@ -21,6 +25,7 @@ import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,38 +41,49 @@ public class AuctionItemService {
     private final UserRepository userRepository;
     private final ImageUtil imageUtil;
     private final BidRepository bidRepository;
-//    private final CacheManager cacheManager;
-//    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
+    // 경매 물품 키워드 검색(조회)
     public Page<SearchAuctionItemRes> searchKeywordAuctionItems(String sort,
         String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
         Long maxPrice, Pageable pageable) {
+
+        if (keyword != null && !keyword.isEmpty()) {
+            savePopularKeywords(keyword);
+        }
+
         return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
             pageable);
     }
 
+    // 경매 물품 단건 조회
     public SearchAuctionItemRes searchAuctionItem(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+
         return SearchAuctionItemRes.from(searchAuctionItem);
     }
 
+    // 경매 물품 최대 입찰가 조회
     public SearchAuctionItemBidRes getAuctionItemWithMaxBid(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
         if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
             AuctionItemBidInfoRes auctionItemBidInfoRes =
                 bidRepository.auctionItemBidInfoFind(auctionItemId);
+
             return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes);
         }
 
         return SearchAuctionItemBidRes.from(searchAuctionItem, null);
     }
 
+    // 경매 물품 목록 전체 조회
     public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {
         return auctionItemRepository.findAllAuctionItems(pageable);
     }
 
+    // 경매 물품 생성
     @Transactional
     public AuctionItemRes createAuctionItem(Long userId,
         CreateAuctionItemReq createAuctionItemReq) {
@@ -94,6 +110,7 @@ public class AuctionItemService {
         return AuctionItemRes.from(auctionItem, imageUrl);
     }
 
+    // 경매 물품 수정
     @Transactional
     public AuctionItemRes updateAuctionItem(Long userId, Long auctionItemId,
         PutAuctionItemReq putAuctionItemReq) {
@@ -130,6 +147,7 @@ public class AuctionItemService {
         return AuctionItemRes.from(updateAuctionItem, updateImageUrl);
     }
 
+    // 경매 물품 삭제
     @Transactional
     public void softDeleteAuctionItem(Long userId, Long auctionItemId) {
 
@@ -154,32 +172,34 @@ public class AuctionItemService {
         return user;
     }
 
-//    // 인기 검색어 조회 // 차순위 개발
-//    public List<String> getPopularKeywords() {
-//        if (popularKeywordsMap.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//
-//        return getTopRankEntries().stream()
-//            .map(Map.Entry::getKey)
-//            .collect(Collectors.toList());
-//    }
-//
-//    // 인기 검색어 추출 메서드 (상위 10개)
-//    private List<Map.Entry<String, Integer>> getTopRankEntries() {
-//        return popularKeywordsMap.entrySet().stream()
-//            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
-//            .limit(10)
-//            .toList();
-//    }
-//
-//    // 인메모리 캐시 가시화 로직
-//    public void printCacheContents(String storedCache) {
-//        Cache cache = cacheManager.getCache(storedCache);
-//        if (cache != null) {
-//            log.info("현재 '{}' 저장된 캐시 : ", storedCache);
-//        } else {
-//            log.warn("'{}' 캐시가 존재하지 않습니다.", storedCache);
-//        }
-//    }
+    // 인기 검색어
+    @Cacheable(value = "popularKeywords", key = "'top10'")
+    public List<String> searchPopularKeywords() {
+        return popularKeywordsMap.entrySet().stream()
+            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))// 검색 횟수 기준 내림차순 정렬
+            .limit(10)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+    // 인기 검색어 저장
+    public void savePopularKeywords(String keyword) {
+        popularKeywordsMap.merge(keyword, 1, Integer::sum);
+        log.info("인기 검색어 저장 - {} (현재 검색 횟수: {})", keyword, popularKeywordsMap.get(keyword));
+    }
+
+    // 검색어 캐싱 내역 가시화 로직
+    public void printPopularKeywordsCacheContents() {
+        log.info(":::현재 인기 검색어 캐시 내용:::");
+
+        if (popularKeywordsMap.isEmpty()) {
+            log.info("현재 저장된 검색어 데이터가 없습니다.");
+            return;
+        }
+
+        popularKeywordsMap.entrySet().stream()
+            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
+            .limit(10)
+            .forEach(entry -> log.info("  - 키워드: {}, 검색 횟수: {}", entry.getKey(), entry.getValue()));
+    }
 }

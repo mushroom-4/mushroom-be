@@ -2,7 +2,9 @@ package nbc.mushroom.domain.auction_item.controller;
 
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auction-items")
@@ -38,6 +41,7 @@ public class AuctionItemControllerV1 {
 
     private final AuctionItemService auctionItemService;
 
+    // 경매 물품 생성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<AuctionItemRes>> postAuctionItem(
         @Valid @ModelAttribute CreateAuctionItemReq createAuctionItemReq,
@@ -91,6 +95,7 @@ public class AuctionItemControllerV1 {
         @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime endDate,
         @RequestParam(value = "minPrice", required = false) Long minPrice,
         @RequestParam(value = "maxPrice", required = false) Long maxPrice) {
+
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sort, sortOrder));
         Page<SearchAuctionItemRes> searchKeywordAuctionItems = auctionItemService.searchKeywordAuctionItems(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice,
@@ -102,6 +107,7 @@ public class AuctionItemControllerV1 {
                 (ApiResponse.success("해당 키워드를 가진 경매 물품들이 모두 조회되었습니다.", searchKeywordAuctionItems)));
     }
 
+    // 경매 물품 수정
     @PutMapping(value = "/{auctionItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<AuctionItemRes>> putAuctionItem(
         @ModelAttribute PutAuctionItemReq putAuctionItemReq,
@@ -116,6 +122,7 @@ public class AuctionItemControllerV1 {
             .body(ApiResponse.success("경매 물품 수정에 성공했습니다.", auctionItemRes));
     }
 
+    // 경매 물품 삭제
     @DeleteMapping(value = "/{auctionItemId}")
     public ResponseEntity<ApiResponse<Void>> deleteAuctionItem(
         @PathVariable Long auctionItemId,
@@ -129,16 +136,20 @@ public class AuctionItemControllerV1 {
             .body(ApiResponse.success("경매 물품 삭제에 성공했습니다."));
     }
 
-//    // 인기 검색어 조회 -> 차순위 개발로 주석처리
-//    @GetMapping("/popular-keywords")
-//    public ResponseEntity<ApiResponse<List<String>>> getPopularKeywords() {
-//        List<String> keywords = auctionItemService.getPopularKeywords();
-//        return ResponseEntity.ok(ApiResponse.success("인기 검색어 조회에 성공했습니다.", keywords));
-//    }
-//
-//    // 저장된 캐시 내용 확인하는 API -> 인메모리 캐싱은 캐시 저장소에 데이터가 저장된 것을 확인하지 못하기 때문
-//    @GetMapping("/{storedCache}")
-//    public void printCache(@PathVariable String storedCache) {
-//        auctionItemService.printCacheContents(storedCache);
-//    }
+    // 인기 검색어 조회 TODO 반환방식 통일하기!
+    @GetMapping("/popular-keywords")
+    public ResponseEntity<ApiResponse<List<String>>> getPopularKeywords() {
+
+        List<String> popularKeywords = auctionItemService.searchPopularKeywords();
+
+        return ResponseEntity.ok(
+            ApiResponse.success("인기 검색어 조회에 성공했습니다.", popularKeywords));
+    }
+
+    // 캐시 내용 가시화 API
+    @GetMapping("/popular-keywords/cache")
+    public ResponseEntity<ApiResponse<Void>> printCache() {
+        auctionItemService.printPopularKeywordsCacheContents();
+        return ResponseEntity.ok(ApiResponse.success("인기 검색어 캐시 내용이 로그에 출력되었습니다."));
+    }
 }
