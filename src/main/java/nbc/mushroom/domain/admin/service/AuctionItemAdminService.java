@@ -39,13 +39,10 @@ public class AuctionItemAdminService {
 
     // 관리자 경매 물품 상태 목록 전체 조회 + 상태별 필터링 조회
     @Transactional(readOnly = true)
-    public Page<AuctionItemStatusRes> getAuctionItemsStatus(List<AuctionItemStatus> status,
-        Pageable pageable) {
-
-        if (status != null && !status.isEmpty()) {
-            return auctionItemRepository.findAuctionItemsByStatus(status, pageable);
-        } else {
-            return auctionItemRepository.findAllAuctionItemsByStatus(pageable);
-        }
+    public Page<AuctionItemStatusRes> getAuctionItemsStatus(
+        List<AuctionItemStatus> status,
+        Pageable pageable
+    ) {
+        return auctionItemRepository.findAuctionItemsByStatus(status, pageable);
     }
 }

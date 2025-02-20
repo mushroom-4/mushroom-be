@@ -36,7 +36,4 @@ public interface AuctionItemRepositoryCustom {
     // 경매 물품 상태별 필터링 조회
     Page<AuctionItemStatusRes> findAuctionItemsByStatus(
         List<AuctionItemStatus> status, Pageable pageable);
-
-    // 경매 물품 상태 목록 전체 조회
-    Page<AuctionItemStatusRes> findAllAuctionItemsByStatus(Pageable pageable);
 }

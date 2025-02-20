@@ -189,11 +189,11 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
     // 경매 물품 상태별 목록 필터링 조회 메서드
     @Override
-    public Page<AuctionItemStatusRes> findAuctionItemsByStatus(List<AuctionItemStatus> status,
-        Pageable pageable) {
-
+    public Page<AuctionItemStatusRes> findAuctionItemsByStatus(
+        List<AuctionItemStatus> status,
+        Pageable pageable
+    ) {
         QAuctionItem auctionItem = QAuctionItem.auctionItem;
-
         BooleanBuilder builder = new BooleanBuilder();
 
         if (status != null && !status.isEmpty()) {
@@ -216,6 +216,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             ))
             .from(auctionItem)
             .where(builder)
+            .orderBy(auctionItem.createdAt.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -224,36 +225,6 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             .select(auctionItem.count())
             .from(auctionItem)
             .where(builder);
-
-        return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
-    }
-
-    // 경매 물품 상태 목록 전체 조회 메서드
-    @Override
-    public Page<AuctionItemStatusRes> findAllAuctionItemsByStatus(Pageable pageable) {
-
-        List<AuctionItemStatusRes> results = queryFactory
-            .select(new QAuctionItemStatusRes(
-                auctionItem.id,
-                auctionItem.name,
-                auctionItem.description,
-                auctionItem.imageUrl,
-                auctionItem.size,
-                auctionItem.category,
-                auctionItem.brand,
-                auctionItem.startPrice,
-                auctionItem.startTime,
-                auctionItem.endTime,
-                auctionItem.status
-            ))
-            .from(auctionItem)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        JPAQuery<Long> total = queryFactory
-            .select(auctionItem.count())
-            .from(auctionItem);
 
         return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
     }
