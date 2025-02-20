@@ -193,12 +193,13 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         List<AuctionItemStatus> status,
         Pageable pageable
     ) {
+        if (status == null || status.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
         QAuctionItem auctionItem = QAuctionItem.auctionItem;
         BooleanBuilder builder = new BooleanBuilder();
-
-        if (status != null && !status.isEmpty()) {
-            builder.and(auctionItem.status.in(status));
-        }
+        builder.and(auctionItem.status.in(status));
 
         List<AuctionItemStatusRes> results = queryFactory
             .select(new QAuctionItemStatusRes(
@@ -215,7 +216,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(builder)
+            .where(auctionItem.isDeleted.eq(false), builder)
             .orderBy(auctionItem.createdAt.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -224,7 +225,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         JPAQuery<Long> total = queryFactory
             .select(auctionItem.count())
             .from(auctionItem)
-            .where(builder);
+            .where(auctionItem.isDeleted.eq(false), builder);
 
         return PageableExecutionUtils.getPage(results, pageable, total::fetchOne);
     }
