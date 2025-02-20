@@ -2,11 +2,13 @@ package nbc.mushroom.domain.like.repository;
 
 import static nbc.mushroom.domain.auction_item.entity.QAuctionItem.auctionItem;
 import static nbc.mushroom.domain.like.entity.QLike.like;
+import static nbc.mushroom.domain.user.entity.QUser.user;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
 import nbc.mushroom.domain.like.entity.Like;
+import nbc.mushroom.domain.notice.dto.NoticeRes;
 import nbc.mushroom.domain.user.dto.response.SearchUserAuctionItemLikeRes;
 import nbc.mushroom.domain.user.entity.QUser;
 import nbc.mushroom.domain.user.entity.User;
@@ -68,6 +71,37 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
                 .fetchOne()).orElse(0L);
 
         return new PageImpl<>(searchUserAuctionItemLikeResList, pageable, totalCount);
+    }
+
+    @Override
+    public List<NoticeRes> findNoticeInfoOfStartByLike(LocalDateTime now, LocalDateTime nowPlus10) {
+        return queryFactory
+            .select(Projections.constructor(NoticeRes.class,
+                auctionItem, user, like))
+            .from(like)
+            .innerJoin(like.auctionItem, auctionItem)
+            .innerJoin(like.user, user)
+            .fetchJoin()
+            .where(
+                // 현재 시간과 startTime 비교 // 현재 시간+10분 과 startTime 비교
+                auctionItem.startTime.gt(now).and(auctionItem.startTime.loe(nowPlus10)),
+                auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
+            ).fetch();
+    }
+
+    @Override
+    public List<NoticeRes> findNoticeInfoOfEndByLike(LocalDateTime now, LocalDateTime nowPlus10) {
+        return queryFactory
+            .select(Projections.constructor(NoticeRes.class,
+                auctionItem, user, like))
+            .from(like)
+            .innerJoin(like.auctionItem, auctionItem)
+            .innerJoin(like.user, user)
+            .where(
+                // 현재 시간과 endTime 비교 // 현재 시간+10분 과 endTime 비교
+                auctionItem.endTime.gt(now).and(auctionItem.endTime.loe(nowPlus10)),
+                auctionItem.isDeleted.isFalse() // 삭제되지 않은 항목만 검색
+            ).fetch();
     }
 
     // like.id 오름 차순으로 정렬
