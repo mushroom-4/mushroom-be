@@ -97,7 +97,6 @@ public class LikeRepositoryImpl implements LikeRepositoryCustom {
             .from(like)
             .innerJoin(like.auctionItem, auctionItem)
             .innerJoin(like.user, user)
-            .fetchJoin()
             .where(
                 // 현재 시간과 endTime 비교 // 현재 시간+10분 과 endTime 비교
                 auctionItem.endTime.gt(now).and(auctionItem.endTime.loe(nowPlus10)),
