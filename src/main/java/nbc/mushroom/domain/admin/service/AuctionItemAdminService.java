@@ -3,6 +3,7 @@ package nbc.mushroom.domain.admin.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nbc.mushroom.domain.admin.dto.request.AuctionItemChangeStatusReq;
 import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
@@ -19,21 +20,18 @@ public class AuctionItemAdminService {
 
     private final AuctionItemRepository auctionItemRepository;
 
-    // 경매 물품 검수 합격 -> status 대기중 (waiting)
+    // 경매 물품 검수
     @Transactional
-    public void approveAuctionItem(Long auctionItemId) {
-
+    public void changeStatusAuctionItem(
+        Long auctionItemId,
+        AuctionItemChangeStatusReq auctionItemChangeStatusReq
+    ) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
 
-        auctionItem.approve();
-    }
-
-    // 경매 물품 검수 불합격 -> status 실패 (rejected)
-    @Transactional
-    public void rejectAuctionItem(Long auctionItemId) {
-
-        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
+        if (auctionItemChangeStatusReq.action().equalsIgnoreCase("approve")) {
+            auctionItem.approve();
+            return;
+        }
         auctionItem.reject();
     }
 
