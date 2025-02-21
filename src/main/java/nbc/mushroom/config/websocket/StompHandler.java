@@ -14,6 +14,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
@@ -104,7 +105,8 @@ public class StompHandler implements ChannelInterceptor {
                 .put("userId", Long.parseLong(claims.getSubject()));
             stompHeaderAccessor.getSessionAttributes().put("email", claims.get("email"));
             stompHeaderAccessor.getSessionAttributes().put("nickname", claims.get("nickname"));
-            stompHeaderAccessor.getSessionAttributes().put("imageUrl", claims.get("imageUrl"));
+            Optional.ofNullable(claims.get("imageUrl"))
+                .ifPresent(url -> stompHeaderAccessor.getSessionAttributes().put("imageUrl", url));
             stompHeaderAccessor.getSessionAttributes().put("userRole", claims.get("userRole"));
 
             log.info("✅ CONNECT 성공, STOMP 세션 저장 확인: {}",
