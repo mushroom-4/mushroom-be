@@ -34,4 +34,7 @@ public interface BidRepositoryCustom {
 
     List<SearchNoticeEndTypeRes> auctionItemBidInfoFindList(
         List<SearchNoticeRes> auctionItemIdByNoticeList);
+
+    Bid findByAuctionItemAndBidderAndBiddingStatus(Long sellerId, User loginUser,
+        BiddingStatus biddingStatus);
 }
