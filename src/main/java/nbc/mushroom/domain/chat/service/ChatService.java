@@ -42,23 +42,24 @@ public class ChatService {
 
         log.info("ChatMessaeg 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId, chatMessage);
 
-        saveChatMessage(chatRoomId, chatMessage);
+        ChatMessageRes chatMessageRes = ChatMessageRes.from(chatMessage);
+        saveChatMessage(chatRoomId, chatMessageRes);
 
-        redisPublish.publish(chatMessage);
+        redisPublish.publish(chatMessageRes);
 
-        return ChatMessageRes.from(chatMessage);
+        return chatMessageRes;
     }
 
     /**
      * Redis에 채팅 저장
      *
      * @param chatRoomId     채팅방 ID
-     * @param chatMessage 저장할 메시지 객체
+     * @param chatMessageRes 저장할 메시지 객체
      */
-    public void saveChatMessage(Long chatRoomId, ChatMessage chatMessage) {
+    public void saveChatMessage(Long chatRoomId, ChatMessageRes chatMessageRes) {
         String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
         log.info("Redis Storage [Key : {}]", key);
-        redisTemplate.opsForList().rightPush(key, chatMessage); // key - value
+        redisTemplate.opsForList().rightPush(key, chatMessageRes); // key - value
     }
 
 
@@ -80,8 +81,7 @@ public class ChatService {
         }
 
         return chatMessageList.stream()
-            .map(o -> (ChatMessage) o) // Object → ChatMessage 변환
-            .map(ChatMessageRes::from) // ChatMessage → ChatMessageRes 변환
+            .map(o -> (ChatMessageRes) o) // Object → ChatMessage 변환
             .toList(); // 최종 List<ChatMessageRes> 반환
     }
 }

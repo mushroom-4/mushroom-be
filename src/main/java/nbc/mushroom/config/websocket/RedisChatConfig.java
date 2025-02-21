@@ -3,7 +3,7 @@ package nbc.mushroom.config.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import nbc.mushroom.domain.chat.entity.ChatMessage;
+import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
 import nbc.mushroom.domain.chat.service.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -53,8 +53,8 @@ public class RedisChatConfig {
         objectMapper.enable(
             SerializationFeature.INDENT_OUTPUT); // 읽기 쉽게 들여쓰기 활성화 (디버깅 용도, 베포 시엔 성능을 위해 비활성화)
 
-        Jackson2JsonRedisSerializer<ChatMessage> serializer = new Jackson2JsonRedisSerializer<>(
-            objectMapper, ChatMessage.class);
+        Jackson2JsonRedisSerializer<ChatMessageRes> serializer = new Jackson2JsonRedisSerializer<>(
+            objectMapper, ChatMessageRes.class);
 
         redisTemplate.setValueSerializer(serializer); // value 직렬화 설정
 
