@@ -27,4 +27,6 @@ public interface BidRepositoryCustom {
     Long countBidsByBidderAndStatus(User bidder, BiddingStatus biddingStatus);
 
     AuctionItemBidInfoRes auctionItemBidInfoFind(Long id);
+
+    Boolean existBidByBidderIdAndAuctionItemId(Long bidderId, Long auctionItemId);
 }

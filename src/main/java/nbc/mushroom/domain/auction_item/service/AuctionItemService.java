@@ -158,6 +158,10 @@ public class AuctionItemService {
         auctionItem.softDelete();
     }
 
+    public Boolean hasAuctionItem(Long auctionItemId) {
+        return auctionItemRepository.existsById(auctionItemId);
+    }
+
     private AuctionItem validateItemById(Long userId, Long auctionItemId) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
         if (!auctionItem.getSeller().getId().equals(userId)) {

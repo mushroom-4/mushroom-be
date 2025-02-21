@@ -60,6 +60,8 @@ public class User extends Timestamped {
             .id(authUser.id())
             .email(authUser.email())
             .userRole(authUser.userRole())
+            .nickname(authUser.nickname())
+            .imageUrl(authUser.imageUrl())
             .build();
     }
 
