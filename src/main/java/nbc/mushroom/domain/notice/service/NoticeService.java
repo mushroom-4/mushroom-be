@@ -11,7 +11,6 @@ import nbc.mushroom.domain.notice.dto.NoticeRes;
 import nbc.mushroom.domain.notice.entity.Notice;
 import nbc.mushroom.domain.notice.entity.NoticeType;
 import nbc.mushroom.domain.notice.repository.NoticeRepository;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +21,7 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final LikeRepository likeRepository;
 
-    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
+    //    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
     public void createNoticeStartTime() {
         log.info("::::Create Notice Start Time::::");
         // 현재 시간
@@ -42,7 +41,7 @@ public class NoticeService {
         }
     }
 
-    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
+    //    @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
     public void createNoticeEndTime() {
         log.info("::::Create Notice End Time::::");
         // 현재 시간
