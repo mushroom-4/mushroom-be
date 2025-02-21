@@ -11,6 +11,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfoRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
@@ -18,6 +19,8 @@ import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.entity.QBid;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.notice.dto.SearchNoticeEndTypeRes;
+import nbc.mushroom.domain.notice.dto.SearchNoticeRes;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -156,5 +159,26 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
                 bid.auctionItem.id.eq(auctionItemId),
                 bid.bidder.id.eq(bidderId))
             .fetchFirst() != null;
+    }
+    @Override
+    public List<SearchNoticeEndTypeRes> auctionItemBidInfoFindList(
+        List<SearchNoticeRes> auctionItemIdByNoticeList) {
+
+        List<Long> auctionItemIdList = auctionItemIdByNoticeList.stream()
+            .map(auctionItemIdByNotice -> auctionItemIdByNotice.auctionItem().getId()).collect(
+                Collectors.toList());
+
+        return queryFactory // Todo 그냥 비드를 넣으면?
+            .select(Projections.constructor(
+                SearchNoticeEndTypeRes.class,
+                bid.biddingPrice.max(),
+                bid.auctionItem.id
+            ))
+            .from(bid)
+            .where(bid.auctionItem.id.in(auctionItemIdList)
+                .and(bid.auctionItem.isDeleted.eq(false)))
+            .groupBy(bid.auctionItem.id)
+
+            .fetch();
     }
 }
