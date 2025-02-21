@@ -5,7 +5,6 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.BIDDING_REQUIRE
 import static nbc.mushroom.domain.common.exception.ExceptionType.CHAT_ROOM_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.EXPIRED_JWT_TOKEN;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INTERNAL_SERVER_ERROR;
-import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_CHAT_ROOM_PATH;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT_SIGNATURE;
 import static nbc.mushroom.domain.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN;
@@ -21,6 +20,7 @@ import nbc.mushroom.domain.auction_item.service.AuctionItemService;
 import nbc.mushroom.domain.bid.service.BidService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
+import nbc.mushroom.domain.common.util.StompDestinationUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -137,7 +137,7 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTH_TOKEN_NOT_FOUND);
             }
 
-            Long chatRoomId = getChatRoomId(stompHeaderAccessor, "/sub");
+            Long chatRoomId = StompDestinationUtils.getChatRoomId(stompHeaderAccessor, "/ws/sub");
             if (Boolean.FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
             }
@@ -156,7 +156,7 @@ public class StompHandler implements ChannelInterceptor {
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
         try {
-            Long chatRoomId = getChatRoomId(stompHeaderAccessor, "/pub");
+            Long chatRoomId = StompDestinationUtils.getChatRoomId(stompHeaderAccessor, "/ws/pub");
             Long loginUserId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
 
             if (loginUserId == null) {
@@ -172,23 +172,6 @@ public class StompHandler implements ChannelInterceptor {
             log.error("❌ SEND 실패: {}", e.getMessage());
             throw e; // 예외를 던져야 STOMP에서 처리 가능
         }
-    }
-
-    /**
-     * STOMP 메시지의 Destination에서 채팅방 ID 추출 후 검증
-     */
-    private Long getChatRoomId(StompHeaderAccessor stompHeaderAccessor, String prefix) {
-        String destination = stompHeaderAccessor.getDestination();
-        if (destination == null || !destination.startsWith(prefix + "/chats/")) {
-            throw new CustomException(INVALID_CHAT_ROOM_PATH);
-        }
-
-        String chatRoomIdStr = destination.substring((prefix + "/chats/").length());
-        if (chatRoomIdStr.isEmpty() || !chatRoomIdStr.matches("\\d+")) {
-            throw new CustomException(INVALID_CHAT_ROOM_PATH);
-        }
-
-        return Long.parseLong(chatRoomIdStr);
     }
 
     /**

@@ -20,15 +20,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // STOMP 엔드포인트 등록
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-
-        // http 용
         registry.addEndpoint("/ws") // 엔트포인트. STOMP 접속 주소 url -> /ws (이 주소로 소켓 연결)
-            .setAllowedOriginPatterns("*")  // CORS 설정 부분. (* : 모든 도메인 허용) -> 추후 지정하든가 하자..
+            .setAllowedOriginPatterns("*")  // CORS 설정 부분. (* : 모든 도메인 허용)
             .withSockJS(); // http 사용을 위해.
-
-        // /ws 용
-        registry.addEndpoint("/ws")
-            .setAllowedOriginPatterns("*");
     }
 
     /**
@@ -43,9 +37,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes(
-            "/pub"); // 클라이언트 -> 서버
+            "/ws/pub"); // 클라이언트 -> 서버
         registry.enableSimpleBroker(
-            "/sub"); //  서버 -> 클라이언트
+            "/ws/sub"); //  서버 -> 클라이언트
     }
 
     /**

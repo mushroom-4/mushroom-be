@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.chat.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.request.ChatMessageReq;
@@ -23,10 +24,11 @@ public class ChatControllerV2 {
     @MessageMapping("/chats/{chatRoomId}")
     public ChatMessageRes sendChatMessage(
         @DestinationVariable Long chatRoomId,
-        @Payload ChatMessageReq chatMessageReq,
+        @Valid @Payload ChatMessageReq chatMessageReq,
         @Auth AuthUser authUser
     ) {
         log.info("Auth User ID : {} ", authUser.id());
-        return chatService.sendChatMessage(chatRoomId, chatMessageReq, User.fromAuthUser(authUser));
+        return chatService.sendChatMessage(chatRoomId, chatMessageReq,
+            User.fromAuthUser(authUser));
     }
 }

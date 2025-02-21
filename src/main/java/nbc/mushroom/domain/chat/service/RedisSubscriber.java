@@ -40,8 +40,8 @@ public class RedisSubscriber implements MessageListener {
             chatMessageRes.dateTime()
         );
 
-        // Redis에서 받은 메시지 WebSocket으로 전달 ( /sub/chats/ -> 웹소켓 구독 경로 )
-        simpMessagingTemplate.convertAndSend("/sub/chats/" + chatMessageRes.chatRoomId(),
+        // Redis에서 받은 메시지 WebSocket으로 전달 ( /ws/sub/chats/ -> 웹소켓 구독 경로 )
+        simpMessagingTemplate.convertAndSend("/ws/sub/chats/" + chatMessageRes.chatRoomId(),
             chatMessageRes);
     }
 }
