@@ -8,13 +8,13 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ExceptionType {
 
-    //Server
+    // Server
     SERVER_IMAGE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV01", "이미지 서버에 문제가 생겼습니다."),
     SERVER_PAYMENT_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV02", "결제가 정상적으로 되지 않았습니다."),
     SERVER_PAYMENT_CANCEL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "SV03", "결제 취소가 정상적으로 되지 않았습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SV04", "서버 내부 오류가 발생했습니다."),
 
-    //Auth
+    // Auth
     AUTH_WRONG_USED(HttpStatus.INTERNAL_SERVER_ERROR, "A01", "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
     AUTH_FAILED(HttpStatus.BAD_REQUEST, "A02", "이메일 또는 비밀번호가 일치하지 않습니다."),
     AUTH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "A03", "토큰을 찾을 수 없습니다."),
@@ -23,23 +23,22 @@ public enum ExceptionType {
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "A06", "만료된 JWT 토큰입니다."),
     UNSUPPORTED_JWT_TOKEN(HttpStatus.BAD_REQUEST, "A07", "지원되지 않는 JWT 토큰입니다."),
 
-    //User
+    // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U01", "해당 사용자를 찾을 수 없습니다."),
     EMAIL_DUPLICATE(HttpStatus.BAD_REQUEST, "U02", "이메일이 중복됩니다."),
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "U03", "기존 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME(HttpStatus.BAD_REQUEST, "U04", "새 비밀번호는 기존 비밀번호와 같을 수 없습니다."),
     INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "U05", "유효하지 않은 UserRole"),
 
-    //AuctionItem
+    // AuctionItem
     AUCTION_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "AI01", "존재하지 않는 물품입니다."),
     AUCTION_ITEM_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "AI02", "경매가 진행 중인 물품이 아닙니다."),
     AUCTION_ITEM_NOT_USER(HttpStatus.FORBIDDEN, "AI03", "사용자 본인의 물품이어야 합니다."),
     REGISTERED_AUCTION_ITEMS_NOT_FOUND(HttpStatus.NOT_FOUND, "AI04", "등록된 경매 물품이 없습니다."),
 
-    //AuctionItem Admin
+    // AuctionItem Admin
     INVALID_AUCTION_ITEM_STATUS(HttpStatus.BAD_REQUEST, "AIA01", "잘못된 상태 변경 요청입니다."),
     AUCTION_ITEM_ALREADY_INSPECTED(HttpStatus.BAD_REQUEST, "AIA02", "이미 검수가 완료된 물품입니다."),
-
 
     // Bid
     SELF_BIDDING_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "B01", "본인 물품을 입찰할 수 없습니다."),
@@ -65,6 +64,11 @@ public enum ExceptionType {
     INVALID_CHAT_ROOM_PATH(HttpStatus.BAD_REQUEST, "C01", "유효하지 않은 채팅방 경로입니다."),
     BIDDING_REQUIRED(HttpStatus.FORBIDDEN, "C02", "메시지 전송 권한이 없습니다. 해당 경매물품에 대한 입찰 내역이 필요합니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "C03", "해당 채팅방을 찾을 수 없습니다."),
+
+    // Review
+    REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "R01", "해당 판매자에 대한 리뷰를 이미 작성하였습니다."),
+    BID_NO_PAYMENT(HttpStatus.BAD_REQUEST, "R02", "리뷰 작성 권한이 없습니다. 해당 경매 물품에 대한 결제 내역이 필요합니다."),
+    SELLER_CANNOT_REVIEW(HttpStatus.BAD_REQUEST, "R03", "판매자는 본인에 대해 리뷰를 작성할 수 없습니다."),
 
     ;
     private final HttpStatus httpStatus;
