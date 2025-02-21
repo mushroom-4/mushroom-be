@@ -66,7 +66,7 @@
       console.log('✅ STOMP 연결 성공:', frame);
 
       const chatRoomId = document.getElementById("chatRoomId").value;
-      stompClient.subscribe('/sub/chats/' + chatRoomId, function (messageOutput) {
+      stompClient.subscribe('/ws/sub/chats/' + chatRoomId, function (messageOutput) {
         showMessage(JSON.parse(messageOutput.body));
       });
 
@@ -93,10 +93,10 @@
       return;
     }
 
-    console.log(`📌 [Client] 메시지 전송: /pub/chats/${chatRoomId}`);
+    console.log(`📌 [Client] 메시지 전송: /ws/pub/chats/${chatRoomId}`);
 
     const payload = JSON.stringify({message: message});
-    stompClient.send("/pub/chats/" + chatRoomId, {}, payload);
+    stompClient.send("/ws/pub/chats/" + chatRoomId, {}, payload);
     document.getElementById("messageInput").value = '';
   }
 
