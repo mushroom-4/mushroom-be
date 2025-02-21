@@ -32,6 +32,9 @@ public interface BidRepositoryCustom {
 
     Boolean existBidByBidderIdAndAuctionItemId(Long bidderId, Long auctionItemId);
 
+    Bid findByAuctionItemAndBidderAndBiddingStatus(Long sellerId, User loginUser,
+        BiddingStatus biddingStatus);
+
     List<SearchNoticeEndTypeRes> auctionItemBidInfoFindList(
         List<SearchNoticeRes> auctionItemIdByNoticeList);
 
