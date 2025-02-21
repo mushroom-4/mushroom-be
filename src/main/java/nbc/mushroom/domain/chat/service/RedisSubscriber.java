@@ -1,8 +1,10 @@
 package nbc.mushroom.domain.chat.service;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
+import nbc.mushroom.domain.chat.entity.ChatMessage;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,16 +30,17 @@ public class RedisSubscriber implements MessageListener {
      */
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        ChatMessageRes chatMessageRes = (ChatMessageRes) redisTemplate.getValueSerializer()
-            .deserialize(
-                message.getBody());
+        ChatMessage chatMessage = (ChatMessage) redisTemplate.getValueSerializer()
+            .deserialize(message.getBody());
+
+        ChatMessageRes chatMessageRes = ChatMessageRes.from(Objects.requireNonNull(chatMessage));
 
         log.info("[ChatRoomId: {}] [{}] {}: {} ( {} )",
             chatMessageRes.chatRoomId(),
             chatMessageRes.messageType(),
             chatMessageRes.nickname(),
             chatMessageRes.message(),
-            chatMessageRes.dateTime()
+            chatMessageRes.sendDateTime()
         );
 
         // Redis에서 받은 메시지 WebSocket으로 전달 ( /ws/sub/chats/ -> 웹소켓 구독 경로 )

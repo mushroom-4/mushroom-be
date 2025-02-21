@@ -44,11 +44,9 @@ public class ChatService {
 
         saveChatMessage(chatRoomId, chatMessage);
 
-        ChatMessageRes chatMessageRes = ChatMessageRes.from(chatMessage);
+        redisPublish.publish(chatMessage);
 
-        redisPublish.publish(chatMessageRes);
-
-        return chatMessageRes;
+        return ChatMessageRes.from(chatMessage);
     }
 
     /**
