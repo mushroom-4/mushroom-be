@@ -50,6 +50,26 @@ public class ChatService {
         return chatMessageRes;
     }
 
+    public void sendBidAnnouncementMessage(Long chatRoomId, User bidder,
+        Long bidiingPrice) {
+        String message = bidiingPrice + "원에 입찰하였습니다. ";
+        ChatMessage announcementMessage = ChatMessage.builder()
+            .chatRoomId(chatRoomId)
+            .messageType(MessageType.ANNOUNCEMENT)
+            .message(message)
+            .sender(bidder)
+            .sendDateTime(LocalDateTime.now())
+            .build();
+
+        log.info("AnnouncementMessaeg 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId,
+            announcementMessage);
+
+        ChatMessageRes announcementMessageRes = ChatMessageRes.from(announcementMessage);
+        saveChatMessage(chatRoomId, announcementMessageRes);
+
+        redisPublish.publish(announcementMessageRes);
+    }
+
     /**
      * Redis에 채팅 저장
      *
