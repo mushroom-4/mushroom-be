@@ -157,4 +157,21 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
                 bid.bidder.id.eq(bidderId))
             .fetchFirst() != null;
     }
+
+    @Override
+    public Bid findByAuctionItemAndBidderAndBiddingStatus(
+        Long sellerId, User loginUser, BiddingStatus paymentCompleted) {
+        return queryFactory
+            .select(bid)
+            .from(bid)
+            .join(bid.auctionItem, auctionItem)
+            .where(
+                auctionItem.seller.id.eq(sellerId),
+                bid.bidder.id.eq(loginUser.getId()),
+                bid.biddingStatus.eq(paymentCompleted)
+            )
+            .limit(1)
+            .fetchOne();
+    }
+    
 }
