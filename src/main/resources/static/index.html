@@ -125,9 +125,14 @@
       }
       subscription = stompClient.subscribe('/ws/sub/chats/' + chatRoomId,
           handleSubscriptionMessage);
+      console.log(`✅ 메시지 구독 성공: /ws/sub/chats/${chatRoomId}`);
 
       // STOMP 연결 완료 후 전송 버튼 활성화
       document.getElementById("sendButton").disabled = false;
+
+      // ✅ 이전 채팅 내역 불러오기 (REST API 호출)
+      fetchChatHistory(chatRoomId);
+
     }, function (error) {
       console.error('🚨 STOMP 연결 오류:', error);
       alert("STOMP 연결에 실패했습니다. 서버 상태를 확인하세요.");
@@ -247,6 +252,42 @@
     } catch (e) {
       console.error("토큰 파싱 오류:", e);
       return null;
+    }
+  }
+
+  async function fetchChatHistory(chatRoomId) {
+    if (!chatRoomId || isNaN(chatRoomId)) {
+      console.error("🚨 오류: 잘못된 chatRoomId 값:", chatRoomId);
+      return;
+    }
+
+    const token = document.getElementById('tokenInput').value;
+    if (!token) {
+      console.error("🚨 토큰 없음!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/v2/bids/chats/${chatRoomId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`이전 채팅 내역을 불러오는 데 실패했습니다. 상태 코드: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ 이전 채팅 내역 불러오기 완료:", result);
+
+      if (result.data) {
+        result.data.forEach(appendMessage);
+      }
+    } catch (error) {
+      console.error("🚨 오류:", error);
     }
   }
 </script>
