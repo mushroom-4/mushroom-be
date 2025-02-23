@@ -87,13 +87,11 @@ public class ChatService {
      * 특정 채팅방의 최근 메시지들 조회
      *
      * @param chatRoomId 채팅방 ID
-     * @param start      시작 인덱스
-     * @param end        종료 인덱스 (예: -1이면 전체)
      * @return 채팅 메시지 리스트
      */
-    public List<ChatMessageRes> getChatHistory(Long chatRoomId, long start, long end) {
+    public List<ChatMessageRes> getChatHistory(Long chatRoomId) {
         String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
-        List<Object> chatMessageList = redisTemplate.opsForList().range(key, start, end);
+        List<Object> chatMessageList = redisTemplate.opsForList().range(key, 0, -1); // 처음부터 끝까지
 
         // chatMessageList가 null이면 빈 리스트 반환
         if (chatMessageList == null) {
