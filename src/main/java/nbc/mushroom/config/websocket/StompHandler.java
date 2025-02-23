@@ -139,6 +139,8 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTH_TOKEN_NOT_FOUND);
             }
 
+            log.info("✅ SUBSCRIBE 요청 destination: {}", stompHeaderAccessor.getDestination());
+
             Long chatRoomId = StompDestinationUtils.getChatRoomId(stompHeaderAccessor, "/ws/sub");
             if (Boolean.FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
