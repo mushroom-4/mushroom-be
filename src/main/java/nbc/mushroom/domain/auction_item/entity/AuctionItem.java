@@ -2,8 +2,8 @@ package nbc.mushroom.domain.auction_item.entity;
 
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.COMPLETED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTING;
+import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.NON_TRADED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
-import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.UNTRADED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_AUCTION_ITEM_STATUS;
@@ -129,10 +129,10 @@ public class AuctionItem extends Timestamped {
         this.status = COMPLETED;
     }
 
-    public void untrade() { // TODO 메서드명도 non traded로 변경하기
+    public void nontrade() { // TODO 메서드명도 non traded로 변경하기
         if (this.status != PROGRESSING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
-        this.status = UNTRADED;
+        this.status = NON_TRADED;
     }
 }

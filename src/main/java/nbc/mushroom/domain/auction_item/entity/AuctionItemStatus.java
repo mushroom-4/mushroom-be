@@ -6,5 +6,5 @@ public enum AuctionItemStatus {
     WAITING,             // 대기중
     PROGRESSING,         // 진행중
     COMPLETED,            // 종료
-    UNTRADED              // 거래 실패 TODO NON_TRADED로 변경하기
+    NON_TRADED              // 거래 실패 TODO NON_TRADED로 변경하기
 }
