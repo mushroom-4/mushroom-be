@@ -53,7 +53,7 @@ public class AuctionItemStatusService {
             log.info("auction endTime : {}", auctionItem.getEndTime());
 
             if (Boolean.FALSE.equals(bidRepository.existsBidByAuctionItem(auctionItem))) {
-                auctionItem.untrade();
+                auctionItem.nontrade();
                 log.info("auction untrade id : {}", auctionItem.getId());
                 log.info("auction untrade Status : {}", auctionItem.getStatus());
                 continue;
