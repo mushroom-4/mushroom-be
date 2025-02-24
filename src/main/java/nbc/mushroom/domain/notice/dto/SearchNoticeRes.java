@@ -10,13 +10,4 @@ public record SearchNoticeRes(
     Notice notice
 ) {
 
-    public SearchNoticeRes(
-        AuctionItem auctionItem,
-        User user,
-        Notice notice
-    ) {
-        this.auctionItem = auctionItem;
-        this.user = user;
-        this.notice = notice;
-    }
 }

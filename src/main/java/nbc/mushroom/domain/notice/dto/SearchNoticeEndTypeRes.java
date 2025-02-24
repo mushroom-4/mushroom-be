@@ -6,9 +6,5 @@ public record SearchNoticeEndTypeRes(
 
 ) {
 
-    public SearchNoticeEndTypeRes(Long maxPrice, Long auctionId) {
-        this.maxPrice = maxPrice;
-        this.auctionId = auctionId;
-    }
 }
 
