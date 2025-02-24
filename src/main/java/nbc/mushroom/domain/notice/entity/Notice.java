@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
-import nbc.mushroom.domain.like.entity.Like;
+import nbc.mushroom.domain.like.entity.AuctionItemLike;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -38,19 +38,20 @@ public class Notice extends Timestamped {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "like_id", nullable = false)
-    private Like like;
+    @JoinColumn(name = "auction_item_like_id", nullable = false)
+    private AuctionItemLike auctionItemLike;
 
     @Enumerated(EnumType.STRING)
     @JoinColumn(nullable = false)
     private NoticeType noticeType;
 
     @Builder
-    public Notice(Long id, AuctionItem auctionItem, User user, Like like, NoticeType noticeType) {
+    public Notice(Long id, AuctionItem auctionItem, User user, AuctionItemLike auctionItemLike,
+        NoticeType noticeType) {
         this.id = id;
         this.auctionItem = auctionItem;
         this.user = user;
-        this.like = like;
+        this.auctionItemLike = auctionItemLike;
         this.noticeType = noticeType;
     }
 }

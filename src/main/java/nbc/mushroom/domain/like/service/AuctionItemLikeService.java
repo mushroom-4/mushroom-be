@@ -10,21 +10,21 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.like.entity.Like;
-import nbc.mushroom.domain.like.repository.LikeRepository;
+import nbc.mushroom.domain.like.entity.AuctionItemLike;
+import nbc.mushroom.domain.like.repository.AuctionItemLikeRepository;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LikeService {
+public class AuctionItemLikeService {
 
     private final UserRepository userRepository;
     private final AuctionItemRepository auctionItemRepository;
-    private final LikeRepository likeRepository;
+    private final AuctionItemLikeRepository auctionItemLikeRepository;
 
-    public void createLike(Long userId, Long auctionItemId) {
+    public void createAuctionItemLike(Long userId, Long auctionItemId) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
 
         User user = userRepository.findById(userId)
@@ -34,29 +34,30 @@ public class LikeService {
             throw new CustomException(NOT_SELF_LIKE);
         }
 
-        if (likeRepository.findLikeByUserAndAuctionItem(user,
+        if (auctionItemLikeRepository.findLikeByUserAndAuctionItem(user,
             auctionItem).isPresent()) {
             throw new CustomException(EXIST_LIKE_BY_AUCTION_ITEM);
         }
 
-        Like like = Like.builder()
+        AuctionItemLike auctionItemLike = AuctionItemLike.builder()
             .auctionItem(auctionItem)
             .user(user)
             .build();
 
-        likeRepository.save(like);
+        auctionItemLikeRepository.save(auctionItemLike);
     }
 
-    public void hardDeleteLike(Long userId, Long auctionItemId) {
+    public void hardDeleteAuctionItemLike(Long userId, Long auctionItemId) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        Like like = likeRepository.findLikeByUserAndAuctionItem(user,
+        AuctionItemLike auctionItemLike = auctionItemLikeRepository.findLikeByUserAndAuctionItem(
+            user,
             auctionItem).orElseThrow(() -> new CustomException(LIKE_NOT_FOUND));
 
-        likeRepository.delete(like);
+        auctionItemLikeRepository.delete(auctionItemLike);
     }
 
 }

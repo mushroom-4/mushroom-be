@@ -12,4 +12,11 @@ public record SearchPageNoticeRes(
         return new SearchPageNoticeRes(message, noticeId);
 
     }
+
+    public static SearchPageNoticeRes from(
+        String message
+    ) {
+        return new SearchPageNoticeRes(message, null);
+
+    }
 }

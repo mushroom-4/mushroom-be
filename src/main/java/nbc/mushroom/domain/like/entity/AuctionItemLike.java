@@ -17,9 +17,9 @@ import nbc.mushroom.domain.user.entity.User;
 
 @Getter
 @Entity
-@Table(name = "`like`")
+@Table(name = "`auction_item_like`")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class AuctionItemLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class Like {
     private User user;
 
     @Builder
-    public Like(Long id, AuctionItem auctionItem, User user) {
+    public AuctionItemLike(Long id, AuctionItem auctionItem, User user) {
         this.id = id;
         this.auctionItem = auctionItem;
         this.user = user;

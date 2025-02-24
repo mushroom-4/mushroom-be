@@ -24,7 +24,7 @@ public class UserNoticeService {
 
     private final NoticeRepository noticeRepository;
 
-    public Page<SearchPageNoticeRes> searchUserNotice(User user, int page) {
+    public Page<SearchPageNoticeRes> searchUserNotice(User user) {
         // 유저가 가지는 공지 List
         List<SearchNoticeRes> SearchNoticeResList = noticeRepository.findNoticeTypeInfoByNoticeList(
             user);
@@ -51,7 +51,7 @@ public class UserNoticeService {
         }
 
         int size = 10;
-
+        int page = 0;
         Pageable pageable = PageRequest.of(page, size);
 
         int start = (int) pageable.getOffset();
