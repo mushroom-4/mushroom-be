@@ -16,6 +16,7 @@ import nbc.mushroom.domain.bid.dto.request.CreateBidReq;
 import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
+import nbc.mushroom.domain.chat.service.ChatService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class BidService {
 
     private final BidRepository bidRepository;
     private final AuctionItemRepository auctionItemRepository;
+    private final ChatService chatService;
 
     @Transactional(readOnly = false)
     public CreateBidRes createOrUpdateBid(
@@ -48,6 +50,9 @@ public class BidService {
         if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
             findBid.updateBiddingPrice(createBidReq.biddingPrice());
         }
+
+        chatService.sendBidAnnouncementMessage(findAuctionItem.getId(), findBid.getBidder(),
+            findBid.getBiddingPrice());
 
         return CreateBidRes.from(findBid);
     }
