@@ -16,18 +16,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 public class CacheConfig {
 
-//    @Bean
-//    public CacheManager cacheManager() {
-//        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-//        cacheManager.setCaffeine(
-//            Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).recordStats());
-//        return cacheManager;
-//    }
-
+    /**
+     * StringRedisSerializer - Key 직렬화 GenericJackson2JsonRedisSerializer - Value 직렬화
+     */
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofHours(1)) // 캐시 유효 기간 1시간
+            .entryTtl(Duration.ofHours(1))
             .serializeKeysWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
                     new StringRedisSerializer())) // Key 직렬화 설정
