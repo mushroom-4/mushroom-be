@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.user.controller;
+package nbc.mushroom.domain.notice.controller;
 
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/users/notices")
-public class UserNoticeControllerV2 {
+public class NoticeControllerV2 {
 
     private final UserNoticeUpgradeService userNoticeUpgradeService;
 
