@@ -28,7 +28,8 @@ public class AuctionItemAdminControllerV1 {
     private final AuctionItemAdminService auctionItemAdminService;
 
     @PatchMapping("/{auctionItemId}")
-    public ResponseEntity<ApiResponse<Void>> adminApproveAuctionItem(
+    public ResponseEntity<ApiResponse<Void>> adminInspectAuctionItem(
+        // todo 리팩토링 할 때 메서드명 adminApproveAuctionItems -> adminInspectAuctionItems로 변경하기
         @PathVariable Long auctionItemId,
         @Valid @RequestBody AuctionItemChangeStatusReq auctionItemChangeStatusReq
     ) {
