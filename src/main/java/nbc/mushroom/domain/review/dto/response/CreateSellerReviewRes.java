@@ -2,13 +2,13 @@ package nbc.mushroom.domain.review.dto.response;
 
 import nbc.mushroom.domain.review.entity.Review;
 
-public record CreateReviewRes(
+public record CreateSellerReviewRes(
     int score,
     String content
 ) {
 
-    public static CreateReviewRes from(Review review) {
-        return new CreateReviewRes(
+    public static CreateSellerReviewRes from(Review review) {
+        return new CreateSellerReviewRes(
             review.getScore(),
             review.getContent()
         );

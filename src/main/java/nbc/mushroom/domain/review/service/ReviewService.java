@@ -7,8 +7,8 @@ import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.exception.ExceptionType;
-import nbc.mushroom.domain.review.dto.request.CreateReviewReq;
-import nbc.mushroom.domain.review.dto.response.CreateReviewRes;
+import nbc.mushroom.domain.review.dto.request.CreateSellerReviewReq;
+import nbc.mushroom.domain.review.dto.response.CreateSellerReviewRes;
 import nbc.mushroom.domain.review.entity.Review;
 import nbc.mushroom.domain.review.repository.ReviewRepository;
 import nbc.mushroom.domain.user.entity.User;
@@ -25,10 +25,10 @@ public class ReviewService {
 
     // 리뷰 생성
     @Transactional
-    public CreateReviewRes createReview(
+    public CreateSellerReviewRes createReview(
         User loginUser,
         Long sellerId,
-        CreateReviewReq createReviewReq
+        CreateSellerReviewReq createSellerReviewReq
     ) {
 
         Review existingReview = reviewRepository.findByBidderAndAuctionItem_Seller(
@@ -56,13 +56,13 @@ public class ReviewService {
             .auctionItem(auctionItem)
             .bidder(loginUser)                // 결제 완료한 리뷰 작성자
             .bid(winningBid)                  // 결제 완료 입찰인 상태
-            .score(createReviewReq.score())
-            .content(createReviewReq.content())
+            .score(createSellerReviewReq.score())
+            .content(createSellerReviewReq.content())
             .build();
 
         reviewRepository.save(review);
 
-        return CreateReviewRes.from(review);
+        return CreateSellerReviewRes.from(review);
     }
 }
 
