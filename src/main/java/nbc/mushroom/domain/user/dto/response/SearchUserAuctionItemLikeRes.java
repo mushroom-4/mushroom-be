@@ -3,11 +3,11 @@ package nbc.mushroom.domain.user.dto.response;
 import java.time.LocalDateTime;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
-import nbc.mushroom.domain.like.entity.Like;
+import nbc.mushroom.domain.like.entity.AuctionItemLike;
 
 public record SearchUserAuctionItemLikeRes(
 
-    Long likeId,
+    Long auctionItemLikeId,
     Long auctionItemId,
     String name,
     String imageUrl,
@@ -17,9 +17,9 @@ public record SearchUserAuctionItemLikeRes(
     AuctionItemStatus status
 ) {
 
-    public SearchUserAuctionItemLikeRes(Like like, AuctionItem AuctionItem) {
+    public SearchUserAuctionItemLikeRes(AuctionItemLike auctionItemLike, AuctionItem AuctionItem) {
         this(
-            like.getId(),
+            auctionItemLike.getId(),
             AuctionItem.getId(),
             AuctionItem.getName(),
             AuctionItem.getImageUrl(),

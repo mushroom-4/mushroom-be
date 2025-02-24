@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nbc.mushroom.domain.like.repository.LikeRepository;
+import nbc.mushroom.domain.like.repository.AuctionItemLikeRepository;
 import nbc.mushroom.domain.notice.dto.NoticeRes;
 import nbc.mushroom.domain.notice.entity.Notice;
 import nbc.mushroom.domain.notice.entity.NoticeType;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
-    private final LikeRepository likeRepository;
+    private final AuctionItemLikeRepository auctionItemLikeRepository;
 
     @Scheduled(cron = "0 */1 * * * *") // 현재는 1분마다 돌아갑니다.
     public void createNoticeStartTime() {
@@ -31,12 +31,14 @@ public class NoticeService {
         LocalDateTime nowPlus10 = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
             .plusMinutes(10);
         // findNoticeInfoForLike 매개변수로 경매 물품의 경매 시작 시간 비교군 now, nowPlus
-        List<NoticeRes> noticeResList = likeRepository.findNoticeInfoOfStartByLike(now, nowPlus10);
+        List<NoticeRes> noticeResList = auctionItemLikeRepository.findNoticeInfoOfStartByAuctionItemLike(
+            now,
+            nowPlus10);
         for (NoticeRes noticeRes : noticeResList) {
             noticeRepository.save(Notice.builder()
                 .auctionItem(noticeRes.auctionItem())
                 .user(noticeRes.user())
-                .like(noticeRes.like())
+                .auctionItemLike(noticeRes.auctionItemLike())
                 .noticeType(NoticeType.START_TIME)
                 .build());
         }
@@ -51,12 +53,14 @@ public class NoticeService {
         LocalDateTime nowPlus10 = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
             .plusMinutes(10);
         // findNoticeInfoForLike 매개변수로 경매 물품의 경매 시작 시간 비교군 now, nowPlus
-        List<NoticeRes> noticeResList = likeRepository.findNoticeInfoOfEndByLike(now, nowPlus10);
+        List<NoticeRes> noticeResList = auctionItemLikeRepository.findNoticeInfoOfEndByAuctionItemLike(
+            now,
+            nowPlus10);
         for (NoticeRes noticeRes : noticeResList) {
             noticeRepository.save(Notice.builder()
                 .auctionItem(noticeRes.auctionItem())
                 .user(noticeRes.user())
-                .like(noticeRes.like())
+                .auctionItemLike(noticeRes.auctionItemLike())
                 .noticeType(NoticeType.END_TIME)
                 .build());
         }

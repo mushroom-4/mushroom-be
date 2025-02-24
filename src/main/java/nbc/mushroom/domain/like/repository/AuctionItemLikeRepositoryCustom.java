@@ -4,21 +4,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
-import nbc.mushroom.domain.like.entity.Like;
+import nbc.mushroom.domain.like.entity.AuctionItemLike;
 import nbc.mushroom.domain.notice.dto.NoticeRes;
 import nbc.mushroom.domain.user.dto.response.SearchUserAuctionItemLikeRes;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-public interface LikeRepositoryCustom {
+public interface AuctionItemLikeRepositoryCustom {
 
-    Optional<Like> findLikeByUserAndAuctionItem(User user, AuctionItem auctionItem);
+    Optional<AuctionItemLike> findLikeByUserAndAuctionItem(User user, AuctionItem auctionItem);
 
     PageImpl<SearchUserAuctionItemLikeRes> findAuctionItemLikeByUserId(User user,
         Pageable pageable);
 
-    List<NoticeRes> findNoticeInfoOfStartByLike(LocalDateTime now, LocalDateTime nowPlus);
+    List<NoticeRes> findNoticeInfoOfStartByAuctionItemLike(LocalDateTime now,
+        LocalDateTime nowPlus);
 
-    List<NoticeRes> findNoticeInfoOfEndByLike(LocalDateTime now, LocalDateTime nowPlus10);
+    List<NoticeRes> findNoticeInfoOfEndByAuctionItemLike(LocalDateTime now,
+        LocalDateTime nowPlus10);
 }

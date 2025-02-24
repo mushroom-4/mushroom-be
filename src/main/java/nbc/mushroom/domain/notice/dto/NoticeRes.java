@@ -1,20 +1,20 @@
 package nbc.mushroom.domain.notice.dto;
 
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
-import nbc.mushroom.domain.like.entity.Like;
+import nbc.mushroom.domain.like.entity.AuctionItemLike;
 import nbc.mushroom.domain.user.entity.User;
 
 public record NoticeRes(
     AuctionItem auctionItem,
     User user,
-    Like like
+    AuctionItemLike auctionItemLike
 ) {
 
     public NoticeRes(AuctionItem auctionItem,
         User user,
-        Like like) {
+        AuctionItemLike auctionItemLike) {
         this.auctionItem = auctionItem;
         this.user = user;
-        this.like = like;
+        this.auctionItemLike = auctionItemLike;
     }
 }

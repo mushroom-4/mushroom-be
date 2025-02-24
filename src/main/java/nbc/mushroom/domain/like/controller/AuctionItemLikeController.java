@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
-import nbc.mushroom.domain.like.service.LikeService;
+import nbc.mushroom.domain.like.service.AuctionItemLikeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auction-items")
-public class LikeController {
+public class AuctionItemLikeController {
 
-    private final LikeService likeService;
+    private final AuctionItemLikeService auctionItemLikeService;
 
     @PostMapping("/{auction-items_id}/likes")
     public ResponseEntity<ApiResponse<Void>> likeItems(
@@ -27,7 +27,7 @@ public class LikeController {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        likeService.createLike(userId, auctionItemId);
+        auctionItemLikeService.createAuctionItemLike(userId, auctionItemId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success("정상적으로 좋아요가 등록되었습니다."));
@@ -39,7 +39,7 @@ public class LikeController {
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
-        likeService.hardDeleteLike(userId, auctionItemId);
+        auctionItemLikeService.hardDeleteAuctionItemLike(userId, auctionItemId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("정상적으로 좋아요가 취소되었습니다."));
