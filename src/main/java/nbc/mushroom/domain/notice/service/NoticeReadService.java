@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.user.service;
+package nbc.mushroom.domain.notice.service;
 
 import static nbc.mushroom.domain.notice.entity.NoticeType.END_TIME;
 import static nbc.mushroom.domain.notice.entity.NoticeType.START_TIME;
@@ -25,14 +25,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserNoticeUpgradeService {
+public class NoticeReadService {
 
     private final NoticeRepository noticeRepository;
     private final BidRepository bidRepository;
 
     public Page<SearchPageNoticeRes> searchUserNotice(User user) {
         // 유저가 가지는 공지 List
-        List<SearchNoticeRes> noticeList = noticeRepository.findNoticeTypeInfoByNoticeList(
+        List<SearchNoticeRes> noticeList = noticeRepository.findNoticeTypeInfoByUser(
             user);
 
         // 정렬 응답 객체를 담는 곳
@@ -152,5 +152,4 @@ public class UserNoticeUpgradeService {
 
         return new PageImpl<>(pagedList, pageable, orderSearchPageNoticeResList.size());
     }
-
 }
