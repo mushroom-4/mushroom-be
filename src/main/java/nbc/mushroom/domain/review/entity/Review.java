@@ -8,16 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.common.entity.Timestamped;
-import nbc.mushroom.domain.user.entity.User;
 
 @Getter
 @Entity
@@ -29,15 +27,7 @@ public class Review extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "auction_item_id", nullable = false)
-    private AuctionItem auctionItem;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User bidder;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bid_id", nullable = false)
     private Bid bid;
 
@@ -48,11 +38,8 @@ public class Review extends Timestamped {
     private String content;
 
     @Builder
-    public Review(Long id, AuctionItem auctionItem, User bidder, Bid bid, int score,
-        String content) {
+    public Review(Long id, Bid bid, int score, String content) {
         this.id = id;
-        this.auctionItem = auctionItem;
-        this.bidder = bidder;
         this.bid = bid;
         this.score = score;
         this.content = content;

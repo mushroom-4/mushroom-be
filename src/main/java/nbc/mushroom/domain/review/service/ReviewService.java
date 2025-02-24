@@ -53,8 +53,6 @@ public class ReviewService {
         AuctionItem auctionItem = winningBid.getAuctionItem();
 
         Review review = Review.builder()
-            .auctionItem(auctionItem)
-            .bidder(loginUser)                // 결제 완료한 리뷰 작성자
             .bid(winningBid)                  // 결제 완료 입찰인 상태
             .score(createSellerReviewReq.score())
             .content(createSellerReviewReq.content())
