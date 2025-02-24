@@ -1,6 +1,8 @@
 package nbc.mushroom.domain.chat.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.request.ChatMessageReq;
@@ -42,11 +44,9 @@ public class ChatService {
 
         saveChatMessage(chatRoomId, chatMessage);
 
-        ChatMessageRes chatMessageRes = ChatMessageRes.from(chatMessage);
+        redisPublish.publish(chatMessage);
 
-        redisPublish.publish(chatMessageRes);
-
-        return chatMessageRes;
+        return ChatMessageRes.from(chatMessage);
     }
 
     /**
@@ -59,5 +59,29 @@ public class ChatService {
         String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
         log.info("Redis Storage [Key : {}]", key);
         redisTemplate.opsForList().rightPush(key, chatMessage); // key - value
+    }
+
+
+    /**
+     * 특정 채팅방의 최근 메시지들 조회
+     *
+     * @param chatRoomId 채팅방 ID
+     * @param start      시작 인덱스
+     * @param end        종료 인덱스 (예: -1이면 전체)
+     * @return 채팅 메시지 리스트
+     */
+    public List<ChatMessageRes> getChatHistory(Long chatRoomId, long start, long end) {
+        String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
+        List<Object> chatMessageList = redisTemplate.opsForList().range(key, start, end);
+
+        // chatMessageList가 null이면 빈 리스트 반환
+        if (chatMessageList == null) {
+            return Collections.emptyList();
+        }
+
+        return chatMessageList.stream()
+            .map(o -> (ChatMessage) o) // Object → ChatMessage 변환
+            .map(ChatMessageRes::from) // ChatMessage → ChatMessageRes 변환
+            .toList(); // 최종 List<ChatMessageRes> 반환
     }
 }
