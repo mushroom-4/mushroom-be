@@ -6,6 +6,7 @@ import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.review.entity.Review;
 
 public record SearchSellerReviewDetailRes(
+    Long reviewId,
     String content,
     int score,
     BidRes bid
@@ -13,7 +14,7 @@ public record SearchSellerReviewDetailRes(
 
     public static SearchSellerReviewDetailRes from(Review review) {
         return new SearchSellerReviewDetailRes(
-            review.getContent(), review.getScore(), new BidRes(review.getBid()));
+            review.getId(), review.getContent(), review.getScore(), new BidRes(review.getBid()));
     }
 
     @NoArgsConstructor
