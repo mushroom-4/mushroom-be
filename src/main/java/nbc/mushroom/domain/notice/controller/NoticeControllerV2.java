@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
-import nbc.mushroom.domain.notice.dto.ReadNoticeRes;
+import nbc.mushroom.domain.notice.dto.response.ReadNoticeRes;
 import nbc.mushroom.domain.notice.service.NoticeReadService;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.http.HttpStatus;

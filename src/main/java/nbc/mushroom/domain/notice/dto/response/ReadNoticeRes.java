@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.notice.dto;
+package nbc.mushroom.domain.notice.dto.response;
 
 import nbc.mushroom.domain.notice.entity.Notice;
 

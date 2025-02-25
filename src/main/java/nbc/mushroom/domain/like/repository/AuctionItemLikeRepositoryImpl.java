@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
 import nbc.mushroom.domain.like.entity.AuctionItemLike;
-import nbc.mushroom.domain.notice.dto.NoticeRes;
+import nbc.mushroom.domain.notice.dto.response.NoticeRes;
 import nbc.mushroom.domain.user.dto.response.SearchUserAuctionItemLikeRes;
 import nbc.mushroom.domain.user.entity.QUser;
 import nbc.mushroom.domain.user.entity.User;
