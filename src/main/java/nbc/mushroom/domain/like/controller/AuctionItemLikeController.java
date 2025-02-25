@@ -1,6 +1,5 @@
 package nbc.mushroom.domain.like.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
