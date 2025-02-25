@@ -6,8 +6,8 @@ import nbc.mushroom.domain.auth.dto.response.TokenRes;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
-import nbc.mushroom.domain.user.dto.request.UserInfoChangeReq;
-import nbc.mushroom.domain.user.dto.request.UserPasswordChangeReq;
+import nbc.mushroom.domain.user.dto.request.UpdateUserInfoReq;
+import nbc.mushroom.domain.user.dto.request.UpdateUserPasswordReq;
 import nbc.mushroom.domain.user.dto.response.UserRes;
 import nbc.mushroom.domain.user.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserControllerV1 {
+public class UserController {
 
     private final UserService userService;
 
@@ -37,22 +37,22 @@ public class UserControllerV1 {
     }
 
     @PutMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<TokenRes>> changeUserInfo(
+    public ResponseEntity<ApiResponse<TokenRes>> updateUserInfo(
         @Auth AuthUser authUser,
-        @Valid @ModelAttribute UserInfoChangeReq userInfoChangeReq
+        @Valid @ModelAttribute UpdateUserInfoReq updateUserInfoReq
     ) {
-        TokenRes tokenRes = userService.changeInfo(authUser, userInfoChangeReq);
+        TokenRes tokenRes = userService.updateUserInfo(authUser, updateUserInfoReq);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("유저의 정보가 정상적으로 변경되었습니다.", tokenRes));
     }
 
     @PutMapping("/password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(
+    public ResponseEntity<ApiResponse<Void>> updatePassword(
         @Auth AuthUser authUser,
-        @Valid @RequestBody UserPasswordChangeReq userPasswordChangeReq
+        @Valid @RequestBody UpdateUserPasswordReq updateUserPasswordReq
     ) {
-        userService.changePassword(authUser.id(), userPasswordChangeReq);
+        userService.updatePassword(authUser.id(), updateUserPasswordReq);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("유저의 비밀번호가 정상 변경되었습니다."));
