@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/payments")
+@RequestMapping("/api/payments")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping("/confirm/widget")
+    @PostMapping("/confirm")
     public ResponseEntity<ApiResponse<PaymentRes>> confirmPayment(
         @Auth AuthUser authUser,
         @Valid @RequestBody PaymentReq paymentReq
