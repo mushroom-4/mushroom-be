@@ -1,4 +1,4 @@
-package nbc.mushroom.domain.user.service;
+package nbc.mushroom.domain.auction_item.service;
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.REGISTERED_AUCTION_ITEMS_NOT_FOUND;
 
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuctionItemRegisterServiceV1 {
+public class AuctionItemRegisterService {
 
     private final AuctionItemRepository auctionItemRepository;
 
-    public Page<AuctionItemRes> searchRegisteredAuctionItems(Long userId, Pageable pageable) {
+    public Page<AuctionItemRes> getAuctionItemsByUser(Long userId, Pageable pageable) {
         Page<AuctionItem> registeredAuctionItems = auctionItemRepository.findRegisteredAuctionItemsByUserId(
             userId,
             pageable);

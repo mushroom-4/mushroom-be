@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
+import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
@@ -36,14 +37,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auction-items")
-public class AuctionItemControllerV1 {
+@RequestMapping("/api/auction-items")
+public class AuctionItemController {
 
     private final AuctionItemService auctionItemService;
 
     // 경매 물품 생성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<AuctionItemRes>> postAuctionItem(
+    public ResponseEntity<ApiResponse<AuctionItemRes>> createAuctionItem(
         @Valid @ModelAttribute CreateAuctionItemReq createAuctionItemReq,
         @Auth AuthUser authUser
     ) {
@@ -55,21 +56,21 @@ public class AuctionItemControllerV1 {
             .body(ApiResponse.success("경매 물품 등록에 성공했습니다.", auctionItemRes));
     }
 
-    // 경매 물품 상세 조회
+    // 경매 물품 상세 조회 (입찰가 포함)
     @GetMapping("/{auctionItemId}/info")
-    public ResponseEntity<ApiResponse<SearchAuctionItemRes>> searchAuctionItem(
+    public ResponseEntity<ApiResponse<SearchAuctionItemBidRes>> getAuctionItem(
         @PathVariable long auctionItemId) {
-        SearchAuctionItemRes searchAuctionItemRes = auctionItemService.searchAuctionItem(
+        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItemWithMaxBid(
             auctionItemId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ApiResponse.success("경매 물품이 정상적으로 조회되었습니다.", searchAuctionItemRes));
+            .body(ApiResponse.success("경매 물품이 정상적으로 조회되었습니다.", searchAuctionItemBidRes));
     }
 
     // 경매 물품 키워드 조회
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<SearchAuctionItemRes>>> searchKeywordAuctionItems(
+    public ResponseEntity<ApiResponse<Page<SearchAuctionItemRes>>> getFilteredAuctionItems(
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam(value = "sort", defaultValue = "name") String sort,
         @RequestParam(value = "sortOrder", defaultValue = "ASC") String sortOrder,
@@ -83,7 +84,7 @@ public class AuctionItemControllerV1 {
         @RequestParam(value = "maxPrice", required = false) Long maxPrice) {
 
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sort, sortOrder));
-        Page<SearchAuctionItemRes> searchKeywordAuctionItems = auctionItemService.searchKeywordAuctionItems(
+        Page<SearchAuctionItemRes> filteredAuctionItems = auctionItemService.getFilteredAuctionItems(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice,
             maxPrice, pageable);
 
@@ -91,13 +92,13 @@ public class AuctionItemControllerV1 {
             .status(HttpStatus.OK)
             .body(ApiResponse.success(
                 "해당 키워드를 가진 경매 물품들이 모두 조회되었습니다.",
-                searchKeywordAuctionItems
+                filteredAuctionItems
             ));
     }
 
     // 경매 물품 수정
     @PutMapping(value = "/{auctionItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<AuctionItemRes>> putAuctionItem(
+    public ResponseEntity<ApiResponse<AuctionItemRes>> updateAuctionItem(
         @Valid @ModelAttribute PutAuctionItemReq putAuctionItemReq,
         @PathVariable Long auctionItemId,
         @Auth AuthUser authUser
@@ -128,7 +129,7 @@ public class AuctionItemControllerV1 {
     @GetMapping("/popular-keywords")
     public ResponseEntity<ApiResponse<List<String>>> getPopularKeywords() {
 
-        List<String> popularKeywords = auctionItemService.searchPopularKeywords();
+        List<String> popularKeywords = auctionItemService.getPopularKeywords();
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("인기 검색어 조회에 성공했습니다.", popularKeywords));

@@ -44,7 +44,7 @@ public class AuctionItemService {
     private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
     // 경매 물품 키워드 검색(조회)
-    public Page<SearchAuctionItemRes> searchKeywordAuctionItems(String sort,
+    public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
         String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
         Long maxPrice, Pageable pageable) {
@@ -56,13 +56,6 @@ public class AuctionItemService {
         return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
             pageable);
-    }
-
-    // 경매 물품 단건 조회
-    public SearchAuctionItemRes searchAuctionItem(long auctionItemId) {
-        AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
-        return SearchAuctionItemRes.from(searchAuctionItem);
     }
 
     // 경매 물품 최대 입찰가 조회
@@ -157,23 +150,9 @@ public class AuctionItemService {
         return auctionItemRepository.existsById(auctionItemId);
     }
 
-    private AuctionItem validateItemById(Long userId, Long auctionItemId) {
-        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-        if (!auctionItem.getSeller().getId().equals(userId)) {
-            throw new CustomException(AUCTION_ITEM_NOT_USER);
-        }
-        return auctionItem;
-    }
-
-    private User validateUserById(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return user;
-    }
-
     // 인기 검색어
     @Cacheable(value = "popularKeywords", key = "'top10'")
-    public List<String> searchPopularKeywords() {
+    public List<String> getPopularKeywords() {
         return popularKeywordsMap.entrySet().stream()
             .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))// 검색 횟수 기준 내림차순 정렬
             .limit(10)
@@ -200,5 +179,19 @@ public class AuctionItemService {
             .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
             .limit(10)
             .forEach(entry -> log.info("  - 키워드: {}, 검색 횟수: {}", entry.getKey(), entry.getValue()));
+    }
+
+    private AuctionItem validateItemById(Long userId, Long auctionItemId) {
+        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+        if (!auctionItem.getSeller().getId().equals(userId)) {
+            throw new CustomException(AUCTION_ITEM_NOT_USER);
+        }
+        return auctionItem;
+    }
+
+    private User validateUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        return user;
     }
 }
