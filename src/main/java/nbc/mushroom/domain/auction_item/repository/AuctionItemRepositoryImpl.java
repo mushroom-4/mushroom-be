@@ -190,7 +190,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
         if (!pageable.getSort().isSorted()) {
-            return new OrderSpecifier[]{auctionItem.name.asc()};
+            return new OrderSpecifier[]{auctionItem.createdAt.desc()};
         }
 
         List<OrderSpecifier<?>> orders = new ArrayList<>();
@@ -212,7 +212,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                     isAscending ? auctionItem.startPrice.asc() : auctionItem.startPrice.desc();
                 case "status" -> isAscending ? auctionItem.status.asc() : auctionItem.status.desc();
 
-                default -> auctionItem.name.asc();
+                default -> auctionItem.createdAt.desc();
             };
             orders.add(orderSpecifier);
         }

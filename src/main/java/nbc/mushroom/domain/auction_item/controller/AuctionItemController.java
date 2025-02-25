@@ -72,8 +72,8 @@ public class AuctionItemController {
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<SearchAuctionItemRes>>> getFilteredAuctionItems(
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "sort", defaultValue = "name") String sort,
-        @RequestParam(value = "sortOrder", defaultValue = "ASC") String sortOrder,
+        @RequestParam(value = "sort", defaultValue = "createdAt") String sort,
+        @RequestParam(value = "sortOrder", defaultValue = "DESC") String sortOrder,
         @RequestParam(value = "keyword", required = false) String keyword,
         @RequestParam(value = "brand", required = false) String brand,
         @RequestParam(value = "category", required = false) AuctionItemCategory category,
