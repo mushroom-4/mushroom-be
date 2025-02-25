@@ -28,12 +28,12 @@ public class JwtFilter implements Filter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final Map<String, List<String>> excludePatterns = Map.of(
         "/**", List.of("OPTIONS"),
-        "/api/*/auction-items/popular-keywords", List.of("GET"),
-        "/api/*/auction-items", List.of("GET"),
-        "/api/*/auction-items/*/info", List.of("GET"),
-        "/api/*/auction-items/search", List.of("GET"),
-        "/api/*/users/*/info", List.of("GET"),
-        "/api/*/auth/**", List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        "/api/auction-items/popular-keywords", List.of("GET"),
+        "/api/auction-items", List.of("GET"),
+        "/api/auction-items/*/info", List.of("GET"),
+        "/api/auction-items/search", List.of("GET"),
+        "/api/users/*/info", List.of("GET"),
+        "/api/auth/**", List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
     );
 
     @Override
