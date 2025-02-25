@@ -22,30 +22,7 @@ public record AuctionItemStatusRes(
 
     // QueryProjection 애너테이션을 사용하기 위해 추가한 생성자
     @QueryProjection
-    public AuctionItemStatusRes(
-        Long auctionItemId,
-        String name,
-        String description,
-        String imageUrl,
-        AuctionItemSize size,
-        AuctionItemCategory category,
-        String brand,
-        Long startPrice,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
-        AuctionItemStatus status
-    ) {
-        this.auctionItemId = auctionItemId;
-        this.name = name;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.size = size;
-        this.category = category;
-        this.brand = brand;
-        this.startPrice = startPrice;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.status = status;
+    public AuctionItemStatusRes {
     }
 }
 
