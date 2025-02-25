@@ -10,11 +10,4 @@ public record NoticeRes(
     AuctionItemLike auctionItemLike
 ) {
 
-    public NoticeRes(AuctionItem auctionItem,
-        User user,
-        AuctionItemLike auctionItemLike) {
-        this.auctionItem = auctionItem;
-        this.user = user;
-        this.auctionItemLike = auctionItemLike;
-    }
 }
