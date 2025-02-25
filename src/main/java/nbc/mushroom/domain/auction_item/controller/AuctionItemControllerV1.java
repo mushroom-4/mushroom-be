@@ -98,7 +98,7 @@ public class AuctionItemControllerV1 {
     // 경매 물품 수정
     @PutMapping(value = "/{auctionItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<AuctionItemRes>> putAuctionItem(
-        @ModelAttribute PutAuctionItemReq putAuctionItemReq,
+        @Valid @ModelAttribute PutAuctionItemReq putAuctionItemReq,
         @PathVariable Long auctionItemId,
         @Auth AuthUser authUser
     ) {
