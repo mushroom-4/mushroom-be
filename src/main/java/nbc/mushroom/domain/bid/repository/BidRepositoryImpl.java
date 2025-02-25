@@ -157,27 +157,4 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
                 bid.bidder.id.eq(bidderId))
             .fetchFirst() != null;
     }
-
-    @Override
-    public List<SearchNoticeEndTypeRes> auctionItemBidInfoFindList(
-        List<SearchNoticeRes> auctionItemIdByNoticeList) {
-
-        List<Long> auctionItemIdList = auctionItemIdByNoticeList.stream()
-            .map(auctionItemIdByNotice -> auctionItemIdByNotice.auctionItem().getId()).collect(
-                Collectors.toList());
-
-        return queryFactory // Todo 그냥 비드를 넣으면?
-            .select(Projections.constructor(
-                SearchNoticeEndTypeRes.class,
-                bid.biddingPrice.max(),
-                bid.auctionItem.id
-            ))
-            .from(bid)
-            .where(bid.auctionItem.id.in(auctionItemIdList)
-                .and(bid.auctionItem.isDeleted.eq(false)))
-            .groupBy(bid.auctionItem.id)
-
-            .fetch();
-    }
-
 }

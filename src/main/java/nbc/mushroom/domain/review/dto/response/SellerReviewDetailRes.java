@@ -5,15 +5,15 @@ import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.review.entity.Review;
 
-public record SearchSellerReviewDetailRes(
+public record SellerReviewDetailRes(
     Long reviewId,
     String content,
     int score,
     BidRes bid
 ) {
 
-    public static SearchSellerReviewDetailRes from(Review review) {
-        return new SearchSellerReviewDetailRes(
+    public static SellerReviewDetailRes from(Review review) {
+        return new SellerReviewDetailRes(
             review.getId(), review.getContent(), review.getScore(), new BidRes(review.getBid()));
     }
 

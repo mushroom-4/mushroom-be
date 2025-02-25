@@ -2,9 +2,9 @@ package nbc.mushroom.domain.review.dto.response;
 
 import java.util.List;
 
-public record SearchSellerReviewRes(
+public record SellerReviewsRes(
     Double averageScore,
-    List<SearchSellerReviewDetailRes> reviews
+    List<SellerReviewDetailRes> reviews
 ) {
 
 }

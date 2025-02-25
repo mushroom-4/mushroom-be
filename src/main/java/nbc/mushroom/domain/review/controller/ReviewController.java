@@ -6,8 +6,8 @@ import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.review.dto.request.CreateSellerReviewReq;
-import nbc.mushroom.domain.review.dto.response.CreateSellerReviewRes;
-import nbc.mushroom.domain.review.dto.response.SearchSellerReviewRes;
+import nbc.mushroom.domain.review.dto.response.SellerReviewDetailRes;
+import nbc.mushroom.domain.review.dto.response.SellerReviewsRes;
 import nbc.mushroom.domain.review.service.ReviewService;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.http.HttpStatus;
@@ -22,33 +22,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v2")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
 
     @PostMapping("/bids/reviews")
-    public ResponseEntity<ApiResponse<CreateSellerReviewRes>> createReview(
+    public ResponseEntity<ApiResponse<SellerReviewDetailRes>> createReview(
         @Auth AuthUser authUser,
         @RequestParam Long bidId,
         @Valid @RequestBody CreateSellerReviewReq createSellerReviewReq
     ) {
-        CreateSellerReviewRes createSellerReviewRes = reviewService.createReview(
+        SellerReviewDetailRes sellerReviewDetailRes = reviewService.createReview(
             User.fromAuthUser(authUser),
             bidId,
             createSellerReviewReq);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body((ApiResponse.success("리뷰가 정상적으로 생성되었습니다.", createSellerReviewRes)));
+            .body(ApiResponse.success("리뷰가 정상적으로 생성되었습니다.", sellerReviewDetailRes));
 
     }
 
     @GetMapping("/sellers/{sellerId}/reviews")
-    public ResponseEntity<ApiResponse<SearchSellerReviewRes>> searchReviews(
+    public ResponseEntity<ApiResponse<SellerReviewsRes>> getAllReviews(
         @PathVariable Long sellerId
     ) {
-        SearchSellerReviewRes searchSellerRes = reviewService.searchReviewsBySeller(sellerId);
+        SellerReviewsRes searchSellerRes = reviewService.getAllReviewsBySeller(sellerId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("판매자 리뷰 조회가 성공적으로 이루어졌습니다.", searchSellerRes));

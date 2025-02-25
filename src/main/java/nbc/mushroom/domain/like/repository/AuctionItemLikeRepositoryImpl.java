@@ -15,9 +15,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.QAuctionItem;
+import nbc.mushroom.domain.like.dto.response.LikedAuctionItemRes;
 import nbc.mushroom.domain.like.entity.AuctionItemLike;
-import nbc.mushroom.domain.notice.dto.NoticeRes;
-import nbc.mushroom.domain.user.dto.response.SearchUserAuctionItemLikeRes;
+import nbc.mushroom.domain.notice.dto.response.NoticeRes;
 import nbc.mushroom.domain.user.entity.QUser;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.PageImpl;
@@ -45,12 +45,12 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
     }
 
     @Override
-    public PageImpl<SearchUserAuctionItemLikeRes> findAuctionItemLikeByUserId(User user,
+    public PageImpl<LikedAuctionItemRes> findAuctionItemLikeByUserId(User user,
         Pageable pageable) {
 
-        List<SearchUserAuctionItemLikeRes> searchUserAuctionItemLikeResList =
+        List<LikedAuctionItemRes> likedAuctionItemResList =
             queryFactory.select(Projections.constructor(
-                    SearchUserAuctionItemLikeRes.class,
+                    LikedAuctionItemRes.class,
                     auctionItemLike,
                     auctionItem))
                 .from(auctionItemLike)
@@ -72,7 +72,7 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
                     auctionItem.isDeleted.eq(false))
                 .fetchOne()).orElse(0L);
 
-        return new PageImpl<>(searchUserAuctionItemLikeResList, pageable, totalCount);
+        return new PageImpl<>(likedAuctionItemResList, pageable, totalCount);
     }
 
     public List<NoticeRes> findNoticeInfoOfStartByAuctionItemLike(LocalDateTime now,
@@ -111,7 +111,6 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
         List<OrderSpecifier<?>> orders = new ArrayList<>();
         for (Order order : pageable.getSort()) {
-            String property = order.getProperty();
             boolean isAscending = order.isAscending();
 
             OrderSpecifier<?> orderSpecifier =

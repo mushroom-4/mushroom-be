@@ -11,9 +11,8 @@ import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.exception.ExceptionType;
 import nbc.mushroom.domain.review.dto.request.CreateSellerReviewReq;
-import nbc.mushroom.domain.review.dto.response.CreateSellerReviewRes;
-import nbc.mushroom.domain.review.dto.response.SearchSellerReviewDetailRes;
-import nbc.mushroom.domain.review.dto.response.SearchSellerReviewRes;
+import nbc.mushroom.domain.review.dto.response.SellerReviewDetailRes;
+import nbc.mushroom.domain.review.dto.response.SellerReviewsRes;
 import nbc.mushroom.domain.review.entity.Review;
 import nbc.mushroom.domain.review.repository.ReviewRepository;
 import nbc.mushroom.domain.user.entity.User;
@@ -29,7 +28,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public CreateSellerReviewRes createReview(
+    public SellerReviewDetailRes createReview(
         User loginUser,
         Long bidId,
         CreateSellerReviewReq createSellerReviewReq
@@ -60,10 +59,10 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        return CreateSellerReviewRes.from(review);
+        return SellerReviewDetailRes.from(review);
     }
 
-    public SearchSellerReviewRes searchReviewsBySeller(Long sellerId) {
+    public SellerReviewsRes getAllReviewsBySeller(Long sellerId) {
 
         List<Review> reviews = reviewRepository.findAllBySellerId(sellerId);
 
@@ -74,12 +73,12 @@ public class ReviewService {
             .orElse(0.0);
 
         // 리뷰룰 DTO로 변환
-        List<SearchSellerReviewDetailRes> reviewDetails = reviews.stream()
-            .map(SearchSellerReviewDetailRes::from)
+        List<SellerReviewDetailRes> reviewDetails = reviews.stream()
+            .map(SellerReviewDetailRes::from)
             .toList();
 
         // 평균 점수와 리뷰 세부정보를 포함한 결과 반환
-        return new SearchSellerReviewRes(averageScore, reviewDetails);
+        return new SellerReviewsRes(averageScore, reviewDetails);
     }
 
     @Transactional

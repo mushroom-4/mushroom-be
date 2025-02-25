@@ -268,7 +268,7 @@
     }
 
     try {
-      const response = await fetch(`/api/v2/bids/chats/${chatRoomId}`, {
+      const response = await fetch(`/api/bids/chats/${chatRoomId}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,

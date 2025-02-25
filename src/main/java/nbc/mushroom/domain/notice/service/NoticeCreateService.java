@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.like.repository.AuctionItemLikeRepository;
-import nbc.mushroom.domain.notice.dto.NoticeRes;
+import nbc.mushroom.domain.notice.dto.response.NoticeRes;
 import nbc.mushroom.domain.notice.entity.Notice;
 import nbc.mushroom.domain.notice.entity.NoticeType;
 import nbc.mushroom.domain.notice.repository.NoticeRepository;

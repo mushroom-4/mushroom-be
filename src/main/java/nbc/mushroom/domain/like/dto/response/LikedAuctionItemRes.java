@@ -1,11 +1,11 @@
-package nbc.mushroom.domain.user.dto.response;
+package nbc.mushroom.domain.like.dto.response;
 
 import java.time.LocalDateTime;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.like.entity.AuctionItemLike;
 
-public record SearchUserAuctionItemLikeRes(
+public record LikedAuctionItemRes(
 
     Long auctionItemLikeId,
     Long auctionItemId,
@@ -17,7 +17,7 @@ public record SearchUserAuctionItemLikeRes(
     AuctionItemStatus status
 ) {
 
-    public SearchUserAuctionItemLikeRes(AuctionItemLike auctionItemLike, AuctionItem AuctionItem) {
+    public LikedAuctionItemRes(AuctionItemLike auctionItemLike, AuctionItem AuctionItem) {
         this(
             auctionItemLike.getId(),
             AuctionItem.getId(),

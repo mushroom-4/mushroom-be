@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.auction_item.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_DELETE_NOT_ALLOW;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
@@ -19,6 +20,7 @@ import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
@@ -44,7 +46,7 @@ public class AuctionItemService {
     private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
     // 경매 물품 키워드 검색(조회)
-    public Page<SearchAuctionItemRes> searchKeywordAuctionItems(String sort,
+    public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
         String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
         Long maxPrice, Pageable pageable) {
@@ -58,13 +60,6 @@ public class AuctionItemService {
             pageable);
     }
 
-    // 경매 물품 단건 조회
-    public SearchAuctionItemRes searchAuctionItem(long auctionItemId) {
-        AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
-        return SearchAuctionItemRes.from(searchAuctionItem);
-    }
-
     // 경매 물품 최대 입찰가 조회
     public SearchAuctionItemBidRes getAuctionItemWithMaxBid(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
@@ -76,11 +71,6 @@ public class AuctionItemService {
         }
 
         return SearchAuctionItemBidRes.from(searchAuctionItem, null);
-    }
-
-    // 경매 물품 목록 전체 조회
-    public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {
-        return auctionItemRepository.findAllAuctionItems(pageable);
     }
 
     // 경매 물품 생성
@@ -153,8 +143,6 @@ public class AuctionItemService {
 
         AuctionItem auctionItem = validateItemById(userId, auctionItemId);
 
-        validateUserById(userId);
-
         auctionItem.softDelete();
     }
 
@@ -162,23 +150,9 @@ public class AuctionItemService {
         return auctionItemRepository.existsById(auctionItemId);
     }
 
-    private AuctionItem validateItemById(Long userId, Long auctionItemId) {
-        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-        if (!auctionItem.getSeller().getId().equals(userId)) {
-            throw new CustomException(AUCTION_ITEM_NOT_USER);
-        }
-        return auctionItem;
-    }
-
-    private User validateUserById(Long userId) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-        return user;
-    }
-
     // 인기 검색어
     @Cacheable(value = "popularKeywords", key = "'top10'")
-    public List<String> searchPopularKeywords() {
+    public List<String> getPopularKeywords() {
         return popularKeywordsMap.entrySet().stream()
             .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))// 검색 횟수 기준 내림차순 정렬
             .limit(10)
@@ -205,5 +179,23 @@ public class AuctionItemService {
             .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
             .limit(10)
             .forEach(entry -> log.info("  - 키워드: {}, 검색 횟수: {}", entry.getKey(), entry.getValue()));
+    }
+
+    private AuctionItem validateItemById(Long userId, Long auctionItemId) {
+        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+        if (!auctionItem.getSeller().getId().equals(userId)) {
+            throw new CustomException(AUCTION_ITEM_NOT_USER);
+        }
+        if (auctionItem.getStatus() == AuctionItemStatus.PROGRESSING
+            || auctionItem.getStatus() == AuctionItemStatus.COMPLETED) {
+            throw new CustomException(AUCTION_ITEM_DELETE_NOT_ALLOW);
+        }
+        return auctionItem;
+    }
+
+    private User validateUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        return user;
     }
 }
