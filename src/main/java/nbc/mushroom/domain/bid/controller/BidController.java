@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auction-items/{auctionItemId}/bids")
-public class BidControllerV1 {
+@RequestMapping("/api/auction-items/{auctionItemId}/bids")
+public class BidController {
 
     private final BidService bidService;
 
