@@ -1,5 +1,8 @@
 package nbc.mushroom.domain.review.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_REVIEW_USER;
+import static nbc.mushroom.domain.common.exception.ExceptionType.REVIEW_NOT_FOUND;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
@@ -25,7 +28,6 @@ public class ReviewService {
     private final BidRepository bidRepository;
     private final ReviewRepository reviewRepository;
 
-    // 리뷰 생성
     @Transactional
     public CreateSellerReviewRes createReview(
         User loginUser,
@@ -47,7 +49,7 @@ public class ReviewService {
         }
 
         if (!bid.getBidder().getId().equals(loginUser.getId())) {
-            throw new CustomException(ExceptionType.INVALID_REVIEW_USER);
+            throw new CustomException(INVALID_REVIEW_USER);
         }
 
         Review review = Review.builder()
@@ -61,7 +63,6 @@ public class ReviewService {
         return CreateSellerReviewRes.from(review);
     }
 
-    // 리뷰 조회 (판매자 한명의 리뷰 리스트)
     public SearchSellerReviewRes searchReviewsBySeller(Long sellerId) {
 
         List<Review> reviews = reviewRepository.findAllBySellerId(sellerId);
@@ -81,18 +82,16 @@ public class ReviewService {
         return new SearchSellerReviewRes(averageScore, reviewDetails);
     }
 
-    // 리뷰 삭제
     @Transactional
-    public void deleteReview(User user, Long bidId) {
+    public void deleteReview(User user, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
-        Review review = reviewRepository.findByBidIdAndUserId(bidId, user.getId());
-
-        if (review == null) {
-            throw new CustomException(ExceptionType.REVIEW_NOT_FOUND);
+        if (!review.getBid().getBidder().getId().equals(user.getId())) {
+            throw new CustomException(INVALID_REVIEW_USER);
         }
 
         reviewRepository.delete(review);
-        //소프트딜리트와 고민하였는데, 리뷰같은 경우는 소프트 사용이 애매한 것 같아서 하드로 작성하였습니다.
     }
 }
 

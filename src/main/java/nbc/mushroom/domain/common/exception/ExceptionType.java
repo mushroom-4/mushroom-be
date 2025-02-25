@@ -68,7 +68,7 @@ public enum ExceptionType {
     // Review
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "R01", "해당 판매자에 대한 리뷰를 이미 작성하였습니다."),
     BID_NO_PAYMENT(HttpStatus.BAD_REQUEST, "R02", "리뷰 작성 권한이 없습니다. 해당 경매 물품에 대한 결제 내역이 필요합니다."),
-    INVALID_REVIEW_USER(HttpStatus.FORBIDDEN, "R03", "본인이 구매한 물품에 한하여 리뷰 작성이 가능합니다."),
+    INVALID_REVIEW_USER(HttpStatus.FORBIDDEN, "R03", "본인이 구매한 물품에 한하여 리뷰 작성|삭제가 가능합니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "R04", "삭제 가능한 리뷰가 존재하지 않습니다."),
 
     ;
