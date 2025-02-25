@@ -5,8 +5,8 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.EMAIL_DUPLICATE
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.auth.dto.request.UserLoginReq;
-import nbc.mushroom.domain.auth.dto.request.UserRegisterReq;
+import nbc.mushroom.domain.auth.dto.request.LoginUserReq;
+import nbc.mushroom.domain.auth.dto.request.RegisterUserReq;
 import nbc.mushroom.domain.auth.dto.response.TokenRes;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
@@ -29,22 +29,22 @@ public class AuthService {
     private final ImageUtil imageUtil;
 
     @Transactional
-    public TokenRes register(UserRegisterReq userRegisterReq) {
-        if (userRepository.existsByEmail(userRegisterReq.email())) {
+    public TokenRes register(RegisterUserReq registerUserReq) {
+        if (userRepository.existsByEmail(registerUserReq.email())) {
             throw new CustomException(EMAIL_DUPLICATE);
         }
 
-        UserRole userRole = UserRole.of(userRegisterReq.userRole());
-        String encodedPassword = passwordEncoder.encode(userRegisterReq.password());
+        UserRole userRole = UserRole.of(registerUserReq.userRole());
+        String encodedPassword = passwordEncoder.encode(registerUserReq.password());
 
-        String fileName = imageUtil.upload(userRegisterReq.image());
+        String fileName = imageUtil.upload(registerUserReq.image());
 
         User savedUser = userRepository.save(
             User.builder()
-                .email(userRegisterReq.email())
+                .email(registerUserReq.email())
                 .password(encodedPassword)
                 .userRole(userRole)
-                .nickname(userRegisterReq.nickname())
+                .nickname(registerUserReq.nickname())
                 .imageUrl(fileName)
                 .build()
         );
@@ -60,11 +60,11 @@ public class AuthService {
         return new TokenRes(bearerToken);
     }
 
-    public TokenRes login(UserLoginReq userLoginReq) {
-        User user = userRepository.findByEmail(userLoginReq.email())
+    public TokenRes login(LoginUserReq loginUserReq) {
+        User user = userRepository.findByEmail(loginUserReq.email())
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(userLoginReq.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginUserReq.password(), user.getPassword())) {
             throw new CustomException(AUTH_FAILED);
         }
 
