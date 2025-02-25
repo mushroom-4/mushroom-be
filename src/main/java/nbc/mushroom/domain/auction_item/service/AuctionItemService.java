@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.auction_item.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_DELETE_NOT_ALLOW;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
@@ -19,6 +20,7 @@ import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
@@ -141,8 +143,6 @@ public class AuctionItemService {
 
         AuctionItem auctionItem = validateItemById(userId, auctionItemId);
 
-        validateUserById(userId);
-
         auctionItem.softDelete();
     }
 
@@ -185,6 +185,10 @@ public class AuctionItemService {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
         if (!auctionItem.getSeller().getId().equals(userId)) {
             throw new CustomException(AUCTION_ITEM_NOT_USER);
+        }
+        if (auctionItem.getStatus() == AuctionItemStatus.PROGRESSING
+            || auctionItem.getStatus() == AuctionItemStatus.COMPLETED) {
+            throw new CustomException(AUCTION_ITEM_DELETE_NOT_ALLOW);
         }
         return auctionItem;
     }
