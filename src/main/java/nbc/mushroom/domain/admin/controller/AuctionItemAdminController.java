@@ -41,7 +41,7 @@ public class AuctionItemAdminController {
     // 관리자 경매 물품 상태 목록 전체 조회 + 필터링 조회 기능 API
     @GetMapping
     public ResponseEntity<ApiResponse<Page<AuctionItemStatusRes>>> getFilteredAuctionItemsByStatus(
-        @RequestParam(required = false) List<AuctionItemStatus> statusList,
+        @RequestParam(value = "status", required = false) List<AuctionItemStatus> statusList,
         @RequestParam(value = "page", defaultValue = "1") int page
     ) {
         Pageable pageable = PageRequest.of(page - 1, 10);
