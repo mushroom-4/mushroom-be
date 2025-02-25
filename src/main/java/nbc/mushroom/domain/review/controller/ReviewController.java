@@ -53,7 +53,7 @@ public class ReviewController {
             .body(ApiResponse.success("판매자 리뷰 조회가 성공적으로 이루어졌습니다.", searchSellerRes));
     }
 
-    @DeleteMapping("/bids/{bidId}/reviews")
+    @DeleteMapping("/bids/{bidId}/reviews/{reviewId}")
     public ResponseEntity<ApiResponse<Void>> deleteReview(
         @Auth AuthUser authUser,
         @PathVariable Long bidId
