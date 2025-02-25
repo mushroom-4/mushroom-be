@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auction-items")
+@RequestMapping("/api/auction-items")
 public class AuctionItemLikeController {
 
     private final AuctionItemLikeService auctionItemLikeService;
 
     @PostMapping("/{auction-items_id}/likes")
-    public ResponseEntity<ApiResponse<Void>> likeItems(
+    public ResponseEntity<ApiResponse<Void>> createAuctionItemLike(
         @PathVariable("auction-items_id") Long auctionItemId,
         @Auth AuthUser authUser
     ) {
@@ -34,7 +34,7 @@ public class AuctionItemLikeController {
     }
 
     @DeleteMapping("/{auction-items_id}/likes")
-    public ResponseEntity<ApiResponse<Void>> cancelLikeItems(
+    public ResponseEntity<ApiResponse<Void>> deleteAuctionItemLike(
         @PathVariable("auction-items_id") Long auctionItemId,
         @Auth AuthUser authUser
     ) {
