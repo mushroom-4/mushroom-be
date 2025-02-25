@@ -18,7 +18,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
-import nbc.mushroom.domain.bid.service.BidService;
+import nbc.mushroom.domain.bid.service.CreateBidService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
 import nbc.mushroom.domain.common.util.StompDestinationUtils;
@@ -35,16 +35,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
-    private final BidService bidService;
+    private final CreateBidService createBidService;
     private final AuctionItemService auctionItemService;
     private final JwtUtil jwtUtil;
 
     /**
      * STOMP 메시지가 전송되기 전에 호출
-     *
-     * STOMP 명령어에 따라 필요한 작업 처리
-     * - SUBSCRIBE: 클라이언트가 특정 토픽을 구독할 때 처리.
-     * - SEND: 클라이언트가 메시지를 보낼 때 처리.
+     * <p>
+     * STOMP 명령어에 따라 필요한 작업 처리 - SUBSCRIBE: 클라이언트가 특정 토픽을 구독할 때 처리. - SEND: 클라이언트가 메시지를 보낼 때 처리.
      *
      * @param message : 클라이언트가 전송한 메시지
      * @param channel : 메시지가 전달될 채널
@@ -127,8 +125,7 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     /**
-     * 채팅방 구독 요청 시
-     * 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
+     * 채팅방 구독 요청 시 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
      */
     private void handleSubscribe(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SUBSCRIBE 요청 감지 ::::");
@@ -154,8 +151,7 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     /**
-     * 메시지 전송 시
-     * 해당 경매에 입찰한 기록이 있는 유저인지 확인
+     * 메시지 전송 시 해당 경매에 입찰한 기록이 있는 유저인지 확인
      */
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
@@ -167,7 +163,7 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTH_TOKEN_NOT_FOUND);
             }
 
-            if (Boolean.FALSE.equals(bidService.hasBid(loginUserId, chatRoomId))) {
+            if (Boolean.FALSE.equals(createBidService.hasBid(loginUserId, chatRoomId))) {
                 throw new CustomException(BIDDING_REQUIRED);
             }
 
