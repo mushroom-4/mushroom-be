@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.payment.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
@@ -24,7 +25,7 @@ public class PaymentController {
     @PostMapping("/confirm/widget")
     public ResponseEntity<ApiResponse<PaymentRes>> confirmPayment(
         @Auth AuthUser authUser,
-        @RequestBody PaymentReq paymentReq
+        @Valid @RequestBody PaymentReq paymentReq
     ) {
         PaymentRes paymentRes = paymentService.confirmPayment(authUser, paymentReq);
 
