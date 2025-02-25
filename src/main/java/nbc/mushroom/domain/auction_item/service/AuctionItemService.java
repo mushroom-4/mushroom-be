@@ -78,11 +78,6 @@ public class AuctionItemService {
         return SearchAuctionItemBidRes.from(searchAuctionItem, null);
     }
 
-    // 경매 물품 목록 전체 조회
-    public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {
-        return auctionItemRepository.findAllAuctionItems(pageable);
-    }
-
     // 경매 물품 생성
     @Transactional
     public AuctionItemRes createAuctionItem(Long userId,

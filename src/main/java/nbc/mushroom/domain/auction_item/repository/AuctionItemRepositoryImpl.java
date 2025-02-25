@@ -46,48 +46,6 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
     }
 
     @Override
-    public Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable) {
-        QAuctionItem auctionItem = QAuctionItem.auctionItem;
-
-        BooleanBuilder builder = new BooleanBuilder();
-
-        builder.and(
-            auctionItem.status.eq(AuctionItemStatus.WAITING)
-                .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING))
-        );
-
-        JPAQuery<SearchAuctionItemRes> query = queryFactory
-            .select(Projections.constructor(SearchAuctionItemRes.class,
-                auctionItem.id,
-                auctionItem.name,
-                auctionItem.description,
-                auctionItem.imageUrl,
-                auctionItem.size,
-                auctionItem.category,
-                auctionItem.brand,
-                auctionItem.startPrice,
-                auctionItem.startTime,
-                auctionItem.endTime,
-                auctionItem.status
-            ))
-            .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), builder)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize());
-
-        // 전체 데이터 수를 가져오기 위한 쿼리 (페이징을 위해 필요)
-        JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
-            .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), builder);
-
-        // 쿼리 실행 후, 결과 데이터를 리스트로 반환
-        List<SearchAuctionItemRes> content = query.fetch();
-
-        // Page 객체를 만들어서 반환
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    @Override
     public List<AuctionItem> findAuctionItemsByStatusAndStartTime(
         AuctionItemStatus auctionItemStatus,
         LocalDateTime now) {

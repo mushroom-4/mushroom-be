@@ -16,8 +16,6 @@ public interface AuctionItemRepositoryCustom {
 
     AuctionItem findAuctionItemById(Long id);
 
-    Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable);
-
     List<AuctionItem> findAuctionItemsByStatusAndStartTime(AuctionItemStatus auctionItemStatus,
         LocalDateTime now);
 

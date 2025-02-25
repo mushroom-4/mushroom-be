@@ -55,20 +55,6 @@ public class AuctionItemControllerV1 {
             .body(ApiResponse.success("경매 물품 등록에 성공했습니다.", auctionItemRes));
     }
 
-    // 경매 물품 전체 조회 (페이징 조회 포함)
-    @GetMapping
-    public ResponseEntity<ApiResponse<Page<SearchAuctionItemRes>>> searchAllAuctionItems(
-        @RequestParam(value = "page", defaultValue = "1") int page
-    ) {
-        Pageable pageable = PageRequest.of(page - 1, 10);
-        Page<SearchAuctionItemRes> allAuctionItems = auctionItemService.findAllAuctionItems(
-            pageable);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(ApiResponse.success("경매 물품이 전체 조회 되었습니다.", allAuctionItems));
-    }
-
     // 경매 물품 상세 조회
     @GetMapping("/{auctionItemId}/info")
     public ResponseEntity<ApiResponse<SearchAuctionItemRes>> searchAuctionItem(
