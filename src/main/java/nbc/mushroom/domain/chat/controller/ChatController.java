@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ChatControllerV2 {
+public class ChatController {
 
     private final ChatService chatService;
 
@@ -38,7 +38,7 @@ public class ChatControllerV2 {
             User.fromAuthUser(authUser));
     }
 
-    @GetMapping("/api/v2/bids/chats/{chatRoomId}")
+    @GetMapping("/api/bids/chats/{chatRoomId}")
     public ResponseEntity<ApiResponse<List<ChatMessageRes>>> getChatHistory(
         @PathVariable Long chatRoomId
     ) {
