@@ -60,7 +60,7 @@ public enum ExceptionType {
     NOT_SELF_LIKE(HttpStatus.BAD_REQUEST, "L02", "좋아요는 본인 경매 물품에 등록할 수 없습니다."),
     LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "L03", "해당 경매 물품에 좋아요를 등록하지 않았습니다."),
 
-    // chat
+    // Chat
     INVALID_CHAT_ROOM_PATH(HttpStatus.BAD_REQUEST, "C01", "유효하지 않은 채팅방 경로입니다."),
     BIDDING_REQUIRED(HttpStatus.FORBIDDEN, "C02", "메시지 전송 권한이 없습니다. 해당 경매물품에 대한 입찰 내역이 필요합니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "C03", "해당 채팅방을 찾을 수 없습니다."),
@@ -68,9 +68,11 @@ public enum ExceptionType {
     // Review
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "R01", "해당 판매자에 대한 리뷰를 이미 작성하였습니다."),
     BID_NO_PAYMENT(HttpStatus.BAD_REQUEST, "R02", "리뷰 작성 권한이 없습니다. 해당 경매 물품에 대한 결제 내역이 필요합니다."),
-    SELLER_CANNOT_REVIEW(HttpStatus.BAD_REQUEST, "R03", "판매자는 본인에 대해 리뷰를 작성할 수 없습니다."),
+    INVALID_REVIEW_USER(HttpStatus.FORBIDDEN, "R03", "본인이 구매한 물품에 한하여 리뷰 작성이 가능합니다."),
 
     ;
+
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
