@@ -16,18 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/users/notices")
-public class NoticeControllerV2 {
+@RequestMapping("/api/users/notices")
+public class NoticeController {
 
     private final NoticeReadService noticeReadService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ReadNoticeRes>>> getUserNotice(
+    public ResponseEntity<ApiResponse<List<ReadNoticeRes>>> getAllNotice(
         @Auth AuthUser authUser
     ) {
         User user = User.fromAuthUser(authUser);
         List<ReadNoticeRes> readNoticeResList = noticeReadService
-            .searchUserNotice(user);
+            .getAllNoticeByUser(user);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("사용자의 공지를 조회했습니다.", readNoticeResList));

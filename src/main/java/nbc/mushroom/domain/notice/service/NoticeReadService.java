@@ -18,7 +18,7 @@ public class NoticeReadService {
 
     private final NoticeRepository noticeRepository;
 
-    public List<ReadNoticeRes> searchUserNotice(User user) {
+    public List<ReadNoticeRes> getAllNoticeByUser(User user) {
         List<Notice> noticeList = noticeRepository.findAllNoticeResByUser(user);
 
         return noticeList.stream().map(ReadNoticeRes::from).toList();

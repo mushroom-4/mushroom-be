@@ -111,7 +111,6 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
         List<OrderSpecifier<?>> orders = new ArrayList<>();
         for (Order order : pageable.getSort()) {
-            String property = order.getProperty();
             boolean isAscending = order.isAscending();
 
             OrderSpecifier<?> orderSpecifier =
