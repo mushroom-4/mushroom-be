@@ -6,6 +6,7 @@ import nbc.mushroom.domain.auth.dto.request.UserRegisterReq;
 import nbc.mushroom.domain.auth.dto.response.TokenRes;
 import nbc.mushroom.domain.auth.service.AuthService;
 import nbc.mushroom.domain.common.dto.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,8 +26,7 @@ public class AuthControllerV2 {
         @Valid @ModelAttribute UserRegisterReq userRegisterReq
     ) {
         TokenRes tokenRes = authService.register(userRegisterReq);
-        return ResponseEntity.ok(
-            ApiResponse.success("정상적으로 회원가입 되었습니다.", tokenRes)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse.success("정상적으로 회원가입 되었습니다.", tokenRes));
     }
 }

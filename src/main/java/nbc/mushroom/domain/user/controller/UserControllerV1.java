@@ -32,8 +32,8 @@ public class UserControllerV1 {
     public ResponseEntity<ApiResponse<UserRes>> getUser(@PathVariable long userId) {
         UserRes userRes = userService.getUser(userId);
 
-        return ResponseEntity
-            .ok(ApiResponse.success("유저가 정상적으로 조회되었습니다.", userRes));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("유저가 정상적으로 조회되었습니다.", userRes));
     }
 
     @PutMapping(value = "/info", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -43,8 +43,7 @@ public class UserControllerV1 {
     ) {
         TokenRes tokenRes = userService.changeInfo(authUser, userInfoChangeReq);
 
-        return ResponseEntity
-            .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("유저의 정보가 정상적으로 변경되었습니다.", tokenRes));
     }
 
@@ -55,8 +54,7 @@ public class UserControllerV1 {
     ) {
         userService.changePassword(authUser.id(), userPasswordChangeReq);
 
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("유저의 비밀번호가 정상 변경되었습니다."));
     }
 }

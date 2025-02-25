@@ -11,6 +11,7 @@ import nbc.mushroom.domain.common.dto.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,12 +30,12 @@ public class AuctionItemAdminControllerV1 {
 
     @PatchMapping("/{auctionItemId}")
     public ResponseEntity<ApiResponse<Void>> adminInspectAuctionItem(
-        // todo 리팩토링 할 때 메서드명 adminApproveAuctionItems -> adminInspectAuctionItems로 변경하기
         @PathVariable Long auctionItemId,
         @Valid @RequestBody AuctionItemChangeStatusReq auctionItemChangeStatusReq
     ) {
         auctionItemAdminService.changeStatusAuctionItem(auctionItemId, auctionItemChangeStatusReq);
-        return ResponseEntity.ok(ApiResponse.success("물품 검수가 완료되었습니다."));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("물품 검수가 완료되었습니다."));
     }
 
     // 관리자 경매 물품 상태 목록 전체 조회 + 필터링 조회 기능 API
@@ -47,7 +48,7 @@ public class AuctionItemAdminControllerV1 {
         Page<AuctionItemStatusRes> auctionItemsStatusRes = auctionItemAdminService
             .getAuctionItemsStatus(status, pageable);
 
-        return ResponseEntity.ok(
-            ApiResponse.success("경매 물품 상태 목록을 조회했습니다.", auctionItemsStatusRes));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("경매 물품 상태 목록을 조회했습니다.", auctionItemsStatusRes));
     }
 }

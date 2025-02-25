@@ -9,6 +9,7 @@ import nbc.mushroom.domain.user.service.AuctionItemRegisterServiceV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ public class AuctionItemRegisterControllerV1 {
         Page<AuctionItemRes> auctionItems = auctionItemRegisterServiceV1.searchRegisteredAuctionItems(
             authUser.id(), pageable);
 
-        return ResponseEntity.ok(ApiResponse.success("등록 경매 물품 목록 조회에 성공했습니다.", auctionItems));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("등록 경매 물품 목록 조회에 성공했습니다.", auctionItems));
     }
 }

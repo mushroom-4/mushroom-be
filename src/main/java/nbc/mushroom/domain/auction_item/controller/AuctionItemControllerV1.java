@@ -103,8 +103,10 @@ public class AuctionItemControllerV1 {
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(
-                (ApiResponse.success("해당 키워드를 가진 경매 물품들이 모두 조회되었습니다.", searchKeywordAuctionItems)));
+            .body(ApiResponse.success(
+                "해당 키워드를 가진 경매 물품들이 모두 조회되었습니다.",
+                searchKeywordAuctionItems
+            ));
     }
 
     // 경매 물품 수정
@@ -136,20 +138,21 @@ public class AuctionItemControllerV1 {
             .body(ApiResponse.success("경매 물품 삭제에 성공했습니다."));
     }
 
-    // 인기 검색어 조회 TODO 반환방식 통일하기!
+    // 인기 검색어 조회
     @GetMapping("/popular-keywords")
     public ResponseEntity<ApiResponse<List<String>>> getPopularKeywords() {
 
         List<String> popularKeywords = auctionItemService.searchPopularKeywords();
 
-        return ResponseEntity.ok(
-            ApiResponse.success("인기 검색어 조회에 성공했습니다.", popularKeywords));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("인기 검색어 조회에 성공했습니다.", popularKeywords));
     }
 
     // 캐시 내용 가시화 API
     @GetMapping("/popular-keywords/cache")
     public ResponseEntity<ApiResponse<Void>> printCache() {
         auctionItemService.printPopularKeywordsCacheContents();
-        return ResponseEntity.ok(ApiResponse.success("인기 검색어 캐시 내용이 로그에 출력되었습니다."));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("인기 검색어 캐시 내용이 로그에 출력되었습니다."));
     }
 }

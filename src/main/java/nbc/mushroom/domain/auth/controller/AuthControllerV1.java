@@ -7,6 +7,7 @@ import nbc.mushroom.domain.auth.dto.request.UserRegisterReq;
 import nbc.mushroom.domain.auth.dto.response.TokenRes;
 import nbc.mushroom.domain.auth.service.AuthService;
 import nbc.mushroom.domain.common.dto.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,8 @@ public class AuthControllerV1 {
         @Valid @RequestBody UserRegisterReq userRegisterReq
     ) {
         TokenRes tokenRes = authService.register(userRegisterReq);
-        return ResponseEntity.ok(
-            ApiResponse.success("정상적으로 회원가입 되었습니다.", tokenRes)
-        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse.success("정상적으로 회원가입 되었습니다.", tokenRes));
     }
 
     @PostMapping("/login")
@@ -35,8 +35,7 @@ public class AuthControllerV1 {
         @Valid @RequestBody UserLoginReq userLoginReq
     ) {
         TokenRes tokenRes = authService.login(userLoginReq);
-        return ResponseEntity.ok(
-            ApiResponse.success("정상적으로 로그인 되었습니다.", tokenRes)
-        );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("정상적으로 로그인 되었습니다.", tokenRes));
     }
 }

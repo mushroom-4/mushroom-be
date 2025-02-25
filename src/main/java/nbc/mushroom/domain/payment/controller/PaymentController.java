@@ -7,6 +7,7 @@ import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.payment.dto.request.PaymentReq;
 import nbc.mushroom.domain.payment.dto.response.PaymentRes;
 import nbc.mushroom.domain.payment.service.PaymentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ public class PaymentController {
     ) {
         PaymentRes paymentRes = paymentService.confirmPayment(authUser, paymentReq);
 
-        return ResponseEntity
-            .ok(ApiResponse.success("결제가 정상적으로 완료되었습니다.", paymentRes));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("결제가 정상적으로 완료되었습니다.", paymentRes));
     }
 }

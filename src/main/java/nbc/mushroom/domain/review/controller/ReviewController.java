@@ -40,7 +40,7 @@ public class ReviewController {
             createSellerReviewReq);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body((ApiResponse.success("리뷰가 정상적으로 생성되었습니다.", createSellerReviewRes)));
+            .body(ApiResponse.success("리뷰가 정상적으로 생성되었습니다.", createSellerReviewRes));
 
     }
 

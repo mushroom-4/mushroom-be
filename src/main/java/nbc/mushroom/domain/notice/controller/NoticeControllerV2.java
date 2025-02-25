@@ -8,6 +8,7 @@ import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.notice.dto.ReadNoticeRes;
 import nbc.mushroom.domain.notice.service.NoticeReadService;
 import nbc.mushroom.domain.user.entity.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class NoticeControllerV2 {
         List<ReadNoticeRes> readNoticeResList = noticeReadService
             .searchUserNotice(user);
 
-        return ResponseEntity
-            .ok(ApiResponse.success("사용자의 공지를 조회했습니다.", readNoticeResList));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("사용자의 공지를 조회했습니다.", readNoticeResList));
     }
 }
