@@ -12,6 +12,7 @@ import nbc.mushroom.domain.review.service.ReviewService;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,5 +52,17 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("판매자 리뷰 조회가 성공적으로 이루어졌습니다.", searchSellerRes));
     }
+
+    @DeleteMapping("/bids/{bidId}/reviews")
+    public ResponseEntity<ApiResponse<Void>> deleteReview(
+        @Auth AuthUser authUser,
+        @PathVariable Long bidId
+    ) {
+        reviewService.deleteReview(User.fromAuthUser(authUser), bidId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .body(ApiResponse.success("리뷰가 정상적으로 삭제 되었습니다."));
+    }
+
 }
 
