@@ -1,6 +1,5 @@
 package nbc.mushroom.domain.notice.service;
 
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NoticeService {
+public class NoticeCreateService {
 
     private final NoticeRepository noticeRepository;
     private final AuctionItemLikeRepository auctionItemLikeRepository;
