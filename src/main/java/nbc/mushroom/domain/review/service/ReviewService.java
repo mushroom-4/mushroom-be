@@ -1,5 +1,8 @@
 package nbc.mushroom.domain.review.service;
 
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_REVIEW_USER;
+import static nbc.mushroom.domain.common.exception.ExceptionType.REVIEW_NOT_FOUND;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.entity.Bid;
@@ -25,7 +28,6 @@ public class ReviewService {
     private final BidRepository bidRepository;
     private final ReviewRepository reviewRepository;
 
-    // 리뷰 생성
     @Transactional
     public CreateSellerReviewRes createReview(
         User loginUser,
@@ -47,7 +49,7 @@ public class ReviewService {
         }
 
         if (!bid.getBidder().getId().equals(loginUser.getId())) {
-            throw new CustomException(ExceptionType.INVALID_REVIEW_USER);
+            throw new CustomException(INVALID_REVIEW_USER);
         }
 
         Review review = Review.builder()
@@ -61,7 +63,6 @@ public class ReviewService {
         return CreateSellerReviewRes.from(review);
     }
 
-    // 리뷰 조회 (판매자 한명의 리뷰 리스트)
     public SearchSellerReviewRes searchReviewsBySeller(Long sellerId) {
 
         List<Review> reviews = reviewRepository.findAllBySellerId(sellerId);
@@ -79,6 +80,18 @@ public class ReviewService {
 
         // 평균 점수와 리뷰 세부정보를 포함한 결과 반환
         return new SearchSellerReviewRes(averageScore, reviewDetails);
+    }
+
+    @Transactional
+    public void deleteReview(User user, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        if (!review.getBid().getBidder().getId().equals(user.getId())) {
+            throw new CustomException(INVALID_REVIEW_USER);
+        }
+
+        reviewRepository.delete(review);
     }
 }
 
