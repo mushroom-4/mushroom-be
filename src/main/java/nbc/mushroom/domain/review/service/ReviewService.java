@@ -80,5 +80,19 @@ public class ReviewService {
         // 평균 점수와 리뷰 세부정보를 포함한 결과 반환
         return new SearchSellerReviewRes(averageScore, reviewDetails);
     }
+
+    // 리뷰 삭제
+    @Transactional
+    public void deleteReview(User user, Long bidId) {
+
+        Review review = reviewRepository.findByBidIdAndUserId(bidId, user.getId());
+
+        if (review == null) {
+            throw new CustomException(ExceptionType.REVIEW_NOT_FOUND);
+        }
+
+        reviewRepository.delete(review);
+        //소프트딜리트와 고민하였는데, 리뷰같은 경우는 소프트 사용이 애매한 것 같아서 하드로 작성하였습니다.
+    }
 }
 
