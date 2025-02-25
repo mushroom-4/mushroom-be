@@ -1,5 +1,7 @@
 package nbc.mushroom.domain.notice.entity;
 
+import static nbc.mushroom.domain.notice.entity.NoticeType.START_TIME;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -53,5 +55,21 @@ public class Notice extends Timestamped {
         this.user = user;
         this.auctionItemLike = auctionItemLike;
         this.noticeType = noticeType;
+    }
+
+    public String createMessage() {
+        if (noticeType == START_TIME) {
+            return String.format("%s님! 좋아요 하신 %s 경매 물품이 10분 후 시작 됩니다! 시작가는 %s원 입니다!",
+                user.getNickname(),
+                auctionItem.getName(),
+                auctionItem.getStartPrice()
+            );
+        }
+
+        return String.format(
+            "%s님! 좋아요 하신 %s 경매 물품이 10분 후 종료 됩니다!",
+            user.getNickname(),
+            auctionItem.getName()
+        );
     }
 }
