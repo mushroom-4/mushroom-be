@@ -50,12 +50,14 @@ public record SearchAuctionItemBidRes(
     @Getter
     private static class SellerRes {
 
+        private Long id;
         private String nickname;
         private String imageUrl;
         private Double averageScore;
         private Integer totalReviewCount;
 
         public SellerRes(User seller, List<Review> reviews) {
+            this.id = seller.getId();
             this.nickname = seller.getNickname();
             this.imageUrl = seller.getImageUrl();
             this.averageScore = reviews.stream()
