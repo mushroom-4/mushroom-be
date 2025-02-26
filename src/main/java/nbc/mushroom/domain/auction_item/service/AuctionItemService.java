@@ -47,12 +47,13 @@ public class AuctionItemService {
     private final BidRepository bidRepository;
     private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
     private final ReviewRepository reviewRepository;
+    private final AuctionItemStatusService auctionItemStatusService;
 
     // 경매 물품 키워드 검색(조회)
     public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
         String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
-        Long maxPrice, Pageable pageable) {
+        Long maxPrice, AuctionItemStatus status, Pageable pageable) {
 
         if (keyword != null && !keyword.isEmpty()) {
             savePopularKeywords(keyword);
@@ -60,7 +61,7 @@ public class AuctionItemService {
 
         return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
-            pageable);
+            status, pageable);
     }
 
     // 경매 물품 상제 조회 (최고 입찰가, 판매자 정보)
