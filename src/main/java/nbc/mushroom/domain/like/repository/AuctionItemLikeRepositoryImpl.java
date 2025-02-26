@@ -118,7 +118,7 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
                     auctionItemLike.user.id.eq(user.getId()))
                 .fetchOne());
 
-        return optionalAuctionItemLike.isEmpty();
+        return optionalAuctionItemLike.isPresent();
     }
 
 
