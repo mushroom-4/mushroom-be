@@ -164,7 +164,9 @@ public class StompHandler implements ChannelInterceptor {
             }
 
             if (Boolean.FALSE.equals(createBidService.hasBid(loginUserId, chatRoomId))) {
-                throw new CustomException(BIDDING_REQUIRED);
+                log.error(BIDDING_REQUIRED.getMessage());
+                stompHeaderAccessor.getSessionAttributes()
+                    .put("error", BIDDING_REQUIRED.getMessage());
             }
 
             log.info("✅ SEND 성공: userId={}, chatRoomId={}", loginUserId, chatRoomId);
