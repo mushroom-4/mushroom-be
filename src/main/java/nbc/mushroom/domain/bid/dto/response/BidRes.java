@@ -11,12 +11,12 @@ public record BidRes(
     SearchAuctionItemRes searchAuctionItemRes
 ) {
 
-    public static BidRes from(Bid bid, SearchAuctionItemRes searchAuctionItemRes) {
+    public static BidRes from(Bid bid) {
         return new BidRes(
             bid.getId(),
             bid.getBiddingPrice(),
             bid.getBiddingStatus(),
-            searchAuctionItemRes
+            SearchAuctionItemRes.from(bid.getAuctionItem())
         );
     }
 }
