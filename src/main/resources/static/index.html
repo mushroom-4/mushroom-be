@@ -145,11 +145,16 @@
    */
   function handleSubscriptionMessage(messageOutput) {
     const data = JSON.parse(messageOutput.body);
-    if (Array.isArray(data)) {
-      data.forEach(appendMessage);
-    } else {
-      appendMessage(data);
+
+    // 에러 메시지인 경우 경고창 표시
+    if (data.messageType === "ERROR") {
+      if (data.senderId === myUserId) {
+        alert(data.message);
+      }
+      return;
     }
+
+    appendMessage(data);
   }
 
   /**
