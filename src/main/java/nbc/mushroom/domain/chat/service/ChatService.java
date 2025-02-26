@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.chat.service;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +60,12 @@ public class ChatService {
 
     public void sendBidAnnouncementMessage(Long chatRoomId, User bidder,
         Long biddingPrice) {
-        String message = biddingPrice + "원에 입찰하였습니다. ";
+
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.KOREA);
+        String formattedPrice = numberFormat.format(biddingPrice);
+
+        String message = formattedPrice + "원에 입찰하였습니다.";
+
         ChatMessage announcementMessage = ChatMessage.builder()
             .chatRoomId(chatRoomId)
             .messageType(MessageType.ANNOUNCEMENT)
@@ -69,7 +75,7 @@ public class ChatService {
             .build();
 
         log.info("AnnouncementMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId,
-            announcementMessage);
+            bidder.getId());
 
         ChatMessageRes announcementMessageRes = ChatMessageRes.from(announcementMessage);
         saveChatMessage(chatRoomId, announcementMessageRes);
