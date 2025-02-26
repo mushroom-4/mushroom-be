@@ -1,8 +1,6 @@
 package nbc.mushroom.domain.auction_item.entity;
 
-import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.COMPLETED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTING;
-import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.NON_TRADED;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED;
@@ -111,10 +109,6 @@ public class AuctionItem extends Timestamped {
         this.status = AuctionItemStatus.REJECTED;
     }
 
-    public void softDelete() {
-        this.isDeleted = true;
-    }
-
     public void start() {
         if (this.status != WAITING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
@@ -126,13 +120,17 @@ public class AuctionItem extends Timestamped {
         if (this.status != PROGRESSING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
-        this.status = COMPLETED;
+        this.status = AuctionItemStatus.COMPLETED;
     }
 
-    public void nontrade() { // TODO 메서드명도 non traded로 변경하기
+    public void nonTrade() { // TODO 카멡케이스로 바꿈
         if (this.status != PROGRESSING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
-        this.status = NON_TRADED;
+        this.status = AuctionItemStatus.NON_TRADED;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

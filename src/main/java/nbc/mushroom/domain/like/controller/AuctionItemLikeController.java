@@ -23,23 +23,23 @@ public class AuctionItemLikeController {
 
     private final AuctionItemLikeService auctionItemLikeService;
 
-    @PostMapping("/{auction-items_id}/likes")
+    @PostMapping("/{auctionItemId}/likes")
     public ResponseEntity<ApiResponse<Void>> createAuctionItemLike(
-        @PathVariable("auction-items_id") Long auctionItemId,
+        @PathVariable Long auctionItemId,
         @Auth AuthUser authUser
     ) {
-        Long userId = authUser.id();
-        auctionItemLikeService.createAuctionItemLike(userId, auctionItemId);
+        User user = User.fromAuthUser(authUser);
+        auctionItemLikeService.createAuctionItemLike(user, auctionItemId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success("정상적으로 좋아요가 등록되었습니다."));
     }
 
     // 본인이 해당 경매 물품에, 좋아요를 한 여부를 확인해주는 API
-    @GetMapping("/{auction-items_id}/likes")
+    @GetMapping("/{auctionItemId}/likes")
     public ResponseEntity<ApiResponse<CheckLikedAuctionItemRes>> checkLikedAuctionItem(
         @Auth AuthUser authUser,
-        @PathVariable("auction-items_id") Long auctionItemId
+        @PathVariable Long auctionItemId
     ) {
         User user = User.fromAuthUser(authUser);
         CheckLikedAuctionItemRes auctionItems = auctionItemLikeService.getLikedAuctionItem(
@@ -50,13 +50,13 @@ public class AuctionItemLikeController {
                 auctionItems));
     }
 
-    @DeleteMapping("/{auction-items_id}/likes")
+    @DeleteMapping("/{auctionItemId}/likes")
     public ResponseEntity<ApiResponse<Void>> deleteAuctionItemLike(
-        @PathVariable("auction-items_id") Long auctionItemId,
+        @PathVariable Long auctionItemId,
         @Auth AuthUser authUser
     ) {
-        Long userId = authUser.id();
-        auctionItemLikeService.hardDeleteAuctionItemLike(userId, auctionItemId);
+        User user = User.fromAuthUser(authUser);
+        auctionItemLikeService.deleteAuctionItemLike(user, auctionItemId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("정상적으로 좋아요가 취소되었습니다."));

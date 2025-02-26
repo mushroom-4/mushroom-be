@@ -45,7 +45,7 @@ public class CreateBidService {
 
         Bid findBid = bidRepository.findBidByUserAndAuctionItem(loginUser, findAuctionItem)
             .orElseGet(() -> createBid(loginUser, findAuctionItem, createBidReq.biddingPrice())
-            ); // 좀 더 생각.. Bid 생성까지 Repository에서 처리하는건 아닌듯..
+            );
 
         if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
             findBid.updateBiddingPrice(createBidReq.biddingPrice());
@@ -57,10 +57,6 @@ public class CreateBidService {
         return CreateBidRes.from(findBid);
     }
 
-    public Boolean hasBid(Long bidderId, Long auctionItemId) {
-        return bidRepository.existBidByBidderIdAndAuctionItemId(bidderId, auctionItemId);
-    }
-
     private Bid createBid(User bidder, AuctionItem auctionItem, Long biddingPrice) {
         Bid bid = Bid.builder()
             .auctionItem(auctionItem)
@@ -69,6 +65,10 @@ public class CreateBidService {
             .build();
 
         return bidRepository.save(bid);
+    }
+
+    public Boolean hasBid(Long bidderId, Long auctionItemId) {
+        return bidRepository.existBidByBidderIdAndAuctionItemId(bidderId, auctionItemId);
     }
 
     private void validateBidRequest(User bidder, AuctionItem auctionItem, Long biddingPrice) {

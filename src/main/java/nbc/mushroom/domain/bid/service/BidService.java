@@ -37,6 +37,7 @@ public class BidService {
         Bid findBid = bidRepository.findBidByBidderAndId(loginUser, bidId);
         SearchAuctionItemRes searchAuctionItemRes = SearchAuctionItemRes.from(
             findBid.getAuctionItem());
+
         return BidRes.from(findBid, searchAuctionItemRes);
     }
 

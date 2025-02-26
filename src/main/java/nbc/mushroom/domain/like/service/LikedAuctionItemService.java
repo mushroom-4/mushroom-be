@@ -15,7 +15,7 @@ public class LikedAuctionItemService {
 
     private final AuctionItemLikeRepository auctionItemLikeRepository;
 
-    // 본인이 누른 경매 물품 좋아요
+    // 본인이 누른 경매 물품 좋아요 목록
     public Page<LikedAuctionItemRes> getAllLikedAuctionItem(User user,
         Pageable pageable) {
 

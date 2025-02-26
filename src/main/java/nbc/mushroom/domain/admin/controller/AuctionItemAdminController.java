@@ -34,6 +34,7 @@ public class AuctionItemAdminController {
         @Valid @RequestBody UpdateAuctionItemStatusReq updateAuctionItemStatusReq
     ) {
         auctionItemAdminService.updateAuctionItemStatus(auctionItemId, updateAuctionItemStatusReq);
+
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("물품 검수가 완료되었습니다."));
     }
