@@ -101,4 +101,13 @@ public class ChatService {
             .map(o -> (ChatMessageRes) o) // Object → ChatMessage 변환
             .toList(); // 최종 List<ChatMessageRes> 반환
     }
+
+    /**
+     * 에러 메시지가 존재하는지 확인
+     */
+    private boolean hasErrorMessage(StompHeaderAccessor stompHeaderAccessor) {
+        String error = (String) Objects.requireNonNull(stompHeaderAccessor.getSessionAttributes())
+            .get("error");
+        return error != null;
+    }
 }
