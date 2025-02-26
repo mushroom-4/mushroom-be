@@ -12,6 +12,7 @@ import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
+import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
@@ -56,11 +57,11 @@ public class AuctionItemController {
             .body(ApiResponse.success("경매 물품 등록에 성공했습니다.", auctionItemRes));
     }
 
-    // 경매 물품 상세 조회 (입찰가 포함)
+    // 경매 물품 상세 조회 (입찰가, 판매자 정보 포함)
     @GetMapping("/{auctionItemId}/info")
     public ResponseEntity<ApiResponse<SearchAuctionItemBidRes>> getAuctionItem(
         @PathVariable long auctionItemId) {
-        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItemWithMaxBid(
+        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItem(
             auctionItemId);
 
         return ResponseEntity
@@ -81,12 +82,13 @@ public class AuctionItemController {
         @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime startDate,
         @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime endDate,
         @RequestParam(value = "minPrice", required = false) Long minPrice,
-        @RequestParam(value = "maxPrice", required = false) Long maxPrice) {
+        @RequestParam(value = "maxPrice", required = false) Long maxPrice,
+        @RequestParam(value = "status", required = false) AuctionItemStatus status) {
 
         Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(sort, sortOrder));
         Page<SearchAuctionItemRes> filteredAuctionItems = auctionItemService.getFilteredAuctionItems(
             sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice,
-            maxPrice, pageable);
+            maxPrice, status, pageable);
 
         return ResponseEntity
             .status(HttpStatus.OK)

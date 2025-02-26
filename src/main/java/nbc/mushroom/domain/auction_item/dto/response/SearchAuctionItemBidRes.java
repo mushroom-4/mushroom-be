@@ -1,10 +1,15 @@
 package nbc.mushroom.domain.auction_item.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
+import nbc.mushroom.domain.review.entity.Review;
+import nbc.mushroom.domain.user.entity.User;
 
 public record SearchAuctionItemBidRes(
     Long auctionItemId,
@@ -18,11 +23,12 @@ public record SearchAuctionItemBidRes(
     LocalDateTime startTime,
     LocalDateTime endTime,
     AuctionItemStatus status,
-    AuctionItemBidInfoRes bid
+    AuctionItemBidInfoRes bid,
+    SellerRes seller
 ) {
 
     public static SearchAuctionItemBidRes from(AuctionItem searchAuctionItem,
-        AuctionItemBidInfoRes bid) {
+        AuctionItemBidInfoRes bid, List<Review> reviews) {
         return new SearchAuctionItemBidRes(
             searchAuctionItem.getId(),
             searchAuctionItem.getName(),
@@ -35,8 +41,29 @@ public record SearchAuctionItemBidRes(
             searchAuctionItem.getStartTime(),
             searchAuctionItem.getEndTime(),
             searchAuctionItem.getStatus(),
-            bid
+            bid,
+            new SellerRes(searchAuctionItem.getSeller(), reviews)
         );
     }
 
+    @NoArgsConstructor
+    @Getter
+    private static class SellerRes {
+
+        private String nickname;
+        private String imageUrl;
+        private Double averageScore;
+        private Integer totalReviewCount;
+
+        public SellerRes(User seller, List<Review> reviews) {
+            this.nickname = seller.getNickname();
+            this.imageUrl = seller.getImageUrl();
+            this.averageScore = reviews.stream()
+                .mapToInt(Review::getScore)
+                .average()
+                .orElse(0.0);
+            this.totalReviewCount = reviews.size();
+
+        }
+    }
 }

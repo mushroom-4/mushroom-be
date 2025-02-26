@@ -136,7 +136,8 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             .select(Projections.constructor(
                 AuctionItemBidInfoRes.class,
                 bid.bidder.nickname,
-                bid.biddingPrice
+                bid.biddingPrice,
+                bid.bidder.imageUrl
             ))
             .from(bid)
             .innerJoin(bid.auctionItem, auctionItem)

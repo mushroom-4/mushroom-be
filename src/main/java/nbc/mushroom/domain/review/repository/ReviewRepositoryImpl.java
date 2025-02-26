@@ -26,14 +26,4 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
             .fetch();
     }
 
-    @Override
-    public Review findByBidIdAndUserId(Long bidId, Long id) {
-        return queryFactory
-            .selectFrom(review)
-            .innerJoin(review.bid, bid)
-            .where(bid.id.eq(bidId)
-                .and(bid.bidder.id.eq(id)))
-            .fetchOne();
-    }
-
 }
