@@ -40,4 +40,5 @@ public class LikedAuctionItemController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("사용자가 좋아요한 경매 물품에 조회 성공했습니다.", auctionItems));
     }
+
 }
