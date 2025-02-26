@@ -107,6 +107,21 @@ public class AuctionItemLikeRepositoryImpl implements AuctionItemLikeRepositoryC
             ).fetch();
     }
 
+    @Override
+    public Boolean existAuctionItemLikeByUserAndAuctionItem(User user,
+        Long auctionItemId) {
+
+        Optional<AuctionItemLike> optionalAuctionItemLike = Optional.ofNullable(
+            queryFactory.select(auctionItemLike)
+                .from(auctionItemLike)
+                .where(auctionItemLike.auctionItem.id.eq(auctionItemId),
+                    auctionItemLike.user.id.eq(user.getId()))
+                .fetchOne());
+
+        return optionalAuctionItemLike.isEmpty();
+    }
+
+
     // like.id 오름 차순으로 정렬
     private OrderSpecifier<?>[] getSortOrders(Pageable pageable) {
         List<OrderSpecifier<?>> orders = new ArrayList<>();

@@ -23,4 +23,7 @@ public interface AuctionItemLikeRepositoryCustom {
 
     List<NoticeRes> findNoticeInfoOfEndByAuctionItemLike(LocalDateTime now,
         LocalDateTime nowPlus10);
+
+    Boolean existAuctionItemLikeByUserAndAuctionItem(User user,
+        Long auctionItemId);
 }
