@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,10 +32,11 @@ public class ChatController {
     public ChatMessageRes sendChatMessage(
         @DestinationVariable Long chatRoomId,
         @Valid @Payload ChatMessageReq chatMessageReq,
+        StompHeaderAccessor stompHeaderAccessor,
         @Auth AuthUser authUser
     ) {
         log.info("Auth User ID : {} ", authUser.id());
-        return chatService.sendChatMessage(chatRoomId, chatMessageReq,
+        return chatService.sendChatMessage(chatRoomId, chatMessageReq, stompHeaderAccessor,
             User.fromAuthUser(authUser));
     }
 
