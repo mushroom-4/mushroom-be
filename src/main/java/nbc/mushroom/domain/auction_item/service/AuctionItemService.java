@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
-import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
+import nbc.mushroom.domain.auction_item.dto.request.UpdateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfoRes;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
@@ -43,43 +43,10 @@ public class AuctionItemService {
 
     private final AuctionItemRepository auctionItemRepository;
     private final UserRepository userRepository;
-    private final ImageUtil imageUtil;
-    private final BidRepository bidRepository;
-    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
     private final ReviewRepository reviewRepository;
-    private final AuctionItemStatusService auctionItemStatusService;
-
-    // 경매 물품 키워드 검색(조회)
-    public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
-        String sortOrder, String keyword, String brand, AuctionItemCategory category,
-        AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
-        Long maxPrice, AuctionItemStatus status, Pageable pageable) {
-
-        if (keyword != null && !keyword.isEmpty()) {
-            savePopularKeywords(keyword);
-        }
-
-        return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
-            sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
-            status, pageable);
-    }
-
-    // 경매 물품 상제 조회 (최고 입찰가, 판매자 정보)
-    public SearchAuctionItemBidRes getAuctionItem(long auctionItemId) {
-        AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
-        List<Review> reviews = reviewRepository.findAllBySellerId(
-            searchAuctionItem.getSeller().getId());
-
-        if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
-            AuctionItemBidInfoRes auctionItemBidInfoRes =
-                bidRepository.auctionItemBidInfoFind(auctionItemId);
-
-            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes, reviews);
-        }
-
-        return SearchAuctionItemBidRes.from(searchAuctionItem, null, reviews);
-    }
+    private final BidRepository bidRepository;
+    private final ImageUtil imageUtil;
+    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
 
     // 경매 물품 생성
     @Transactional
@@ -108,10 +75,42 @@ public class AuctionItemService {
         return AuctionItemRes.from(auctionItem, imageUrl);
     }
 
+    // 경매 물품 상세 조회 (최고 입찰가, 판매자 정보)
+    public SearchAuctionItemBidRes getAuctionItem(long auctionItemId) {
+        AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+
+        List<Review> reviews = reviewRepository.findAllBySellerId(
+            searchAuctionItem.getSeller().getId());
+
+        if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
+            AuctionItemBidInfoRes auctionItemBidInfoRes =
+                bidRepository.auctionItemBidInfoFind(auctionItemId);
+
+            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes, reviews);
+        }
+
+        return SearchAuctionItemBidRes.from(searchAuctionItem, null, reviews);
+    }
+
+    // 경매 물품 키워드 검색(조회)
+    public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
+        String sortOrder, String keyword, String brand, AuctionItemCategory category,
+        AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
+        Long maxPrice, AuctionItemStatus status, Pageable pageable) {
+
+        if (keyword != null && !keyword.isEmpty()) {
+            savePopularKeywords(keyword);
+        }
+
+        return auctionItemRepository.findAuctionItemsByKeywordAndFiltering(
+            sort, sortOrder, keyword, brand, category, size, startDate, endDate, minPrice, maxPrice,
+            status, pageable);
+    }
+
     // 경매 물품 수정
     @Transactional
     public AuctionItemRes updateAuctionItem(Long userId, Long auctionItemId,
-        PutAuctionItemReq putAuctionItemReq) {
+        UpdateAuctionItemReq updateAuctionItemReq) {
 
         AuctionItem auctionItem = validateItemById(userId, auctionItemId);
 
@@ -119,25 +118,25 @@ public class AuctionItemService {
 
         User user = validateUserById(userId);
 
-        if (putAuctionItemReq.image() != null) {
+        if (updateAuctionItemReq.image() != null) {
             imageUtil.delete(auctionItem.getImageUrl());
         }
 
-        String fileName = imageUtil.upload(putAuctionItemReq.image());
+        String fileName = imageUtil.upload(updateAuctionItemReq.image());
         String updateImageUrl = imageUtil.getImageUrl(fileName);
 
         AuctionItem updateAuctionItem = AuctionItem.builder()
             .id(auctionItemId)
             .seller(user)
-            .name(putAuctionItemReq.name())
-            .description(putAuctionItemReq.description())
-            .brand(putAuctionItemReq.brand())
+            .name(updateAuctionItemReq.name())
+            .description(updateAuctionItemReq.description())
+            .brand(updateAuctionItemReq.brand())
             .imageUrl(fileName)
-            .size(putAuctionItemReq.auctionItemSize())
-            .category(putAuctionItemReq.auctionItemCategory())
-            .startPrice(putAuctionItemReq.startPrice())
-            .startTime(putAuctionItemReq.startTime())
-            .endTime(putAuctionItemReq.endTime())
+            .size(updateAuctionItemReq.auctionItemSize())
+            .category(updateAuctionItemReq.auctionItemCategory())
+            .startPrice(updateAuctionItemReq.startPrice())
+            .startTime(updateAuctionItemReq.startTime())
+            .endTime(updateAuctionItemReq.endTime())
             .build();
 
         auctionItemRepository.save(updateAuctionItem);
@@ -147,11 +146,11 @@ public class AuctionItemService {
 
     // 경매 물품 삭제
     @Transactional
-    public void softDeleteAuctionItem(Long userId, Long auctionItemId) {
+    public void deleteAuctionItem(Long userId, Long auctionItemId) {
 
         AuctionItem auctionItem = validateItemById(userId, auctionItemId);
 
-        auctionItem.softDelete();
+        auctionItem.delete();
     }
 
     public Boolean hasAuctionItem(Long auctionItemId) {

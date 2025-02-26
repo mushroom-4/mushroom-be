@@ -21,7 +21,7 @@ public class NoticeCreateService {
     private final NoticeRepository noticeRepository;
     private final AuctionItemLikeRepository auctionItemLikeRepository;
 
-    @Scheduled(cron = "0 */10 * * * *") // 현재는 1분마다 돌아갑니다.
+    @Scheduled(cron = "0 */10 * * * *")
     public void createNoticeStartTime() {
         log.info("::::Create Notice Start Time::::");
         // 현재 시간
@@ -33,6 +33,7 @@ public class NoticeCreateService {
         List<NoticeRes> noticeResList = auctionItemLikeRepository.findNoticeInfoOfStartByAuctionItemLike(
             now,
             nowPlus10);
+
         for (NoticeRes noticeRes : noticeResList) {
             noticeRepository.save(Notice.builder()
                 .auctionItem(noticeRes.auctionItem())
@@ -43,7 +44,7 @@ public class NoticeCreateService {
         }
     }
 
-    @Scheduled(cron = "0 */10 * * * *") // 현재는 1분마다 돌아갑니다.
+    @Scheduled(cron = "0 */10 * * * *")
     public void createNoticeEndTime() {
         log.info("::::Create Notice End Time::::");
         // 현재 시간
@@ -55,6 +56,7 @@ public class NoticeCreateService {
         List<NoticeRes> noticeResList = auctionItemLikeRepository.findNoticeInfoOfEndByAuctionItemLike(
             now,
             nowPlus10);
+
         for (NoticeRes noticeRes : noticeResList) {
             noticeRepository.save(Notice.builder()
                 .auctionItem(noticeRes.auctionItem())

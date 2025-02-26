@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
-import nbc.mushroom.domain.auction_item.dto.request.PutAuctionItemReq;
+import nbc.mushroom.domain.auction_item.dto.request.UpdateAuctionItemReq;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemBidRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
@@ -101,13 +101,13 @@ public class AuctionItemController {
     // 경매 물품 수정
     @PutMapping(value = "/{auctionItemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<AuctionItemRes>> updateAuctionItem(
-        @Valid @ModelAttribute PutAuctionItemReq putAuctionItemReq,
+        @Valid @ModelAttribute UpdateAuctionItemReq updateAuctionItemReq,
         @PathVariable Long auctionItemId,
         @Auth AuthUser authUser
     ) {
         Long userId = authUser.id();
         AuctionItemRes auctionItemRes = auctionItemService.updateAuctionItem(userId, auctionItemId,
-            putAuctionItemReq);
+            updateAuctionItemReq);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("경매 물품 수정에 성공했습니다.", auctionItemRes));
@@ -121,7 +121,7 @@ public class AuctionItemController {
     ) {
         Long userId = authUser.id();
 
-        auctionItemService.softDeleteAuctionItem(userId, auctionItemId);
+        auctionItemService.deleteAuctionItem(userId, auctionItemId);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("경매 물품 삭제에 성공했습니다."));

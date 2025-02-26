@@ -58,6 +58,7 @@ public class BidController {
         @PathVariable Long bidId
     ) {
         bidService.deleteBid(User.fromAuthUser(authUser), bidId);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(ApiResponse.success("입찰 취소에 성공했습니다."));
     }

@@ -25,9 +25,9 @@ public class ChatService {
     /**
      * 클라이언트가 보낸 메시지를 Redis에 저장하고 전송
      *
-     * @param chatRoomId : 메시지 전송될 채팅방 ID
+     * @param chatRoomId     : 메시지 전송될 채팅방 ID
      * @param chatMessageReq : 클라이언트가 보낸 메시지 요청 Dto
-     * @param loginUser : 현재 로그인한 유저 (메시지 보낸 사람)
+     * @param loginUser      : 현재 로그인한 유저 (메시지 보낸 사람)
      */
     public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq,
         User loginUser) {
@@ -40,7 +40,7 @@ public class ChatService {
             .sender(loginUser)
             .build();
 
-        log.info("ChatMessaeg 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId, chatMessage);
+        log.info("ChatMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId, chatMessage);
 
         ChatMessageRes chatMessageRes = ChatMessageRes.from(chatMessage);
         saveChatMessage(chatRoomId, chatMessageRes);
@@ -51,8 +51,8 @@ public class ChatService {
     }
 
     public void sendBidAnnouncementMessage(Long chatRoomId, User bidder,
-        Long bidiingPrice) {
-        String message = bidiingPrice + "원에 입찰하였습니다. ";
+        Long biddingPrice) {
+        String message = biddingPrice + "원에 입찰하였습니다. ";
         ChatMessage announcementMessage = ChatMessage.builder()
             .chatRoomId(chatRoomId)
             .messageType(MessageType.ANNOUNCEMENT)
@@ -61,7 +61,7 @@ public class ChatService {
             .sendDateTime(LocalDateTime.now())
             .build();
 
-        log.info("AnnouncementMessaeg 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId,
+        log.info("AnnouncementMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId,
             announcementMessage);
 
         ChatMessageRes announcementMessageRes = ChatMessageRes.from(announcementMessage);
@@ -81,7 +81,6 @@ public class ChatService {
         log.info("Redis Storage [Key : {}]", key);
         redisTemplate.opsForList().rightPush(key, chatMessageRes); // key - value
     }
-
 
     /**
      * 특정 채팅방의 최근 메시지들 조회

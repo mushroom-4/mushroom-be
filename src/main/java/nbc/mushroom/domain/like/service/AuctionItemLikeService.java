@@ -4,7 +4,6 @@ package nbc.mushroom.domain.like.service;
 import static nbc.mushroom.domain.common.exception.ExceptionType.EXIST_LIKE_BY_AUCTION_ITEM;
 import static nbc.mushroom.domain.common.exception.ExceptionType.LIKE_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.NOT_SELF_LIKE;
-import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
@@ -25,11 +24,8 @@ public class AuctionItemLikeService {
     private final AuctionItemRepository auctionItemRepository;
     private final AuctionItemLikeRepository auctionItemLikeRepository;
 
-    public void createAuctionItemLike(Long userId, Long auctionItemId) {
+    public void createAuctionItemLike(User user, Long auctionItemId) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         if (auctionItemRepository.existsByUserAndAuctionItem(user, auctionItemId)) {
             throw new CustomException(NOT_SELF_LIKE);
@@ -57,11 +53,8 @@ public class AuctionItemLikeService {
         return new CheckLikedAuctionItemRes(hasLike);
     }
 
-    public void hardDeleteAuctionItemLike(Long userId, Long auctionItemId) {
+    public void deleteAuctionItemLike(User user, Long auctionItemId) {
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
-
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
         AuctionItemLike auctionItemLike = auctionItemLikeRepository.findLikeByUserAndAuctionItem(
             user,

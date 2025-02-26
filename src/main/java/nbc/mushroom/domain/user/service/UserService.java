@@ -34,6 +34,7 @@ public class UserService {
     public UserRes getUser(long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
         return UserRes.from(user);
     }
 

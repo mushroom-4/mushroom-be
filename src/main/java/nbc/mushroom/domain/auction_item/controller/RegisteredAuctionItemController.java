@@ -2,7 +2,7 @@ package nbc.mushroom.domain.auction_item.controller;
 
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemRes;
-import nbc.mushroom.domain.auction_item.service.AuctionItemRegisterService;
+import nbc.mushroom.domain.auction_item.service.RegisteredAuctionItemService;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/registrations")
-public class AuctionItemRegisterController {
+public class RegisteredAuctionItemController {
 
-    private final AuctionItemRegisterService auctionItemRegisterService;
+    private final RegisteredAuctionItemService registeredAuctionItemService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<AuctionItemRes>>> getAuctionItemsByUser(
@@ -31,7 +31,7 @@ public class AuctionItemRegisterController {
     ) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        Page<AuctionItemRes> auctionItems = auctionItemRegisterService.getAuctionItemsByUser(
+        Page<AuctionItemRes> auctionItems = registeredAuctionItemService.getAuctionItemsByUser(
             authUser.id(), pageable);
 
         return ResponseEntity.status(HttpStatus.OK)

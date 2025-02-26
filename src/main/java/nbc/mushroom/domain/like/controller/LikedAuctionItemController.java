@@ -32,6 +32,7 @@ public class LikedAuctionItemController {
         @RequestParam(value = "page", defaultValue = "1") int page
     ) {
         User user = User.fromAuthUser(authUser);
+
         Pageable pageable = PageRequest.of(page - 1, 10);
         Page<LikedAuctionItemRes> auctionItems = likedAuctionItemService.getAllLikedAuctionItem(
             user,

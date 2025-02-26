@@ -11,7 +11,7 @@ import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
 import org.springframework.web.multipart.MultipartFile;
 
-public record PutAuctionItemReq(
+public record UpdateAuctionItemReq(
     @NotBlank(message = "경매 물품 명은 필수이며, 공백일 수 없습니다.")
     @Size(max = 50)
     String name,

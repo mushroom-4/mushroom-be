@@ -54,9 +54,9 @@ public class AuctionItemStatusService {
             log.info("auction endTime : {}", auctionItem.getEndTime());
 
             if (Boolean.FALSE.equals(bidRepository.existsBidByAuctionItem(auctionItem))) {
-                auctionItem.nontrade();
-                log.info("auction untrade id : {}", auctionItem.getId());
-                log.info("auction untrade Status : {}", auctionItem.getStatus());
+                auctionItem.nonTrade();
+                log.info("auction non-trade id : {}", auctionItem.getId());
+                log.info("auction non-trade Status : {}", auctionItem.getStatus());
                 continue;
             }
 
@@ -65,7 +65,7 @@ public class AuctionItemStatusService {
             log.info("auction Status : {}", auctionItem.getStatus());
 
             Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
-            log.info("succedBid ID : {}", succedBid.getId().toString());
+            log.info("succeedBid ID : {}", succedBid.getId().toString());
             succedBid.succeed();
 
             // 최고가 아닌 Bid들을 fail 처리
