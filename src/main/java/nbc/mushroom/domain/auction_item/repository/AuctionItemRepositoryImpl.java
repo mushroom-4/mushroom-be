@@ -63,10 +63,10 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
     public Page<SearchAuctionItemRes> findAuctionItemsByKeywordAndFiltering(
         String sort, String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
-        Long maxPrice, Pageable pageable) {
+        Long maxPrice, AuctionItemStatus status, Pageable pageable) {
 
         BooleanBuilder builder = auctionItemsBuilder(
-            keyword, brand, category, size, startDate, endDate, minPrice, maxPrice
+            keyword, brand, category, size, startDate, endDate, minPrice, maxPrice, status
         );
 
         JPAQuery<SearchAuctionItemRes> query = queryFactory
@@ -224,7 +224,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
     private BooleanBuilder auctionItemsBuilder(
         String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate,
-        Long minPrice, Long maxPrice) {
+        Long minPrice, Long maxPrice, AuctionItemStatus status) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -262,10 +262,14 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             builder.and(auctionItem.startPrice.loe(maxPrice));
         }
 
-        builder.and(
-            auctionItem.status.eq(AuctionItemStatus.WAITING)
-                .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING))
-        );
+        if (status != null) {
+            builder.and(auctionItem.status.eq(status));
+        } else {
+            builder.and(
+                auctionItem.status.eq(AuctionItemStatus.WAITING)
+                    .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING)));
+        }
+
         return builder;
     }
 }
