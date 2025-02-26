@@ -70,6 +70,22 @@ public class ChatService {
 
         redisPublish.publish(announcementMessageRes);
     }
+
+    /**
+     * 일반 메시지 생성 메서드
+     */
+    private ChatMessage createChatMessage(Long chatRoomId, String message, User sender) {
+        log.info("ChatMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId,
+            sender.getId());
+        return ChatMessage.builder()
+            .chatRoomId(chatRoomId)
+            .messageType(MessageType.MESSAGE)
+            .message(message)
+            .sendDateTime(LocalDateTime.now())
+            .sender(sender)
+            .build();
+    }
+
     /**
      * 에러 메시지 생성 메서드
      */
