@@ -56,11 +56,11 @@ public class AuctionItemController {
             .body(ApiResponse.success("경매 물품 등록에 성공했습니다.", auctionItemRes));
     }
 
-    // 경매 물품 상세 조회 (입찰가 포함)
+    // 경매 물품 상세 조회 (입찰가, 판매자 정보 포함)
     @GetMapping("/{auctionItemId}/info")
     public ResponseEntity<ApiResponse<SearchAuctionItemBidRes>> getAuctionItem(
         @PathVariable long auctionItemId) {
-        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItemWithMaxBid(
+        SearchAuctionItemBidRes searchAuctionItemBidRes = auctionItemService.getAuctionItem(
             auctionItemId);
 
         return ResponseEntity
