@@ -25,6 +25,8 @@ import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.image.ImageUtil;
+import nbc.mushroom.domain.review.entity.Review;
+import nbc.mushroom.domain.review.repository.ReviewRepository;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,6 +46,7 @@ public class AuctionItemService {
     private final ImageUtil imageUtil;
     private final BidRepository bidRepository;
     private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
+    private final ReviewRepository reviewRepository;
 
     // 경매 물품 키워드 검색(조회)
     public Page<SearchAuctionItemRes> getFilteredAuctionItems(String sort,
@@ -60,17 +63,21 @@ public class AuctionItemService {
             pageable);
     }
 
-    // 경매 물품 최대 입찰가 조회
-    public SearchAuctionItemBidRes getAuctionItemWithMaxBid(long auctionItemId) {
+    // 경매 물품 상제 조회 (최고 입찰가, 판매자 정보)
+    public SearchAuctionItemBidRes getAuctionItem(long auctionItemId) {
         AuctionItem searchAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+
+        List<Review> reviews = reviewRepository.findAllBySellerId(
+            searchAuctionItem.getSeller().getId());
+
         if (bidRepository.existsBidByAuctionItem(searchAuctionItem)) {
             AuctionItemBidInfoRes auctionItemBidInfoRes =
                 bidRepository.auctionItemBidInfoFind(auctionItemId);
 
-            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes);
+            return SearchAuctionItemBidRes.from(searchAuctionItem, auctionItemBidInfoRes, reviews);
         }
 
-        return SearchAuctionItemBidRes.from(searchAuctionItem, null);
+        return SearchAuctionItemBidRes.from(searchAuctionItem, null, reviews);
     }
 
     // 경매 물품 생성
