@@ -7,5 +7,4 @@ public interface ReviewRepositoryCustom {
 
     List<Review> findAllBySellerId(Long sellerId);
 
-    Review findByBidIdAndUserId(Long bidId, Long id);
 }
