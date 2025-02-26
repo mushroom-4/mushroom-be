@@ -11,6 +11,7 @@ import nbc.mushroom.domain.chat.entity.ChatMessage;
 import nbc.mushroom.domain.chat.entity.MessageType;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -68,6 +69,24 @@ public class ChatService {
         saveChatMessage(chatRoomId, announcementMessageRes);
 
         redisPublish.publish(announcementMessageRes);
+    }
+    /**
+     * 에러 메시지 생성 메서드
+     */
+    private ChatMessage createErrorMessage(Long chatRoomId,
+        StompHeaderAccessor stompHeaderAccessor,
+        User sender) {
+        ChatMessage chatErrorMessage = ChatMessage.builder()
+            .chatRoomId(chatRoomId)
+            .messageType(MessageType.ERROR)
+            .message((String) stompHeaderAccessor.getSessionAttributes().get("error"))
+            .sendDateTime(LocalDateTime.now())
+            .sender(sender)
+            .build();
+
+        log.info("ErrorMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}] [ErrorMessage : {}]",
+            chatRoomId, sender.getId(), chatErrorMessage.getMessage());
+        return chatErrorMessage;
     }
 
     /**
