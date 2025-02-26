@@ -3,6 +3,8 @@ package nbc.mushroom.domain.chat.service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.request.ChatMessageReq;
@@ -26,25 +28,29 @@ public class ChatService {
     /**
      * 클라이언트가 보낸 메시지를 Redis에 저장하고 전송
      *
+     * hasErrorMessage가 true면 에러메시지 생성, false면 일반 메시지 생성
+     *
      * @param chatRoomId     : 메시지 전송될 채팅방 ID
      * @param chatMessageReq : 클라이언트가 보낸 메시지 요청 Dto
      * @param loginUser      : 현재 로그인한 유저 (메시지 보낸 사람)
+     * @param stompHeaderAccessor : STOMP 헤더 정보에 접근하기 위한 클래스 (Error메시지가 담겼는지 확인하기 위해)
      */
     public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq,
+        StompHeaderAccessor stompHeaderAccessor,
         User loginUser) {
 
-        ChatMessage chatMessage = ChatMessage.builder()
-            .chatRoomId(chatRoomId)
-            .messageType(MessageType.MESSAGE)
-            .message(chatMessageReq.message())
-            .sendDateTime(LocalDateTime.now())
-            .sender(loginUser)
-            .build();
+        boolean isError = hasErrorMessage(stompHeaderAccessor);
 
-        log.info("ChatMessage 객체 생성 [ChatRoomId : {}] [SenderId : {}]", chatRoomId, chatMessage);
+        ChatMessage chatMessage = isError
+            ? createErrorMessage(chatRoomId, stompHeaderAccessor, loginUser)
+            : createChatMessage(chatRoomId, chatMessageReq.message(), loginUser);
 
         ChatMessageRes chatMessageRes = ChatMessageRes.from(chatMessage);
-        saveChatMessage(chatRoomId, chatMessageRes);
+
+        // 에러 메시지가 아닐 때만 저장
+        if (!isError) {
+            saveChatMessage(chatRoomId, chatMessageRes);
+        }
 
         redisPublish.publish(chatMessageRes);
 
