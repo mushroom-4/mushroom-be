@@ -4,11 +4,11 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_DE
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.dto.request.CreateAuctionItemReq;
@@ -32,6 +32,8 @@ import nbc.mushroom.domain.user.repository.UserRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +48,9 @@ public class AuctionItemService {
     private final ReviewRepository reviewRepository;
     private final BidRepository bidRepository;
     private final ImageUtil imageUtil;
-    private final ConcurrentHashMap<String, Integer> popularKeywordsMap = new ConcurrentHashMap<>();
+    private final RedisTemplate<String, String> redisCacheTemplate;
+    private final static String POPULAR_KEYWORDS_KEY = "popularKeywords";
+
 
     // 경매 물품 생성
     @Transactional
@@ -157,35 +161,41 @@ public class AuctionItemService {
         return auctionItemRepository.existsById(auctionItemId);
     }
 
-    // 인기 검색어
+    // 인기 검색어 TODO 캐시 만료 정책을 어떻게 할것인가?
     @Cacheable(value = "popularKeywords", key = "'top10'")
     public List<String> getPopularKeywords() {
-        return popularKeywordsMap.entrySet().stream()
-            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))// 검색 횟수 기준 내림차순 정렬
-            .limit(10)
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toList());
+
+        Set<String> keywords = redisCacheTemplate.opsForZSet()
+            .reverseRange(POPULAR_KEYWORDS_KEY, 0, 9);
+
+        return keywords != null ? new ArrayList<>(keywords) : new ArrayList<>();
     }
 
     // 인기 검색어 저장
     public void savePopularKeywords(String keyword) {
-        popularKeywordsMap.merge(keyword, 1, Integer::sum);
-        log.info("인기 검색어 저장 - {} (현재 검색 횟수: {})", keyword, popularKeywordsMap.get(keyword));
+        redisCacheTemplate.opsForZSet().incrementScore(POPULAR_KEYWORDS_KEY, keyword, 1);
+
+        redisCacheTemplate.expire(POPULAR_KEYWORDS_KEY,
+            Duration.ofMinutes(10)); // todo 테스트 후 만료 정책 변경
+
+        log.info("인기 검색어 저장 - {} (현재 검색 횟수: {})", keyword,
+            redisCacheTemplate.opsForZSet().score(POPULAR_KEYWORDS_KEY, keyword));
     }
 
     // 검색어 캐싱 내역 가시화 로직
     public void printPopularKeywordsCacheContents() {
         log.info(":::현재 인기 검색어 캐시 내용:::");
 
-        if (popularKeywordsMap.isEmpty()) {
+        Set<ZSetOperations.TypedTuple<String>> entries = redisCacheTemplate.opsForZSet()
+            .reverseRangeWithScores(POPULAR_KEYWORDS_KEY, 0, 9);
+
+        if (entries == null || entries.isEmpty()) {
             log.info("현재 저장된 검색어 데이터가 없습니다.");
             return;
         }
 
-        popularKeywordsMap.entrySet().stream()
-            .sorted((k1, k2) -> k2.getValue().compareTo(k1.getValue()))
-            .limit(10)
-            .forEach(entry -> log.info("  - 키워드: {}, 검색 횟수: {}", entry.getKey(), entry.getValue()));
+        entries.forEach(
+            entry -> log.info("  - 키워드: {}, 검색 횟수: {}", entry.getValue(), entry.getScore()));
     }
 
     private AuctionItem validateItemById(Long userId, Long auctionItemId) {

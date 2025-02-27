@@ -123,7 +123,7 @@ public class AuctionItem extends Timestamped {
         this.status = AuctionItemStatus.COMPLETED;
     }
 
-    public void nonTrade() { // TODO 카멡케이스로 바꿈
+    public void nonTrade() {
         if (this.status != PROGRESSING) {
             throw new CustomException(INVALID_AUCTION_ITEM_STATUS);
         }
