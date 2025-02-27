@@ -5,6 +5,7 @@ import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemSize;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
+import nbc.mushroom.domain.review.entity.Review;
 
 public record BidInfoRes(
     Long bidId,
@@ -14,7 +15,7 @@ public record BidInfoRes(
     ReviewRes review
 ) {
 
-    public static BidInfoRes from(Bid bid) {
+    public static BidInfoRes from(Bid bid, Review review) {
         return new BidInfoRes(
             bid.getId(),
             bid.getBiddingPrice(),
@@ -30,10 +31,10 @@ public record BidInfoRes(
                 bid.getAuctionItem().getStartTime(),
                 bid.getAuctionItem().getEndTime()
             ),
-            bid.getReview() == null ? null : new BidInfoRes.ReviewRes(
-                bid.getReview().getId(),
-                bid.getReview().getContent(),
-                bid.getReview().getScore()
+            review == null ? null : new BidInfoRes.ReviewRes(
+                review.getId(),
+                review.getContent(),
+                review.getScore()
             )
         );
     }

@@ -3,17 +3,21 @@ package nbc.mushroom.domain.bid.repository;
 import static nbc.mushroom.domain.auction_item.entity.QAuctionItem.auctionItem;
 import static nbc.mushroom.domain.bid.entity.QBid.bid;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
+import static nbc.mushroom.domain.review.entity.QReview.review;
 import static nbc.mushroom.domain.user.entity.QUser.user;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfoRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
+import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.entity.QBid;
@@ -117,6 +121,29 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         return optionalBid.orElseThrow(
             () -> new CustomException(BID_NOT_FOUND)
         );
+    }
+
+    @Override
+    public BidInfoRes findBidInfoByBidderAndId(User bidder, Long bidId) {
+        Tuple result = queryFactory
+            .select(
+                bid,
+                review
+            )
+            .from(bid)
+            .innerJoin(bid.auctionItem, auctionItem)
+            .leftJoin(review).on(review.bid.eq(bid))
+            .where(
+                bid.bidder.eq(bidder),
+                bid.id.eq(bidId)
+            )
+            .fetchOne();
+
+        if (result == null) {
+            throw new CustomException(BID_NOT_FOUND);
+        }
+
+        return BidInfoRes.from(Objects.requireNonNull(result.get(bid)), result.get(review));
     }
 
     @Override

@@ -32,8 +32,7 @@ public class BidService {
     }
 
     public BidInfoRes getBidByUser(User loginUser, Long bidId) {
-        Bid bid = bidRepository.findBidByBidderAndId(loginUser, bidId);
-        return BidInfoRes.from(bid);
+        return bidRepository.findBidInfoByBidderAndId(loginUser, bidId);
     }
 
     @Transactional(readOnly = false)

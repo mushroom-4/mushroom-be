@@ -15,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,7 +23,6 @@ import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.common.exception.CustomException;
-import nbc.mushroom.domain.review.entity.Review;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -51,9 +49,6 @@ public class Bid extends Timestamped {
     @Enumerated(EnumType.STRING)
     @Column(name = "bidding_status", nullable = false)
     private BiddingStatus biddingStatus;
-
-    @OneToOne(mappedBy = "bid")
-    private Review review;
 
     @Builder
     public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice) {

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import nbc.mushroom.domain.auction_item.dto.response.AuctionItemBidInfoRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
+import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.user.entity.User;
@@ -23,6 +24,8 @@ public interface BidRepositoryCustom {
     Page<Bid> findBidsByUser(User user, Pageable pageable);
 
     Bid findBidByBidderAndId(User bidder, Long bidId);
+
+    BidInfoRes findBidInfoByBidderAndId(User bidder, Long bidId);
 
     Long countBidsByBidderAndStatus(User bidder, BiddingStatus biddingStatus);
 
