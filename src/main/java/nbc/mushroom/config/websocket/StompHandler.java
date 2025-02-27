@@ -14,6 +14,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -146,7 +147,7 @@ public class StompHandler implements ChannelInterceptor {
             log.info("✅ SUBSCRIBE 성공: userId={}, chatRoomId={}", userId, chatRoomId);
         } catch (Exception e) {
             log.error("❌ SUBSCRIBE 실패: {}", e.getMessage());
-            throw e; // 예외를 던져야 STOMP에서 처리 가능
+            throw e;
         }
     }
 
@@ -166,23 +167,14 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTH_TOKEN_NOT_FOUND);
             }
 
-            if (Boolean.FALSE.equals(bidService.hasBid(loginUserId, chatRoomId))) {
-                log.error(BIDDING_REQUIRED.getMessage());
-                stompHeaderAccessor.getSessionAttributes()
-                    .put("error", BIDDING_REQUIRED.getMessage());
-            }
+            boolean hasBid = Boolean.TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
 
-            //  세션에 error 값이 있는지 체크
-            if (Boolean.TRUE.equals(bidService.hasBid(loginUserId, chatRoomId))
-                && stompHeaderAccessor.getSessionAttributes().get("error") != null) {
-                stompHeaderAccessor.getSessionAttributes().remove("error");
-                log.info("입찰 내역 확인. 기존 에러 메시지 세션에서 삭제");
-            }
+            validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
 
             log.info("✅ SEND 성공: userId={}, chatRoomId={}", loginUserId, chatRoomId);
         } catch (Exception e) {
             log.error("❌ SEND 실패: {}", e.getMessage());
-            throw e; // 예외를 던져야 STOMP에서 처리 가능
+            throw e;
         }
     }
 
@@ -192,5 +184,27 @@ public class StompHandler implements ChannelInterceptor {
     private String getAuthorizationHeader(StompHeaderAccessor accessor) {
         List<String> authHeaders = accessor.getNativeHeader("Authorization");
         return (authHeaders != null && !authHeaders.isEmpty()) ? authHeaders.get(0) : null;
+    }
+
+    /**
+     * 세션에서 입찰 여부에 따라 에러 메시지를 추가하거나 삭제하는 메서드
+     *
+     * 입찰하지 않은 경우: 에러 메시지를 세션에 추가
+     * 입찷한 경우 & 세션에 에러메시지가 존재하는 경우 : 기존에 존재하는 에러 메시지를 삭제
+     */
+    private void validateBidAndSessionAttributeError(StompHeaderAccessor stompHeaderAccessor,
+        boolean hasBid) {
+        Map<String, Object> sessionAttributes = stompHeaderAccessor.getSessionAttributes();
+
+        if (!hasBid) {
+            log.error("입찰 필요: {}", BIDDING_REQUIRED.getMessage());
+            sessionAttributes.put("error", BIDDING_REQUIRED.getMessage());
+            return; // 이후 로직 실행할 필요 없음
+        }
+
+        if (sessionAttributes.get("error") != null) {
+            log.info("입찰 내역이 확인됨 - 기존 에러 메시지 삭제");
+            sessionAttributes.remove("error");
+        }
     }
 }
