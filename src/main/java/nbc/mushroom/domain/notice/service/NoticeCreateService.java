@@ -24,6 +24,8 @@ public class NoticeCreateService {
     @Scheduled(cron = "0 */10 * * * *")
     public void createNoticeStartTime() {
         log.info("::::Create Notice Start Time::::");
+        log.info("::::Start Time // Current Time {} ::::",
+            LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         // 현재 시간
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
         // 현재 시간에 10분 추가
@@ -47,6 +49,8 @@ public class NoticeCreateService {
     @Scheduled(cron = "0 */10 * * * *")
     public void createNoticeEndTime() {
         log.info("::::Create Notice End Time::::");
+        log.info("::::End Time // Current Time {} ::::",
+            LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         // 현재 시간
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES); // 초 단위 버림
         // 현재 시간에 10분 추가
