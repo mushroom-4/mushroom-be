@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.common.entity.Timestamped;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.review.entity.Review;
 import nbc.mushroom.domain.user.entity.User;
 
 @Getter
@@ -43,12 +45,15 @@ public class Bid extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User bidder;
 
-    @Column(nullable = false)
+    @Column(name = "bidding_price", nullable = false)
     private Long biddingPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "bidding_status", nullable = false)
     private BiddingStatus biddingStatus;
+
+    @OneToOne(mappedBy = "bid")
+    private Review review;
 
     @Builder
     public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice) {
@@ -88,7 +93,7 @@ public class Bid extends Timestamped {
         if (!biddingPrice.equals(paymentAmount)) {
             throw new CustomException(INVALID_PAYMENT_AMOUNT);
         }
-        
+
         if (this.biddingStatus != SUCCEED) {
             throw new CustomException(INVALID_BID_STATUS);
         }
