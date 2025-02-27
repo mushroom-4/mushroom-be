@@ -67,10 +67,6 @@ public class CreateBidService {
         return bidRepository.save(bid);
     }
 
-    public Boolean hasBid(Long bidderId, Long auctionItemId) {
-        return bidRepository.existBidByBidderIdAndAuctionItemId(bidderId, auctionItemId);
-    }
-
     private void validateBidRequest(User bidder, AuctionItem auctionItem, Long biddingPrice) {
         if (auctionItem.getStatus() != AuctionItemStatus.PROGRESSING) {
             throw new CustomException(AUCTION_ITEM_NOT_IN_PROGRESS);

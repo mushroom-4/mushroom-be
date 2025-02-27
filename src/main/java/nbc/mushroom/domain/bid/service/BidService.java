@@ -44,6 +44,10 @@ public class BidService {
         findBid.cancel();
     }
 
+    public Boolean hasBid(Long bidderId, Long auctionItemId) {
+        return bidRepository.existBidByBidderIdAndAuctionItemId(bidderId, auctionItemId);
+    }
+
     private void validateBidCancellation(User loginUser, Bid bid) {
         LocalDateTime now = LocalDateTime.now();
 

@@ -18,7 +18,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
-import nbc.mushroom.domain.bid.service.CreateBidService;
+import nbc.mushroom.domain.bid.service.BidService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
 import nbc.mushroom.domain.common.util.StompDestinationUtils;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
-    private final CreateBidService createBidService;
+    private final BidService bidService;
     private final AuctionItemService auctionItemService;
     private final JwtUtil jwtUtil;
 
@@ -166,14 +166,14 @@ public class StompHandler implements ChannelInterceptor {
                 throw new CustomException(AUTH_TOKEN_NOT_FOUND);
             }
 
-            if (Boolean.FALSE.equals(createBidService.hasBid(loginUserId, chatRoomId))) {
+            if (Boolean.FALSE.equals(bidService.hasBid(loginUserId, chatRoomId))) {
                 log.error(BIDDING_REQUIRED.getMessage());
                 stompHeaderAccessor.getSessionAttributes()
                     .put("error", BIDDING_REQUIRED.getMessage());
             }
 
             //  세션에 error 값이 있는지 체크
-            if (Boolean.TRUE.equals(createBidService.hasBid(loginUserId, chatRoomId))
+            if (Boolean.TRUE.equals(bidService.hasBid(loginUserId, chatRoomId))
                 && stompHeaderAccessor.getSessionAttributes().get("error") != null) {
                 stompHeaderAccessor.getSessionAttributes().remove("error");
                 log.info("입찰 내역 확인. 기존 에러 메시지 세션에서 삭제");
