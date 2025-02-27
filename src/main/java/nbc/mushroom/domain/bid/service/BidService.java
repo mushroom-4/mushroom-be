@@ -8,6 +8,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.BID_CANNOT_CANC
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.dto.response.BidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
@@ -30,9 +31,9 @@ public class BidService {
         return bidPage.map(BidRes::from);
     }
 
-    public BidRes getBidByUser(User loginUser, Long bidId) {
+    public BidInfoRes getBidByUser(User loginUser, Long bidId) {
         Bid bid = bidRepository.findBidByBidderAndId(loginUser, bidId);
-        return BidRes.from(bid);
+        return BidInfoRes.from(bid);
     }
 
     @Transactional(readOnly = false)
