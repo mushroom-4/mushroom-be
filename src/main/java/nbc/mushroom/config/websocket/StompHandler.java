@@ -152,6 +152,9 @@ public class StompHandler implements ChannelInterceptor {
 
     /**
      * 메시지 전송 시 해당 경매에 입찰한 기록이 있는 유저인지 확인
+     *
+     * 없으면 Error 메시지를 세션에 저장
+     * 웹소켓 연결 중 권한이 생기면 세션에 저장된 Error 메시지 삭제
      */
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
@@ -167,6 +170,13 @@ public class StompHandler implements ChannelInterceptor {
                 log.error(BIDDING_REQUIRED.getMessage());
                 stompHeaderAccessor.getSessionAttributes()
                     .put("error", BIDDING_REQUIRED.getMessage());
+            }
+
+            //  세션에 error 값이 있는지 체크
+            if (Boolean.TRUE.equals(createBidService.hasBid(loginUserId, chatRoomId))
+                && stompHeaderAccessor.getSessionAttributes().get("error") != null) {
+                stompHeaderAccessor.getSessionAttributes().remove("error");
+                log.info("입찰 내역 확인. 기존 에러 메시지 세션에서 삭제");
             }
 
             log.info("✅ SEND 성공: userId={}, chatRoomId={}", loginUserId, chatRoomId);
