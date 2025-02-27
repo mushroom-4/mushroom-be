@@ -35,7 +35,8 @@ public enum ExceptionType {
     AUCTION_ITEM_NOT_IN_PROGRESS(HttpStatus.BAD_REQUEST, "AI02", "경매가 진행 중인 물품이 아닙니다."),
     AUCTION_ITEM_NOT_USER(HttpStatus.FORBIDDEN, "AI03", "사용자 본인의 물품이어야 합니다."),
     REGISTERED_AUCTION_ITEMS_NOT_FOUND(HttpStatus.NOT_FOUND, "AI04", "등록된 경매 물품이 없습니다."),
-    AUCTION_ITEM_DELETE_NOT_ALLOW(HttpStatus.BAD_REQUEST, "AI05", "지금은 경매 물품을 삭제할 수 없습니다."),
+    AUCTION_ITEM_UPDATE_AND_DELETE_NOT_ALLOW(HttpStatus.BAD_REQUEST, "AI05",
+        "지금은 경매 물품을 수정, 삭제할 수 없습니다."),
 
 
     // AuctionItem Admin

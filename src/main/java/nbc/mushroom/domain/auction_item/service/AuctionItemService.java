@@ -1,7 +1,7 @@
 package nbc.mushroom.domain.auction_item.service;
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_DELETE_NOT_ALLOW;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_USER;
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_UPDATE_AND_DELETE_NOT_ALLOW;
 import static nbc.mushroom.domain.common.exception.ExceptionType.USER_NOT_FOUND;
 
 import java.time.LocalDateTime;
@@ -193,9 +193,8 @@ public class AuctionItemService {
         if (!auctionItem.getSeller().getId().equals(userId)) {
             throw new CustomException(AUCTION_ITEM_NOT_USER);
         }
-        if (auctionItem.getStatus() == AuctionItemStatus.PROGRESSING
-            || auctionItem.getStatus() == AuctionItemStatus.COMPLETED) {
-            throw new CustomException(AUCTION_ITEM_DELETE_NOT_ALLOW);
+        if (!(auctionItem.getStatus() == AuctionItemStatus.INSPECTING)) {
+            throw new CustomException(AUCTION_ITEM_UPDATE_AND_DELETE_NOT_ALLOW);
         }
         return auctionItem;
     }
