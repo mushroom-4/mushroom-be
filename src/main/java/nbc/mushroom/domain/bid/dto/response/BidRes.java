@@ -1,6 +1,5 @@
 package nbc.mushroom.domain.bid.dto.response;
 
-import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 
@@ -8,15 +7,25 @@ public record BidRes(
     Long bidId,
     Long biddingPrice,
     BiddingStatus biddingStatus,
-    SearchAuctionItemRes searchAuctionItemRes
+    AuctionItemRes auctionItem
 ) {
 
-    public static BidRes from(Bid bid, SearchAuctionItemRes searchAuctionItemRes) {
+    public static BidRes from(Bid bid) {
         return new BidRes(
             bid.getId(),
             bid.getBiddingPrice(),
             bid.getBiddingStatus(),
-            searchAuctionItemRes
+            new BidRes.AuctionItemRes(
+                bid.getAuctionItem().getName(),
+                bid.getAuctionItem().getImageUrl()
+            )
         );
+    }
+
+    private record AuctionItemRes(
+        String name,
+        String imageUrl
+    ) {
+
     }
 }

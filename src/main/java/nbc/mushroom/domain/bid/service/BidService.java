@@ -8,7 +8,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.BID_CANNOT_CANC
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
+import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.dto.response.BidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
@@ -28,17 +28,11 @@ public class BidService {
 
     public Page<BidRes> getAllBidsByUser(User loginUser, Pageable pageable) {
         Page<Bid> bidPage = bidRepository.findBidsByUser(loginUser, pageable);
-
-        return bidPage.map(bid ->
-            BidRes.from(bid, SearchAuctionItemRes.from(bid.getAuctionItem())));
+        return bidPage.map(BidRes::from);
     }
 
-    public BidRes getBidByUser(User loginUser, Long bidId) {
-        Bid findBid = bidRepository.findBidByBidderAndId(loginUser, bidId);
-        SearchAuctionItemRes searchAuctionItemRes = SearchAuctionItemRes.from(
-            findBid.getAuctionItem());
-
-        return BidRes.from(findBid, searchAuctionItemRes);
+    public BidInfoRes getBidByUser(User loginUser, Long bidId) {
+        return bidRepository.findBidInfoByBidderAndId(loginUser, bidId);
     }
 
     @Transactional(readOnly = false)

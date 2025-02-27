@@ -43,11 +43,11 @@ public class Bid extends Timestamped {
     @JoinColumn(name = "user_id", nullable = false)
     private User bidder;
 
-    @Column(nullable = false)
+    @Column(name = "bidding_price", nullable = false)
     private Long biddingPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "bidding_status", nullable = false)
     private BiddingStatus biddingStatus;
 
     @Builder
@@ -88,7 +88,7 @@ public class Bid extends Timestamped {
         if (!biddingPrice.equals(paymentAmount)) {
             throw new CustomException(INVALID_PAYMENT_AMOUNT);
         }
-        
+
         if (this.biddingStatus != SUCCEED) {
             throw new CustomException(INVALID_BID_STATUS);
         }

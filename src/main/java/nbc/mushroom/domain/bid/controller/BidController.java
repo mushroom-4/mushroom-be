@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.bid.controller;
 
 import lombok.RequiredArgsConstructor;
+import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.dto.response.BidRes;
 import nbc.mushroom.domain.bid.service.BidService;
 import nbc.mushroom.domain.common.annotation.Auth;
@@ -41,15 +42,15 @@ public class BidController {
     }
 
     @GetMapping("/{bidId}")
-    public ResponseEntity<ApiResponse<BidRes>> getBid(
+    public ResponseEntity<ApiResponse<BidInfoRes>> getBid(
         @Auth AuthUser authUser,
         @PathVariable Long bidId
     ) {
         User loginUser = User.fromAuthUser(authUser);
-        BidRes bidRes = bidService.getBidByUser(loginUser, bidId);
+        BidInfoRes bidInfoRes = bidService.getBidByUser(loginUser, bidId);
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.success("입찰 내역 상세 조회에 성공했습니다.", bidRes));
+            .body(ApiResponse.success("입찰 내역 상세 조회에 성공했습니다.", bidInfoRes));
     }
 
     @DeleteMapping("/{bidId}/cancel")

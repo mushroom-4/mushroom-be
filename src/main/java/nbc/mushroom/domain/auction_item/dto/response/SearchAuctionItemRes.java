@@ -20,19 +20,19 @@ public record SearchAuctionItemRes(
     AuctionItemStatus status
 ) {
 
-    public static SearchAuctionItemRes from(AuctionItem searchAuctionItem) {
+    public static SearchAuctionItemRes from(AuctionItem auctionItem) {
         return new SearchAuctionItemRes(
-            searchAuctionItem.getId(),
-            searchAuctionItem.getName(),
-            searchAuctionItem.getDescription(),
-            searchAuctionItem.getImageUrl(),
-            searchAuctionItem.getSize(),
-            searchAuctionItem.getCategory(),
-            searchAuctionItem.getBrand(),
-            searchAuctionItem.getStartPrice(),
-            searchAuctionItem.getStartTime(),
-            searchAuctionItem.getEndTime(),
-            searchAuctionItem.getStatus()
+            auctionItem.getId(),
+            auctionItem.getName(),
+            auctionItem.getDescription(),
+            auctionItem.getImageUrl(),
+            auctionItem.getSize(),
+            auctionItem.getCategory(),
+            auctionItem.getBrand(),
+            auctionItem.getStartPrice(),
+            auctionItem.getStartTime(),
+            auctionItem.getEndTime(),
+            auctionItem.getStatus()
         );
     }
 }
