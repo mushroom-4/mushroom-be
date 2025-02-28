@@ -1,8 +1,8 @@
 package nbc.mushroom.config.websocket;
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.AUTH_TOKEN_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BIDDING_REQUIRED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.CHAT_ROOM_NOT_FOUND;
+import static nbc.mushroom.domain.common.exception.ExceptionType.JWT_TOKEN_REQUIRED;
 
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class StompHandler implements ChannelInterceptor {
             Long userId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
 
             if (userId == null) {
-                throw new CustomException(AUTH_TOKEN_NOT_FOUND);
+                throw new CustomException(JWT_TOKEN_REQUIRED);
             }
 
             log.info("✅ SUBSCRIBE 요청 destination: {}", stompHeaderAccessor.getDestination());
@@ -121,7 +121,7 @@ public class StompHandler implements ChannelInterceptor {
             Long loginUserId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
 
             if (loginUserId == null) {
-                throw new CustomException(AUTH_TOKEN_NOT_FOUND);
+                throw new CustomException(JWT_TOKEN_REQUIRED);
             }
 
             boolean hasBid = Boolean.TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));

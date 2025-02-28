@@ -17,7 +17,7 @@ public enum ExceptionType {
     // Auth
     AUTH_WRONG_USED(HttpStatus.INTERNAL_SERVER_ERROR, "A01", "@Auth와 AuthUser 타입은 함께 사용되어야 합니다."),
     AUTH_FAILED(HttpStatus.BAD_REQUEST, "A02", "이메일 또는 비밀번호가 일치하지 않습니다."),
-    AUTH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "A03", "토큰을 찾을 수 없습니다."),
+    JWT_TOKEN_REQUIRED(HttpStatus.BAD_REQUEST, "A03", "JWT 토큰이 필요합니다."),
     INVALID_JWT(HttpStatus.BAD_REQUEST, "A04", "잘못된 JWT 토큰입니다."),
     INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, "A05", "유효하지 않은 JWT 서명입니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "A06", "만료된 JWT 토큰입니다."),
