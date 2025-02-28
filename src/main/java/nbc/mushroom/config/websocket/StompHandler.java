@@ -3,19 +3,9 @@ package nbc.mushroom.config.websocket;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUTH_TOKEN_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BIDDING_REQUIRED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.CHAT_ROOM_NOT_FOUND;
-import static nbc.mushroom.domain.common.exception.ExceptionType.EXPIRED_JWT_TOKEN;
-import static nbc.mushroom.domain.common.exception.ExceptionType.INTERNAL_SERVER_ERROR;
-import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT;
-import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT_SIGNATURE;
-import static nbc.mushroom.domain.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
@@ -84,45 +74,12 @@ public class StompHandler implements ChannelInterceptor {
 
         log.info("✅ 받은 토큰: {}", bearerJwt);
 
-        if (bearerJwt == null) {
-            throw new CustomException(AUTH_TOKEN_NOT_FOUND);
-        }
+        Map<String, Object> userInfo = jwtUtil.parseTokenUserInfo(bearerJwt);
 
-        String jwt = bearerJwt.substring(7); // "Bearer " 제거
+        stompHeaderAccessor.getSessionAttributes().putAll(userInfo);
 
-        try {
-            Claims claims = jwtUtil.extractClaims(jwt);
-
-            if (claims == null) {
-                throw new CustomException(INVALID_JWT);
-            }
-
-            log.info("✅ userId : {}", claims.getSubject());
-
-            // STOMP 세션에 사용자 정보 저장 (나중에 사용 가능)
-            stompHeaderAccessor.getSessionAttributes()
-                .put("userId", Long.parseLong(claims.getSubject()));
-            stompHeaderAccessor.getSessionAttributes().put("email", claims.get("email"));
-            stompHeaderAccessor.getSessionAttributes().put("nickname", claims.get("nickname"));
-            Optional.ofNullable(claims.get("imageUrl"))
-                .ifPresent(url -> stompHeaderAccessor.getSessionAttributes().put("imageUrl", url));
-            stompHeaderAccessor.getSessionAttributes().put("userRole", claims.get("userRole"));
-
-            log.info("✅ CONNECT 성공, STOMP 세션 저장 확인: {}",
-                stompHeaderAccessor.getSessionAttributes());
-        } catch (SecurityException | MalformedJwtException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
-            throw new CustomException(INVALID_JWT_SIGNATURE);
-        } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token, 만료된 JWT token 입니다.", e);
-            throw new CustomException(EXPIRED_JWT_TOKEN);
-        } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
-            throw new CustomException(UNSUPPORTED_JWT_TOKEN);
-        } catch (Exception e) {
-            log.error("Internal server error", e);
-            throw new CustomException(INTERNAL_SERVER_ERROR);
-        }
+        log.info("✅ CONNECT 성공, STOMP 세션 저장 확인: {}",
+            stompHeaderAccessor.getSessionAttributes());
     }
 
     /**
