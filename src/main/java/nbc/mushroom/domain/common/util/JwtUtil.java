@@ -1,6 +1,5 @@
 package nbc.mushroom.domain.common.util;
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.AUTH_TOKEN_NOT_FOUND;
 import static nbc.mushroom.domain.common.exception.ExceptionType.EXPIRED_JWT_TOKEN;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INTERNAL_SERVER_ERROR;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT;
