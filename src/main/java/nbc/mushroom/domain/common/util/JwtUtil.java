@@ -5,6 +5,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.EXPIRED_JWT_TOK
 import static nbc.mushroom.domain.common.exception.ExceptionType.INTERNAL_SERVER_ERROR;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_JWT_SIGNATURE;
+import static nbc.mushroom.domain.common.exception.ExceptionType.JWT_TOKEN_REQUIRED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.UNSUPPORTED_JWT_TOKEN;
 
 import io.jsonwebtoken.Claims;
@@ -17,10 +18,12 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.user.entity.UserRole;
@@ -77,6 +80,30 @@ public class JwtUtil {
             .build()
             .parseClaimsJws(token)
             .getBody();
+    }
+
+    /**
+     * JWT 토큰 검증 후 사용자 정보 추출
+     * 사용자 정보 추출은 메서드 호출로 이루어짐
+     *
+     * @param exceptionHandler
+     * : getUserInfoFromTokenForWebSocket에서 호출하면 CustomException으로 예외처리
+     * getUserInfoFromTokenForHttp에서 호출하면 httpResponse.sendError로 예외처리
+     * 상황에 따라 다르게 동작할 수 있도록 해주는 함수형 인터페이스
+     */
+    private Map<String, Object> extractUserInfoFromToken(String bearerToken,
+        Consumer<CustomException> exceptionHandler) {
+        if (bearerToken == null) {
+            exceptionHandler.accept(new CustomException(JWT_TOKEN_REQUIRED));
+            return Collections.emptyMap();
+        }
+
+        try {
+            return parseTokenUserInfo(bearerToken);
+        } catch (CustomException e) {
+            exceptionHandler.accept(e);
+            return Collections.emptyMap();
+        }
     }
 
     /**
