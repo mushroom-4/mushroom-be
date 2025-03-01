@@ -1,6 +1,7 @@
 package nbc.mushroom.domain.common.util;
 
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_CHAT_ROOM_PATH;
+import static nbc.mushroom.domain.common.exception.ExceptionType.JWT_TOKEN_REQUIRED;
 
 import nbc.mushroom.domain.common.exception.CustomException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -22,5 +23,16 @@ public class StompUtil {
         }
 
         return Long.parseLong(chatRoomIdStr);
+    }
+
+    /**
+     * STOMP 요청에서 사용자 ID 추출
+     */
+    public static Long getUserId(StompHeaderAccessor stompHeaderAccessor) {
+        Long userId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
+        if (userId == null) {
+            throw new CustomException(JWT_TOKEN_REQUIRED);
+        }
+        return userId;
     }
 }
