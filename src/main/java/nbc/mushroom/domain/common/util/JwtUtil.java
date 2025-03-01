@@ -68,7 +68,7 @@ public class JwtUtil {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7);
         }
-        throw new CustomException(AUTH_TOKEN_NOT_FOUND);
+        throw new CustomException(JWT_TOKEN_REQUIRED);
     }
 
     public Claims extractClaims(String token) {
@@ -80,14 +80,10 @@ public class JwtUtil {
     }
 
     /**
-     * JWT 토큰을 검증하고 사용자 정보를 반환
+     * JWT 토큰에서 사용자 정보를 추출
      */
-    public Map<String, Object> parseTokenUserInfo(String bearerToken) {
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            throw new CustomException(AUTH_TOKEN_NOT_FOUND);
-        }
-
-        String jwt = bearerToken.substring(7); // "Bearer " 제거
+    private Map<String, Object> parseTokenUserInfo(String bearerToken) {
+        String jwt = substringToken(bearerToken); // "Bearer " 제거
 
         try {
             Claims claims = extractClaims(jwt);
