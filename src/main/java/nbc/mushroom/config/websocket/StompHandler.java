@@ -74,7 +74,7 @@ public class StompHandler implements ChannelInterceptor {
 
         log.info("✅ 받은 토큰: {}", bearerJwt);
 
-        Map<String, Object> userInfo = jwtUtil.parseTokenUserInfo(bearerJwt);
+        Map<String, Object> userInfo = jwtUtil.getUserInfoFromTokenForWebSocket(bearerJwt);
 
         stompHeaderAccessor.getSessionAttributes().putAll(userInfo);
 

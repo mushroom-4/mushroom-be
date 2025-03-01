@@ -83,6 +83,17 @@ public class JwtUtil {
     }
 
     /**
+     * JWT 토큰에서 사용자 정보를 가져옴 (WebSocket용)
+     * WebSocket 예외 처리 방식 적용
+     */
+    public Map<String, Object> getUserInfoFromTokenForWebSocket(String bearerToken) {
+        return extractUserInfoFromToken(bearerToken, e -> {
+            log.error("WebSocket 연결 실패 - {}", e.getMessage(), e);
+            throw e;
+        });
+    }
+
+    /**
      * JWT 토큰 검증 후 사용자 정보 추출
      * 사용자 정보 추출은 메서드 호출로 이루어짐
      *
