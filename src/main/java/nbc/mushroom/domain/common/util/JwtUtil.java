@@ -16,6 +16,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Collections;
@@ -80,6 +82,22 @@ public class JwtUtil {
             .build()
             .parseClaimsJws(token)
             .getBody();
+    }
+
+    /**
+     * JJWT 토큰에서 사용자 정보를 가져옴 (HTTP 용)
+     * HttpResponse 예외 처리 방식 적용
+     */
+    public Map<String, Object> getUserInfoFromTokenForHttp(String bearerToken,
+        HttpServletResponse httpResponse) {
+        return extractUserInfoFromToken(bearerToken, e -> {
+            log.error("Http 연결 실패 - {}", e.getMessage(), e);
+            try {
+                httpResponse.sendError(e.getHttpStatus().value(), e.getMessage());
+            } catch (IOException ex) {
+                log.error("Http 응답 처리 중 오류 발생", ex);
+            }
+        });
     }
 
     /**
