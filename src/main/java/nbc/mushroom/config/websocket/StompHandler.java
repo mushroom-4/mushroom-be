@@ -1,8 +1,9 @@
 package nbc.mushroom.config.websocket;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BIDDING_REQUIRED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.CHAT_ROOM_NOT_FOUND;
-import static nbc.mushroom.domain.common.exception.ExceptionType.JWT_TOKEN_REQUIRED;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import nbc.mushroom.domain.auction_item.service.AuctionItemService;
 import nbc.mushroom.domain.bid.service.BidService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
-import nbc.mushroom.domain.common.util.StompDestinationUtils;
+import nbc.mushroom.domain.common.util.StompUtil;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -88,16 +89,12 @@ public class StompHandler implements ChannelInterceptor {
     private void handleSubscribe(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SUBSCRIBE 요청 감지 ::::");
         try {
-            Long userId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
-
-            if (userId == null) {
-                throw new CustomException(JWT_TOKEN_REQUIRED);
-            }
+            Long userId = StompUtil.getUserId(stompHeaderAccessor);
 
             log.info("✅ SUBSCRIBE 요청 destination: {}", stompHeaderAccessor.getDestination());
 
-            Long chatRoomId = StompDestinationUtils.getChatRoomId(stompHeaderAccessor, "/ws/sub");
-            if (Boolean.FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/sub");
+            if (FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
             }
 
@@ -117,14 +114,10 @@ public class StompHandler implements ChannelInterceptor {
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
         try {
-            Long chatRoomId = StompDestinationUtils.getChatRoomId(stompHeaderAccessor, "/ws/pub");
-            Long loginUserId = (Long) stompHeaderAccessor.getSessionAttributes().get("userId");
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/pub");
+            Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
 
-            if (loginUserId == null) {
-                throw new CustomException(JWT_TOKEN_REQUIRED);
-            }
-
-            boolean hasBid = Boolean.TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
+            boolean hasBid = TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
 
             validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
 
