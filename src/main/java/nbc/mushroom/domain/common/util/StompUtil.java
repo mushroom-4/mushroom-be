@@ -5,7 +5,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_CHAT_RO
 import nbc.mushroom.domain.common.exception.CustomException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 
-public class StompDestinationUtils {
+public class StompUtil {
 
     /**
      * STOMP 메시지의 Destination에서 채팅방 ID 추출 후 검증
