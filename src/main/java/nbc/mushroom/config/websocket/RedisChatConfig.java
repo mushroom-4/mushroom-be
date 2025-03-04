@@ -41,7 +41,10 @@ public class RedisChatConfig {
         RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer()); // String으로 직렬화 설정
+
+        // key 직렬화 설정
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // 자바의 날짜/시간 API 올바르게 사용할 수 있도록
@@ -53,7 +56,9 @@ public class RedisChatConfig {
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(
             objectMapper, Object.class);
 
-        redisTemplate.setValueSerializer(serializer); // value 직렬화 설정
+        // value 직렬화 설정
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
 
         return redisTemplate;
     }
