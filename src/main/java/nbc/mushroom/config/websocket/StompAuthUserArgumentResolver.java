@@ -40,7 +40,7 @@ public class StompAuthUserArgumentResolver implements HandlerMethodArgumentResol
         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
 
         if (sessionAttributes == null || !sessionAttributes.containsKey("userId")) {
-            throw new CustomException(ExceptionType.AUTH_TOKEN_NOT_FOUND);
+            throw new CustomException(ExceptionType.JWT_TOKEN_REQUIRED);
         }
 
         // STOMP 세션에서 사용자 정보 가져오기
