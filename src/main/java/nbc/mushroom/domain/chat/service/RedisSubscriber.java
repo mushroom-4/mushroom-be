@@ -49,13 +49,6 @@ public class RedisSubscriber implements MessageListener {
             String subMessageTypeStr = jsonNode.get("subMessageType").asText();
             String eventData = jsonNode.get("data").toString();
 
-        log.info("[ChatRoomId: {}] [{}] {}: {} ( {} )",
-            chatMessageRes.chatRoomId(),
-            chatMessageRes.messageType(),
-            chatMessageRes.nickname(),
-            chatMessageRes.message(),
-            chatMessageRes.sendDateTime()
-        );
             SubMessageType subMessageType = SubMessageType.fromValue(subMessageTypeStr);
 
             switch (subMessageType) {
@@ -77,8 +70,17 @@ public class RedisSubscriber implements MessageListener {
         }
     }
 
+    private void handleChatMessage(ChatMessageRes chatMessageRes) {
+        log.info("[Redis Subscribe] 채팅 메시지 수신 - chatRoomId={}, sender={}, message={}",
+            chatMessageRes.chatRoomId(), chatMessageRes.nickname(), chatMessageRes.message());
+
         // Redis에서 받은 메시지 WebSocket으로 전달 ( /ws/sub/chats/ -> 웹소켓 구독 경로 )
         simpMessagingTemplate.convertAndSend("/ws/sub/chats/" + chatMessageRes.chatRoomId(),
             chatMessageRes);
+
+        log.info("[WebSocket Send] 채팅 메시지 전송 - chatRoomId={}, sender={}, message={}",
+            chatMessageRes.chatRoomId(), chatMessageRes.nickname(), chatMessageRes.message());
+    }
+
     }
 }
