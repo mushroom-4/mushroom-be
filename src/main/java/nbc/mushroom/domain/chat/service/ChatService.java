@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nbc.mushroom.domain.chat.constant.RedisChatRoomKey;
 import nbc.mushroom.domain.chat.dto.request.ChatMessageReq;
 import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
 import nbc.mushroom.domain.chat.entity.ChatMessage;
@@ -22,16 +23,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatService {
 
-    private final String REDIS_CHAT_ROOM_KEY = "chatroom: ";
     private final RedisPublish redisPublish;
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 클라이언트가 보낸 메시지를 Redis에 저장하고 전송
      *
-     * @param chatRoomId     : 메시지 전송될 채팅방 ID
-     * @param chatMessageReq : 클라이언트가 보낸 메시지 요청 Dto
-     * @param loginUser      : 현재 로그인한 유저 (메시지 보낸 사람)
+     * @param chatRoomId          : 메시지 전송될 채팅방 ID
+     * @param chatMessageReq      : 클라이언트가 보낸 메시지 요청 Dto
+     * @param loginUser           : 현재 로그인한 유저 (메시지 보낸 사람)
      * @param stompHeaderAccessor : STOMP 헤더 정보에 접근하기 위한 클래스 (Error메시지가 담겼는지 확인하기 위해)
      */
     public ChatMessageRes sendChatMessage(Long chatRoomId, ChatMessageReq chatMessageReq,
@@ -74,7 +74,7 @@ public class ChatService {
             saveChatMessage(chatRoomId, chatMessageRes);
         }
 
-        redisPublish.publish(chatMessageRes);
+        redisPublish.publishChatMessage(chatMessageRes);
 
         return chatMessageRes;
     }
@@ -125,9 +125,9 @@ public class ChatService {
      */
     public void saveChatMessage(Long chatRoomId, ChatMessageRes chatMessageRes) {
 
-        String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
+        String key = RedisChatRoomKey.getMessageStorageKey(chatRoomId);
 
-        log.info("Redis Storage [Key : {}]", key);
+        log.info("[채팅 메시지 저장] Redis Storage Key - {}", key);
 
         redisTemplate.opsForList().rightPush(key, chatMessageRes); // key - value
     }
@@ -140,7 +140,7 @@ public class ChatService {
      */
     public List<ChatMessageRes> getChatHistory(Long chatRoomId) {
 
-        String key = REDIS_CHAT_ROOM_KEY + chatRoomId;
+        String key = RedisChatRoomKey.getMessageStorageKey(chatRoomId);
         List<Object> chatMessageList = redisTemplate.opsForList().range(key, 0, -1); // 처음부터 끝까지
 
         // chatMessageList가 null이면 빈 리스트 반환
