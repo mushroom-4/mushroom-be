@@ -228,12 +228,6 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (keyword != null && !keyword.isBlank()) {
-            builder.or(auctionItem.name.contains(keyword)
-                .or(auctionItem.description.contains(keyword))
-                .or(auctionItem.brand.contains(keyword)));
-        }
-
         if (brand != null && !brand.isBlank()) {
             builder.and(auctionItem.brand.eq(brand));
         }
@@ -244,6 +238,14 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
 
         if (size != null) {
             builder.and(auctionItem.size.eq(size));
+        }
+
+        if (status != null) {
+            builder.and(auctionItem.status.eq(status));
+        } else {
+            builder.and(
+                auctionItem.status.eq(AuctionItemStatus.WAITING)
+                    .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING)));
         }
 
         if (startDate != null) {
@@ -262,12 +264,10 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             builder.and(auctionItem.startPrice.loe(maxPrice));
         }
 
-        if (status != null) {
-            builder.and(auctionItem.status.eq(status));
-        } else {
-            builder.and(
-                auctionItem.status.eq(AuctionItemStatus.WAITING)
-                    .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING)));
+        if (keyword != null && !keyword.isBlank()) {
+            builder.or(auctionItem.name.startsWith(keyword)
+                .or(auctionItem.description.contains(keyword))
+                .or(auctionItem.brand.startsWith(keyword)));
         }
 
         return builder;
