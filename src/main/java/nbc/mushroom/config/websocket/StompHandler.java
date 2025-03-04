@@ -100,7 +100,7 @@ public class StompHandler implements ChannelInterceptor {
 
             log.info("✅ SUBSCRIBE 요청 destination: {}", stompHeaderAccessor.getDestination());
 
-            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/sub");
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor);
             if (FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
             }
@@ -126,7 +126,7 @@ public class StompHandler implements ChannelInterceptor {
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
         try {
-            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/pub");
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor);
             Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
 
             // '메시지' 전송에서만 실행
