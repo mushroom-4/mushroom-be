@@ -26,8 +26,14 @@ public class RedisPublish {
      *
      * @param chatMessageRes : 메시지 정보
      */
-    public void publish(ChatMessageRes chatMessageRes) {
-        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessageRes);
+    public void publishChatMessage(ChatMessageRes chatMessageRes) {
+        RedisSubMessage redisSubMessage = new RedisSubMessage(SubMessageType.CHAT_MESSAGE,
+            chatMessageRes);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), redisSubMessage);
+        log.info("[Redis Publish] 채팅 메시지 발행 - chatRoomId={}, sender={}, message={}",
+            chatMessageRes.chatRoomId(), chatMessageRes.nickname(), chatMessageRes.message());
+    }
+
     /**
      * 현재 채팅방 접속자 목록 Redis 채널에 전송
      */
