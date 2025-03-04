@@ -12,20 +12,67 @@
       margin: 20px;
     }
 
-    /* 메시지 컨테이너 Flex 설정 */
-    #messages {
+    /* ✅ 채팅창과 접속자 목록을 가로 배치 */
+    #container {
       display: flex;
-      flex-direction: column;
-      list-style: none;
-      padding: 0;
+      flex-direction: row; /* 가로 정렬 */
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 1200px; /* 최대 너비 설정 */
+      margin: 0 auto; /* 가운데 정렬 */
     }
 
-    #messages li {
+    /* ✅ 메시지 목록을 화면 대부분 차지하도록 설정 */
+    #messagesContainer {
+      flex-grow: 1; /* 남는 공간을 최대한 차지 */
+      padding-right: 20px;
+    }
+
+    /* ✅ 접속자 목록 UI 정리 */
+    #userListContainer {
+      width: 250px; /* 접속자 목록 크기 조절 */
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      text-align: center; /* 제목 가운데 정렬 */
+    }
+
+    /* ✅ 접속자 수를 목록 위로 정렬 */
+    #userCount {
+      display: block; /* 목록 위에 표시 */
+      font-size: 16px;
+      font-weight: bold;
       margin-bottom: 10px;
-      padding: 5px 10px;
-      border-radius: 8px;
-      max-width: 70%;
-      word-wrap: break-word;
+    }
+
+    /* ✅ 접속자 목록 스타일 */
+    #userList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* ✅ 개별 사용자 항목 */
+    .user-item {
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
+      text-align: left; /* 사용자 이름 왼쪽 정렬 */
+    }
+
+    .user-item img {
+      max-width: 40px;
+      max-height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .user-item span {
+      font-weight: bold;
+      color: #333;
     }
 
     /* 내 메시지 (오른쪽 정렬, 배경색) */
@@ -66,23 +113,39 @@
   </style>
 </head>
 <body>
-<h2>STOMP 채팅 테스트</h2>
-<label for="tokenInput">토큰:</label>
-<input type="text" id="tokenInput" placeholder="토큰 입력">
-<button onclick="connect()">🔗 연결</button> <!-- ✅ 연결 버튼 추가 -->
-<br><br>
-<label for="chatRoomId">채팅방 ID:</label>
-<input type="text" id="chatRoomId" value="1" size="3">
-<br><br>
-<label for="messageInput">메시지:</label>
-<input type="text" id="messageInput" placeholder="메시지를 입력하세요">
-<button id="sendButton" onclick="sendMessage()" disabled>💬 전송</button> <!-- ✅ 초기에는 비활성화 -->
-<hr>
-<ul id="messages"></ul>
+<!-- ✅ 채팅창 & 접속자 목록을 가로 배치하는 컨테이너 -->
+<div id="container">
+  <!-- ✅ 메시지 영역 -->
+  <div id="messagesContainer">
+    <h2>STOMP 채팅 테스트</h2>
+    <label for="tokenInput">토큰:</label>
+    <input type="text" id="tokenInput" placeholder="토큰 입력">
+    <button onclick="connect()">🔗 연결</button>
+    <br><br>
+    <label for="chatRoomId">채팅방 ID:</label>
+    <input type="text" id="chatRoomId" value="1" size="3">
+    <br><br>
+    <label for="messageInput">메시지:</label>
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+    <button id="sendButton" onclick="sendMessage()" disabled>💬 전송</button>
+    <hr>
+    <ul id="messages"></ul>
+  </div>
+
+  <!-- ✅ 현재 접속자 목록 (오른쪽 배치) -->
+  <div id="userListContainer">
+    <h3 id="userCount">현재 접속자: 0명</h3>
+    <h3>현재 접속자 목록</h3>
+    <ul id="userList">
+      <li>현재 접속자가 없습니다.</li>
+    </ul>
+  </div>
+</div>
 
 <script>
   let stompClient = null;
   let subscription = null;
+  let userListSubscription = null;
   let myUserId = null;
   let lastDateKey = null;  // 마지막으로 표시한 날짜 (YYYY-MM-DD)
 
@@ -119,13 +182,23 @@
       console.log('✅ STOMP 연결 성공:', frame);
 
       const chatRoomId = document.getElementById("chatRoomId").value;
-      // 이미 구독이 존재하면 unsubscribe (중복 방지)
+
+      // ✅ 기존 구독 해제 후 다시 구독
       if (subscription) {
         subscription.unsubscribe();
       }
+      if (userListSubscription) {
+        userListSubscription.unsubscribe();
+      }
+
       subscription = stompClient.subscribe('/ws/sub/chats/' + chatRoomId,
           handleSubscriptionMessage);
       console.log(`✅ 메시지 구독 성공: /ws/sub/chats/${chatRoomId}`);
+
+      // ✅ 사용자 목록 구독 (현재 접속자 목록 수신)
+      userListSubscription = stompClient.subscribe('/ws/sub/chatrooms/' + chatRoomId + '/users',
+          handleUserListUpdate);
+      console.log(`✅ 사용자 목록 구독 성공: /ws/sub/chatrooms/${chatRoomId}/users`);
 
       // STOMP 연결 완료 후 전송 버튼 활성화
       document.getElementById("sendButton").disabled = false;
@@ -133,9 +206,60 @@
       // ✅ 이전 채팅 내역 불러오기 (REST API 호출)
       fetchChatHistory(chatRoomId);
 
+      // ✅ 서버에 현재 접속자 목록 요청
+      stompClient.send(`/ws/pub/chatrooms/${chatRoomId}/users`, {}, {});
+
     }, function (error) {
       console.error('🚨 STOMP 연결 오류:', error);
       alert("STOMP 연결에 실패했습니다. 서버 상태를 확인하세요.");
+    });
+  }
+
+  /**
+   * handleUserListUpdate: 서버에서 접속자 목록을 수신하여 업데이트
+   */
+  function handleUserListUpdate(message) {
+    const data = JSON.parse(message.body);
+    console.log("✅ 현재 접속자 목록 수신:", data);
+    updateUserList(data.userInfoRes, data.currentUserCount);
+  }
+
+  /**
+   * updateUserList: 화면의 접속자 목록을 갱신
+   */
+  function updateUserList(userList, currentUserCount) {
+    const userListDiv = document.getElementById("userList"); // ✅ 접속자 목록
+    const userCountElement = document.getElementById("userCount"); // ✅ 접속자 수
+    userListDiv.innerHTML = "";
+
+    // ✅ 접속자 수 업데이트
+    userCountElement.textContent = `현재 접속자: ${currentUserCount}명`;
+
+    // ✅ 목록 초기화
+    userListDiv.innerHTML = "";
+
+    if (!userList || userList.length === 0) {
+      userListDiv.innerHTML = "현재 접속자가 없습니다.";
+      return;
+    }
+
+    userList.forEach(user => {
+      const userItem = document.createElement("li");
+      userItem.classList.add("user-item");
+
+      const userImage = document.createElement("img");
+      userImage.src = user.imageUrl
+          || "https://yeim-vpc-bucket-240130.s3.ap-northeast-2.amazonaws.com/public/12b545cf-2687-46e6-8c4d-aecef88d762b.JPG"; // 기본 이미지
+
+      const userName = document.createElement("span");
+      userName.textContent = user.nickname;
+
+      userItem.appendChild(userImage);
+      userItem.appendChild(userName);
+
+      console.log(`✅ 접속자 추가됨: ${user.nickname}`); // 🔍 디버깅용 로그 추가
+
+      userListDiv.appendChild(userItem);
     });
   }
 
