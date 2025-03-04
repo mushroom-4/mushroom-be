@@ -60,7 +60,7 @@ public class RedisSubscriber implements MessageListener {
                 case CONCURRENT_USER_LIST:
                     ConcurrentUserListRes concurrentUserListRes = objectMapper.readValue(eventData,
                         ConcurrentUserListRes.class);
-                    handleUserList(concurrentUserListRes);
+                    handleConcurrentUserList(concurrentUserListRes);
                     break;
                 default:
                     break;
@@ -82,5 +82,15 @@ public class RedisSubscriber implements MessageListener {
             chatMessageRes.chatRoomId(), chatMessageRes.nickname(), chatMessageRes.message());
     }
 
+    private void handleConcurrentUserList(ConcurrentUserListRes concurrentUserListRes) {
+        log.info("[Redis Subscribe] 채팅방 접속자 목록 수신 - chatRoomId={}, 접속자 수={}",
+            concurrentUserListRes.chatRoomId(), concurrentUserListRes.concurrentUserCount());
+
+        simpMessagingTemplate.convertAndSend(
+            "/ws/sub/chatrooms/" + concurrentUserListRes.chatRoomId() + "/users",
+            concurrentUserListRes);
+
+        log.info("[WebSocket Send] 채팅방 접속자 목록 전송 - chatRoomId={}, 접속자 수={}",
+            concurrentUserListRes.chatRoomId(), concurrentUserListRes.concurrentUserCount());
     }
 }
