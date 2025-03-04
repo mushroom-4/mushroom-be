@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.request.ChatMessageReq;
 import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
+import nbc.mushroom.domain.chat.service.ChatRoomService;
 import nbc.mushroom.domain.chat.service.ChatService;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     private final ChatService chatService;
+    private final ChatRoomService chatRoomService;
 
     @MessageMapping("/chats/{chatRoomId}")
     public ChatMessageRes sendChatMessage(
@@ -38,6 +40,13 @@ public class ChatController {
         log.info("Auth User ID : {} ", authUser.id());
         return chatService.sendChatMessage(chatRoomId, chatMessageReq, stompHeaderAccessor,
             User.fromAuthUser(authUser));
+    }
+
+    @MessageMapping("/chatrooms/{chatRoomId}/users")
+    public void sendConcurrentUserList(
+        @DestinationVariable Long chatRoomId
+    ) {
+        chatRoomService.sendConcurrentUserList(chatRoomId);
     }
 
     @GetMapping("/api/bids/chats/{chatRoomId}")
