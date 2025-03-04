@@ -89,7 +89,9 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     /**
-     * 채팅방 구독 요청 시 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
+     * 채팅방 구독 요청 시
+     * 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
+     * 접속자 목록에 유저Id, 세션Id 추가
      */
     private void handleSubscribe(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SUBSCRIBE 요청 감지 ::::");
@@ -102,6 +104,11 @@ public class StompHandler implements ChannelInterceptor {
             if (FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
             }
+
+            stompHeaderAccessor.getSessionAttributes().put("chatRoomId", chatRoomId.toString());
+
+            chatRoomService.addSessionId(chatRoomId.toString(), userId.toString(),
+                stompHeaderAccessor.getSessionId());
 
             log.info("✅ SUBSCRIBE 성공: userId={}, chatRoomId={}", userId, chatRoomId);
         } catch (Exception e) {
