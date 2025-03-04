@@ -56,6 +56,9 @@ public class ImageUtilS3 implements ImageUtil {
 
     @Override
     public void delete(String filename) {
+        if (filename == null) {
+            return;
+        }
         try {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)
@@ -70,6 +73,9 @@ public class ImageUtilS3 implements ImageUtil {
 
     @Override
     public String getImageUrl(String filename) {
+        if (filename == null) {
+            return null;
+        }
         return endpoint + "/" + filename;
     }
 }

@@ -2,6 +2,7 @@ package nbc.mushroom.domain.auction_item.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemCategory;
@@ -14,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 public interface AuctionItemRepositoryCustom {
 
     AuctionItem findAuctionItemById(Long id);
-
-    Page<SearchAuctionItemRes> findAllAuctionItems(Pageable pageable);
 
     List<AuctionItem> findAuctionItemsByStatusAndStartTime(AuctionItemStatus auctionItemStatus,
         LocalDateTime now);
@@ -30,5 +29,9 @@ public interface AuctionItemRepositoryCustom {
     Page<SearchAuctionItemRes> findAuctionItemsByKeywordAndFiltering(
         String sort, String sortOrder, String keyword, String brand, AuctionItemCategory category,
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate,
-        Long minPrice, Long maxPrice, Pageable pageable);
+        Long minPrice, Long maxPrice, AuctionItemStatus status, Pageable pageable);
+
+    // 경매 물품 상태별 필터링 조회
+    Page<AuctionItemStatusRes> findAuctionItemsByStatus(
+        List<AuctionItemStatus> status, Pageable pageable);
 }

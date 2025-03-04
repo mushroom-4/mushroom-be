@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>STOMP 채팅 테스트</title>
+  <!-- SockJS와 stomp.js 라이브러리 로드 (CDN 사용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+
+    /* 메시지 컨테이너 Flex 설정 */
+    #messages {
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      padding: 0;
+    }
+
+    #messages li {
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    /* 내 메시지 (오른쪽 정렬, 배경색) */
+    .my-message {
+      align-self: flex-end;
+      text-align: right;
+      margin-left: auto;
+      background-color: #d1ffd1; /* 예시 배경색 추가 */
+    }
+
+    /* 다른 사람 메시지 (왼쪽 정렬, 배경색) */
+    .other-message {
+      align-self: flex-start;
+      text-align: left;
+      margin-right: auto;
+      background-color: #f1f1f1; /* 예시 배경색 추가 */
+    }
+
+    /* 날짜 헤더 스타일 */
+    .date-header {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+      background-color: #fff;
+      color: #888;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* 둥근 이미지 예시 */
+    .chat-img {
+      max-width: 50px;
+      max-height: 50px;
+      border-radius: 50%;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<h2>STOMP 채팅 테스트</h2>
+<label for="tokenInput">토큰:</label>
+<input type="text" id="tokenInput" placeholder="토큰 입력">
+<button onclick="connect()">🔗 연결</button> <!-- ✅ 연결 버튼 추가 -->
+<br><br>
+<label for="chatRoomId">채팅방 ID:</label>
+<input type="text" id="chatRoomId" value="1" size="3">
+<br><br>
+<label for="messageInput">메시지:</label>
+<input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+<button id="sendButton" onclick="sendMessage()" disabled>💬 전송</button> <!-- ✅ 초기에는 비활성화 -->
+<hr>
+<ul id="messages"></ul>
+
+<script>
+  let stompClient = null;
+  let subscription = null;
+  let myUserId = null;
+  let lastDateKey = null;  // 마지막으로 표시한 날짜 (YYYY-MM-DD)
+
+  /**
+   * connect: STOMP 연결 및 구독
+   */
+  function connect(options) {
+    const token = document.getElementById('tokenInput').value;
+
+    if (!token) {
+      console.error("🚨 토큰이 없습니다!");
+      alert("토큰을 입력하세요!");
+      return;
+    }
+
+    console.log("📌 연결 요청: ws://localhost:8080/ws");
+    console.log("📌 보낼 토큰:", token);
+
+    // 토큰에서 사용자 ID 추출
+    myUserId = Number(getUserIdFromToken(token));
+    console.log("현재 사용자 ID:", myUserId);
+
+    const socket = new SockJS('/ws'); // 웹소켓 엔드포인트 지정
+    stompClient = Stomp.over(socket);
+
+    stompClient.debug = function (str) {
+      console.log("📌 [STOMP Debug]", str);
+    };
+
+    const headers = {'Authorization': 'Bearer ' + token};
+    console.log("[Header] : ", headers)
+
+    stompClient.connect(headers, function (frame) {
+      console.log('✅ STOMP 연결 성공:', frame);
+
+      const chatRoomId = document.getElementById("chatRoomId").value;
+      // 이미 구독이 존재하면 unsubscribe (중복 방지)
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+      subscription = stompClient.subscribe('/ws/sub/chats/' + chatRoomId,
+          handleSubscriptionMessage);
+      console.log(`✅ 메시지 구독 성공: /ws/sub/chats/${chatRoomId}`);
+
+      // STOMP 연결 완료 후 전송 버튼 활성화
+      document.getElementById("sendButton").disabled = false;
+
+      // ✅ 이전 채팅 내역 불러오기 (REST API 호출)
+      fetchChatHistory(chatRoomId);
+
+    }, function (error) {
+      console.error('🚨 STOMP 연결 오류:', error);
+      alert("STOMP 연결에 실패했습니다. 서버 상태를 확인하세요.");
+    });
+  }
+
+  /**
+   * handleSubscriptionMessage: 서버에서 메시지 수신 시 호출
+   *    - 메시지가 배열이면 각각 처리, 단일이면 그대로 처리
+   */
+  function handleSubscriptionMessage(messageOutput) {
+    const data = JSON.parse(messageOutput.body);
+
+    // 에러 메시지인 경우 경고창 표시
+    if (data.messageType === "ERROR") {
+      if (data.senderId === myUserId) {
+        alert(data.message);
+      }
+      return;
+    }
+
+    appendMessage(data);
+  }
+
+  /**
+   * sendMessage: 메시지 전송
+   */
+  function sendMessage() {
+    if (!stompClient || !stompClient.connected) {
+      console.error("🚨 STOMP 연결이 안 되어 있습니다! 먼저 connect()를 실행하세요.");
+      alert("STOMP 서버에 연결되지 않았습니다. 먼저 연결을 시도하세요!");
+      return;
+    }
+
+    const chatRoomId = document.getElementById("chatRoomId").value;
+    const message = document.getElementById("messageInput").value;
+
+    if (!message.trim()) {
+      console.warn("🚨 메시지가 비어 있습니다!");
+      return;
+    }
+
+    console.log(`📌 [Client] 메시지 전송: /ws/pub/chats/${chatRoomId}`);
+
+    const payload = JSON.stringify({message: message});
+    stompClient.send("/ws/pub/chats/" + chatRoomId, {}, payload);
+    document.getElementById("messageInput").value = '';
+  }
+
+  /**
+   * appendMessage: 수신된 메시지를 화면에 표시
+   *    - 날짜가 달라지면 날짜 헤더 추가
+   *    - 내 메시지인지 여부에 따라 CSS 클래스 구분
+   */
+  function appendMessage(msg) {
+    const messagesList = document.getElementById("messages");
+    // 실제 메시지 표시
+    const messageElement = document.createElement('li');
+
+    // 날짜 키 추출 (YYYY-MM-DD)
+    const dateKey = formatDateKey(msg.sendDateTime);
+
+    // 날짜가 바뀌면 헤더 추가
+    if (!lastDateKey || lastDateKey !== dateKey) {
+      appendDateHeader(dateKey);
+      lastDateKey = dateKey;
+    }
+
+    // dateTime을 로컬 시간 문자열로 변환
+    const timeString = msg.sendDateTime ? new Date(msg.sendDateTime).toLocaleTimeString()
+        : new Date().toLocaleTimeString();
+
+    // 내 메시지 여부: myUserId와 msg.senderId 비교
+    const isMyMessage = myUserId !== null && msg.senderId === myUserId;
+
+    // 메시지 텍스트 구성
+    messageElement.textContent = `[${timeString}] ${msg.nickname || '익명'}: ${msg.message}`;
+
+    // 내 메시지와 타 메시지 구분 (CSS 클래스 적용)
+    messageElement.className = isMyMessage ? "my-message" : "other-message";
+
+    messagesList.appendChild(messageElement);
+    console.log("메시지 추가:", msg);
+  }
+
+  /**
+   * appendDateHeader: 날짜 헤더(li 요소) 추가
+   */
+  function appendDateHeader(dateKey) {
+    const messagesList = document.getElementById("messages");
+    const dateHeaderEl = document.createElement('li');
+    dateHeaderEl.className = "date-header";
+    dateHeaderEl.textContent = dateKey; // 예: 2025-02-21
+    messagesList.appendChild(dateHeaderEl);
+  }
+
+  /**
+   *  formatDateKey: YYYY-MM-DD 형태로 날짜 키를 추출
+   */
+  function formatDateKey(dateTimeStr) {
+    if (!dateTimeStr) {
+      return new Date().toISOString().slice(0, 10);
+    }
+    const dateObj = new Date(dateTimeStr);
+    return dateObj.toISOString().slice(0, 10); // YYYY-MM-DD
+  }
+
+  // JWT 토큰에서 사용자 ID를 추출하는 함수
+  function getUserIdFromToken(token) {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error("Invalid token");
+      }
+      // payload는 두 번째 부분
+      const payload = parts[1];
+      // Base64 디코딩 (URL-safe 변환 처리)
+      const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      const payloadObj = JSON.parse(decodedPayload);
+      // 'sub' 또는 'userId' 필드를 사용 (프로젝트에 맞게 수정)
+      return payloadObj.sub || payloadObj.userId;
+    } catch (e) {
+      console.error("토큰 파싱 오류:", e);
+      return null;
+    }
+  }
+
+  async function fetchChatHistory(chatRoomId) {
+    if (!chatRoomId || isNaN(chatRoomId)) {
+      console.error("🚨 오류: 잘못된 chatRoomId 값:", chatRoomId);
+      return;
+    }
+
+    const token = document.getElementById('tokenInput').value;
+    if (!token) {
+      console.error("🚨 토큰 없음!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/bids/chats/${chatRoomId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`이전 채팅 내역을 불러오는 데 실패했습니다. 상태 코드: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ 이전 채팅 내역 불러오기 완료:", result);
+
+      if (result.data) {
+        result.data.forEach(appendMessage);
+      }
+    } catch (error) {
+      console.error("🚨 오류:", error);
+    }
+  }
+</script>
+</body>
+</html>
