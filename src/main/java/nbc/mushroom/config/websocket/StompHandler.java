@@ -129,9 +129,12 @@ public class StompHandler implements ChannelInterceptor {
             Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/pub");
             Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
 
-            boolean hasBid = TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
-
-            validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
+            // '메시지' 전송에서만 실행
+            String destination = stompHeaderAccessor.getDestination();
+            if (destination.startsWith("/ws/pub/chats/")) {
+                boolean hasBid = TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
+                validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
+            }
 
             log.info("✅ SEND 성공: userId={}, chatRoomId={}", loginUserId, chatRoomId);
         } catch (Exception e) {
