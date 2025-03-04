@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
 import nbc.mushroom.domain.bid.service.BidService;
+import nbc.mushroom.domain.chat.service.ChatRoomService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
 import nbc.mushroom.domain.common.util.StompUtil;
@@ -29,6 +30,7 @@ public class StompHandler implements ChannelInterceptor {
 
     private final BidService bidService;
     private final AuctionItemService auctionItemService;
+    private final ChatRoomService chatRoomService;
     private final JwtUtil jwtUtil;
 
     /**
@@ -58,6 +60,9 @@ public class StompHandler implements ChannelInterceptor {
                 break;
             case SEND:
                 handleSend(stompHeaderAccessor);
+                break;
+            case DISCONNECT:
+                handleDisconnect(stompHeaderAccessor);
                 break;
             default:
                 break;
@@ -126,6 +131,26 @@ public class StompHandler implements ChannelInterceptor {
             log.error("❌ SEND 실패: {}", e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * Disconnect 시 채팅방 접속자 목록에서 제거
+     */
+    private void handleDisconnect(StompHeaderAccessor stompHeaderAccessor) {
+        log.info(":::: DISCONNECT 요청 감지 ::::");
+
+        Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
+
+        String chatRoomIdStr = (String) stompHeaderAccessor.getSessionAttributes()
+            .get("chatRoomId");
+
+        String sessionId = stompHeaderAccessor.getSessionId();
+
+        chatRoomService.removeSessionId(chatRoomIdStr, loginUserId.toString(),
+            sessionId);
+
+        log.info("DISCONNECT 성공: userId={}, chatRoomId={}, sessionId={}", loginUserId,
+            chatRoomIdStr, sessionId);
     }
 
     /**
