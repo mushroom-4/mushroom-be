@@ -50,6 +50,40 @@ public class ChatRoomService {
             .put(key, userId, String.join(",", userSessionList));
     }
 
+    /**
+     * 채팅방을 나가면 세션Id 저장 Redis Hash에서 제거
+     */
+    public void removeSessionId(String chatRoomId, String userId, String sessionId) {
+        String key = RedisChatRoomKey.getConcurrenUserStorageKey(chatRoomId);
+
+        Object existingSessionsObj = redisTemplate.opsForHash().get(key, userId);
+        if (existingSessionsObj == null) {
+            log.warn("[채팅방 퇴장 실패] [chatRoomId={}] [userId={}] [sessionId={}] - 존재하지 않는 세션",
+                chatRoomId,
+                userId, sessionId);
+            return; // 등록된 세션이 없으면 종료
+        }
+
+        List<String> userSessionList = new ArrayList<>(
+            Arrays.asList(existingSessionsObj.toString().split(",")));
+
+        userSessionList.remove(sessionId);
+
+        if (userSessionList.isEmpty()) {
+            // 세션이 없으면 userId 키 자체를 삭제
+            redisTemplate.opsForHash().delete(key, userId);
+            log.info("[채팅방 퇴장] [chatRoomId={}] [userId={}] - 모든 세션 종료",
+                chatRoomId, userId);
+        } else {
+            // 삭제할 세션 삭제한 리스트로 다시 저장
+            redisTemplate.opsForHash().put(key, userId, String.join(",", userSessionList));
+            log.info("[채팅방 퇴장] [chatRoomId={}] [userId={}], [남은 세션 수={}] [Redis Storage Key={}]",
+                chatRoomId, userId, userSessionList.size(), key);
+        }
+
+        sendConcurrentUserList(Long.parseLong(chatRoomId));
+    }
+
     // 현재 접속자 목록 전송
     public void sendConcurrentUserList(Long chatRoomId) {
         List<UserInfoRes> userInfoResList = getConcurrentUsers(chatRoomId.toString());
