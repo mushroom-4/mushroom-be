@@ -47,6 +47,8 @@ public class ChatRoomService {
         );
 
         redisTemplate.opsForHash().put(key, userId, String.join(",", userSessionSet));
+
+        sendConcurrentUserList(Long.parseLong(chatRoomId));
     }
 
     /**
