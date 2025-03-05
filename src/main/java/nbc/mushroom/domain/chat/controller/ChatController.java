@@ -42,13 +42,6 @@ public class ChatController {
             User.fromAuthUser(authUser));
     }
 
-    @MessageMapping("/chatrooms/{chatRoomId}/users")
-    public void sendConcurrentUserList(
-        @DestinationVariable Long chatRoomId
-    ) {
-        chatRoomService.sendConcurrentUserList(chatRoomId);
-    }
-
     @GetMapping("/api/bids/chats/{chatRoomId}")
     public ResponseEntity<ApiResponse<List<ChatMessageRes>>> getChatHistory(
         @PathVariable Long chatRoomId
