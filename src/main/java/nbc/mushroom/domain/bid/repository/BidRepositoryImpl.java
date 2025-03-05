@@ -60,21 +60,6 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             .fetchOne();
     }
 
-
-    @Override
-    public List<Bid> findPotentiallyFailedBidsByAuctionItem(AuctionItem auctionItem,
-        Bid succeedBid) {
-        return queryFactory
-            .select(bid)
-            .from(bid)
-            .where(
-                bid.auctionItem.eq(auctionItem),
-                bid.ne(succeedBid),
-                bid.biddingStatus.eq(BiddingStatus.BIDDING)
-            )
-            .fetch();
-    }
-
     @Override
     public Boolean existsBidByAuctionItem(AuctionItem auctionItem) {
         return queryFactory

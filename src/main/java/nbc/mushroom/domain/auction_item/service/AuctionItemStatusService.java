@@ -5,12 +5,14 @@ import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.entity.Bid;
+import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.repository.BidRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -53,24 +55,36 @@ public class AuctionItemStatusService {
         for (AuctionItem auctionItem : progressingAuctionItems) {
             log.info("auction endTime : {}", auctionItem.getEndTime());
 
-            if (Boolean.FALSE.equals(bidRepository.existsBidByAuctionItem(auctionItem))) {
+            List<Bid> biddingBidsList = bidRepository.findBidsByAuctionItemAndBiddingStatus(
+                auctionItem,
+                BiddingStatus.BIDDING
+            );
+
+            // 최고 입찰 찾기
+            Bid succeedBid = biddingBidsList.stream()
+                .max(Comparator.comparing(Bid::getBiddingPrice))
+                .orElse(null);
+
+            // 최고 입찰이 없으면 non-trade
+            if (succeedBid == null) {
                 auctionItem.nonTrade();
                 log.info("auction non-trade id : {}", auctionItem.getId());
                 log.info("auction non-trade Status : {}", auctionItem.getStatus());
                 continue;
             }
 
-            log.info("auction ID : {}", auctionItem.getId().toString());
-            auctionItem.complete();
-            log.info("auction Status : {}", auctionItem.getStatus());
+            // 최고 입찰은 성공으로
+            succeedBid.succeed();
 
-            Bid succedBid = bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem);
-            log.info("succeedBid ID : {}", succedBid.getId().toString());
-            succedBid.succeed();
-
-            // 최고가 아닌 Bid들을 fail 처리
-            bidRepository.findPotentiallyFailedBidsByAuctionItem(auctionItem, succedBid)
+            // 나머지는 모두 실패로
+            biddingBidsList.stream()
+                .filter(bid -> !bid.equals(succeedBid))
                 .forEach(Bid::fail);
+
+            // 경매 물품 완료처리
+            auctionItem.complete();
+            log.info("auction ID : {}", auctionItem.getId().toString());
+            log.info("auction Status : {}", auctionItem.getStatus());
         }
     }
 }
