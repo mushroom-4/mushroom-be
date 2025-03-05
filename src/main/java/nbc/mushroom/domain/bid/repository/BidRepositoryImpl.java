@@ -51,7 +51,10 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
         return queryFactory
             .select(bid)
             .from(bid)
-            .where(bid.auctionItem.eq(auctionItem))
+            .where(
+                bid.auctionItem.eq(auctionItem),
+                bid.biddingStatus.eq(BiddingStatus.BIDDING)
+            )
             .orderBy(bid.biddingPrice.desc())
             .limit(1)
             .fetchOne();
@@ -66,7 +69,8 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             .from(bid)
             .where(
                 bid.auctionItem.eq(auctionItem),
-                bid.ne(succeedBid)
+                bid.ne(succeedBid),
+                bid.biddingStatus.eq(BiddingStatus.BIDDING)
             )
             .fetch();
     }
