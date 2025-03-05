@@ -221,7 +221,7 @@
   function handleUserListUpdate(message) {
     const data = JSON.parse(message.body);
     console.log("✅ 현재 접속자 목록 수신:", data);
-    updateUserList(data.userInfoRes, data.currentUserCount);
+    updateUserList(data.userInfoRes, data.concurrentUserCount);
   }
 
   /**
