@@ -17,7 +17,7 @@ public interface BidRepositoryCustom {
 
     Bid findPotentiallySucceededBidByAuctionItem(AuctionItem auctionItem);
 
-    List<Bid> findPotentiallyFailedBidsByAuctionItem(AuctionItem auctionItem);
+    List<Bid> findPotentiallyFailedBidsByAuctionItem(AuctionItem auctionItem, Bid succedBid);
 
     Boolean existsBidByAuctionItem(AuctionItem auctionItem);
 

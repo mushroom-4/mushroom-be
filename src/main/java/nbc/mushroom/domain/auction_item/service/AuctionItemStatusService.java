@@ -69,7 +69,7 @@ public class AuctionItemStatusService {
             succedBid.succeed();
 
             // 최고가 아닌 Bid들을 fail 처리
-            bidRepository.findPotentiallyFailedBidsByAuctionItem(auctionItem)
+            bidRepository.findPotentiallyFailedBidsByAuctionItem(auctionItem, succedBid)
                 .forEach(Bid::fail);
         }
     }
