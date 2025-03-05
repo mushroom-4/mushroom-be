@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ChatRoomCleanupEvent {
+public class ChatRoomEventListener {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
