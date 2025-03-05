@@ -1,8 +1,8 @@
 package nbc.mushroom.domain.chat.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,20 +34,19 @@ public class ChatRoomService {
         Object userSessionObj = redisTemplate.opsForHash()
             .get(key, userId);
 
-        List<String> userSessionList = userSessionObj != null
-            // 있으면 ,로 구분해서 리스트로 바꿔
-            ? new ArrayList<>(Arrays.asList(userSessionObj.toString().split(",")))
-            : new ArrayList<>();
+        Set<String> userSessionSet = userSessionObj != null
+            ? new HashSet<>(Arrays.asList(userSessionObj.toString().split(","))) // 기존 데이터를 Set으로 변환
+            : new HashSet<>(); // 없으면 새로운 Set 생성
 
-        if (!userSessionList.contains(sessionId)) { // List에 없으면 추가해
-            userSessionList.add(sessionId);
-            log.info(
-                "[채팅방 접속] [chatRoomId={}] [userId={}] [새로운 세션 sessionId={}] [Redis Storage Key={}]",
-                chatRoomId, userId, sessionId, key);
-        }
+        // Set에 세션 id 추가
+        userSessionSet.add(sessionId);
 
-        redisTemplate.opsForHash()
-            .put(key, userId, String.join(",", userSessionList));
+        log.info(
+            "[채팅방 접속] [chatRoomId={}] [userId={}] [새로운 세션 sessionId={}] [Redis Storage Key={}]",
+            chatRoomId, userId, sessionId, key
+        );
+
+        redisTemplate.opsForHash().put(key, userId, String.join(",", userSessionSet));
     }
 
     /**
@@ -64,7 +63,7 @@ public class ChatRoomService {
             return; // 등록된 세션이 없으면 종료
         }
 
-        List<String> userSessionList = new ArrayList<>(
+        Set<String> userSessionList = new HashSet<>(
             Arrays.asList(existingSessionsObj.toString().split(",")));
 
         userSessionList.remove(sessionId);
