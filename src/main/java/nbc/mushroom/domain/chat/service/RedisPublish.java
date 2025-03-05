@@ -1,11 +1,16 @@
 package nbc.mushroom.domain.chat.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
+import nbc.mushroom.domain.chat.dto.response.ConcurrentUserListRes;
+import nbc.mushroom.domain.chat.entity.RedisSubMessage;
+import nbc.mushroom.domain.chat.entity.SubMessageType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisPublish {
@@ -21,7 +26,22 @@ public class RedisPublish {
      *
      * @param chatMessageRes : 메시지 정보
      */
-    public void publish(ChatMessageRes chatMessageRes) {
-        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessageRes);
+    public void publishChatMessage(ChatMessageRes chatMessageRes) {
+        RedisSubMessage redisSubMessage = new RedisSubMessage(SubMessageType.CHAT_MESSAGE,
+            chatMessageRes);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), redisSubMessage);
+        log.info("[Redis Publish] 채팅 메시지 발행 - chatRoomId={}, sender={}, message={}",
+            chatMessageRes.chatRoomId(), chatMessageRes.nickname(), chatMessageRes.message());
+    }
+
+    /**
+     * 현재 채팅방 접속자 목록 Redis 채널에 전송
+     */
+    public void publishConcurrentUserList(ConcurrentUserListRes concurrentUserListRes) {
+        RedisSubMessage redisSubMessage = new RedisSubMessage(SubMessageType.CONCURRENT_USER_LIST,
+            concurrentUserListRes);
+        redisTemplate.convertAndSend(channelTopic.getTopic(), redisSubMessage);
+        log.info("[Redis Publish] 채팅방 접속자 목록 발행 - chatRoomId={}, 접속자 수={}",
+            concurrentUserListRes.chatRoomId(), concurrentUserListRes.concurrentUserCount());
     }
 }

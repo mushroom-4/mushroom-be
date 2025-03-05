@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.service.AuctionItemService;
 import nbc.mushroom.domain.bid.service.BidService;
+import nbc.mushroom.domain.chat.service.ChatRoomService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.common.util.JwtUtil;
 import nbc.mushroom.domain.common.util.StompUtil;
@@ -29,6 +30,7 @@ public class StompHandler implements ChannelInterceptor {
 
     private final BidService bidService;
     private final AuctionItemService auctionItemService;
+    private final ChatRoomService chatRoomService;
     private final JwtUtil jwtUtil;
 
     /**
@@ -59,6 +61,9 @@ public class StompHandler implements ChannelInterceptor {
             case SEND:
                 handleSend(stompHeaderAccessor);
                 break;
+            case DISCONNECT:
+                handleDisconnect(stompHeaderAccessor);
+                break;
             default:
                 break;
         }
@@ -84,7 +89,9 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     /**
-     * 채팅방 구독 요청 시 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
+     * 채팅방 구독 요청 시
+     * 해당 경매 물품이 존재하는지 확인 ( chatRoomId == auctionItemId )
+     * 접속자 목록에 유저Id, 세션Id 추가
      */
     private void handleSubscribe(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SUBSCRIBE 요청 감지 ::::");
@@ -93,10 +100,15 @@ public class StompHandler implements ChannelInterceptor {
 
             log.info("✅ SUBSCRIBE 요청 destination: {}", stompHeaderAccessor.getDestination());
 
-            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/sub");
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor);
             if (FALSE.equals(auctionItemService.hasAuctionItem(chatRoomId))) {
                 throw new CustomException(CHAT_ROOM_NOT_FOUND);
             }
+
+            stompHeaderAccessor.getSessionAttributes().put("chatRoomId", chatRoomId.toString());
+
+            chatRoomService.addSessionId(chatRoomId.toString(), userId.toString(),
+                stompHeaderAccessor.getSessionId());
 
             log.info("✅ SUBSCRIBE 성공: userId={}, chatRoomId={}", userId, chatRoomId);
         } catch (Exception e) {
@@ -114,18 +126,41 @@ public class StompHandler implements ChannelInterceptor {
     private void handleSend(StompHeaderAccessor stompHeaderAccessor) {
         log.info(":::: SEND 요청 감지 ::::");
         try {
-            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor, "/ws/pub");
+            Long chatRoomId = StompUtil.getChatRoomId(stompHeaderAccessor);
             Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
 
-            boolean hasBid = TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
-
-            validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
+            // '메시지' 전송에서만 실행
+            String destination = stompHeaderAccessor.getDestination();
+            if (destination.startsWith("/ws/pub/chats/")) {
+                boolean hasBid = TRUE.equals(bidService.hasBid(loginUserId, chatRoomId));
+                validateBidAndSessionAttributeError(stompHeaderAccessor, hasBid);
+            }
 
             log.info("✅ SEND 성공: userId={}, chatRoomId={}", loginUserId, chatRoomId);
         } catch (Exception e) {
             log.error("❌ SEND 실패: {}", e.getMessage());
             throw e;
         }
+    }
+
+    /**
+     * Disconnect 시 채팅방 접속자 목록에서 제거
+     */
+    private void handleDisconnect(StompHeaderAccessor stompHeaderAccessor) {
+        log.info(":::: DISCONNECT 요청 감지 ::::");
+
+        Long loginUserId = StompUtil.getUserId(stompHeaderAccessor);
+
+        String chatRoomIdStr = (String) stompHeaderAccessor.getSessionAttributes()
+            .get("chatRoomId");
+
+        String sessionId = stompHeaderAccessor.getSessionId();
+
+        chatRoomService.removeSessionId(chatRoomIdStr, loginUserId.toString(),
+            sessionId);
+
+        log.info("DISCONNECT 성공: userId={}, chatRoomId={}, sessionId={}", loginUserId,
+            chatRoomIdStr, sessionId);
     }
 
     /**

@@ -67,6 +67,7 @@ public enum ExceptionType {
     INVALID_CHAT_ROOM_PATH(HttpStatus.BAD_REQUEST, "C01", "유효하지 않은 채팅방 경로입니다."),
     BIDDING_REQUIRED(HttpStatus.FORBIDDEN, "C02", "메시지 전송 권한이 없습니다. 해당 경매물품에 대한 입찰 내역이 필요합니다."),
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "C03", "해당 채팅방을 찾을 수 없습니다."),
+    SUB_MESSAGE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "C04", "일치하는 SubMessage 타입을 찾을 수 없습니다."),
 
     // Review
     REVIEW_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "R01", "해당 판매자에 대한 리뷰를 이미 작성하였습니다."),

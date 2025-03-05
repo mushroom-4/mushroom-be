@@ -3,26 +3,37 @@ package nbc.mushroom.domain.common.util;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_CHAT_ROOM_PATH;
 import static nbc.mushroom.domain.common.exception.ExceptionType.JWT_TOKEN_REQUIRED;
 
+import java.util.List;
 import nbc.mushroom.domain.common.exception.CustomException;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.util.AntPathMatcher;
 
 public class StompUtil {
+
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    // STOMP 경로 패턴 리스트
+    private static final List<String> chatRoomPatterns = List.of(
+        "/ws/**/chats/{chatRoomId}/**",
+        "/ws/**/chatrooms/{chatRoomId}/users"
+    );
 
     /**
      * STOMP 메시지의 Destination에서 채팅방 ID 추출 후 검증
      */
-    public static Long getChatRoomId(StompHeaderAccessor stompHeaderAccessor, String prefix) {
+    public static Long getChatRoomId(StompHeaderAccessor stompHeaderAccessor) {
         String destination = stompHeaderAccessor.getDestination();
-        if (destination == null || !destination.startsWith(prefix + "/chats/")) {
+        if (destination == null) {
             throw new CustomException(INVALID_CHAT_ROOM_PATH);
         }
 
-        String chatRoomIdStr = destination.substring((prefix + "/chats/").length());
-        if (chatRoomIdStr.isEmpty() || !chatRoomIdStr.matches("\\d+")) {
-            throw new CustomException(INVALID_CHAT_ROOM_PATH);
-        }
-
-        return Long.parseLong(chatRoomIdStr);
+        return chatRoomPatterns.stream()
+            .filter(pattern -> pathMatcher.match(pattern, destination))
+            .map(pattern -> pathMatcher.extractUriTemplateVariables(pattern, destination)
+                .get("chatRoomId"))
+            .map(Long::valueOf)
+            .findFirst()
+            .orElseThrow(() -> new CustomException(INVALID_CHAT_ROOM_PATH));
     }
 
     /**

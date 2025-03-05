@@ -3,7 +3,6 @@ package nbc.mushroom.config.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import nbc.mushroom.domain.chat.dto.response.ChatMessageRes;
 import nbc.mushroom.domain.chat.service.RedisSubscriber;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +32,7 @@ public class RedisChatConfig {
     }
 
     /**
-     * Redis 기본 설정 ( Key : String Value : ChatMessageRes )
-     * <p>
-     * Redis 쓸 때 사용. 현재는 ChatMessage만 직렬화/역직렬화 수행하도록 설정
+     * Redis 템플릿 - Object
      *
      * @param redisConnectionFactory : Redis 연결
      */
@@ -44,7 +41,10 @@ public class RedisChatConfig {
         RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer()); // String으로 직렬화 설정
+
+        // key 직렬화 설정
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // 자바의 날짜/시간 API 올바르게 사용할 수 있도록
@@ -53,10 +53,12 @@ public class RedisChatConfig {
         objectMapper.enable(
             SerializationFeature.INDENT_OUTPUT); // 읽기 쉽게 들여쓰기 활성화 (디버깅 용도, 베포 시엔 성능을 위해 비활성화)
 
-        Jackson2JsonRedisSerializer<ChatMessageRes> serializer = new Jackson2JsonRedisSerializer<>(
-            objectMapper, ChatMessageRes.class);
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(
+            objectMapper, Object.class);
 
-        redisTemplate.setValueSerializer(serializer); // value 직렬화 설정
+        // value 직렬화 설정
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashValueSerializer(serializer);
 
         return redisTemplate;
     }
