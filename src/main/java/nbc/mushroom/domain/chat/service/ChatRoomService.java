@@ -1,5 +1,7 @@
 package nbc.mushroom.domain.chat.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -113,5 +115,27 @@ public class ChatRoomService {
         return userList.stream()
             .map(UserInfoRes::from)
             .toList();
+    }
+
+    /**
+     * 채팅방 메시지 저장소 만료 시간 설정
+     */
+    public void setChatRoomStorageTTL(Long chatRoomId) {
+        String key = RedisChatRoomKey.getMessageStorageKey(chatRoomId);
+
+        Boolean hasKey = redisTemplate.hasKey(key);
+        if (!hasKey) {
+            return;
+        }
+
+        Duration ttl = Duration.ofDays(7);
+
+        redisTemplate.expire(key, ttl);
+
+        Long expireSecond = redisTemplate.getExpire(key);
+        LocalDateTime expirationTime = LocalDateTime.now().plusSeconds(expireSecond);
+
+        log.info("[채팅방 TTL 설정] chatRoomId={}, Redis Storage Key={}, 만료 예정 시간={}",
+            chatRoomId, key, expirationTime);
     }
 }

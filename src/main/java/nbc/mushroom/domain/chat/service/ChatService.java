@@ -1,5 +1,6 @@
 package nbc.mushroom.domain.chat.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -25,6 +26,7 @@ public class ChatService {
 
     private final RedisPublish redisPublish;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     /**
      * 클라이언트가 보낸 메시지를 Redis에 저장하고 전송
@@ -149,7 +151,7 @@ public class ChatService {
         }
 
         return chatMessageList.stream()
-            .map(o -> (ChatMessageRes) o) // Object → ChatMessage 변환
+            .map(o -> objectMapper.convertValue(o, ChatMessageRes.class)) // Object → ChatMessage 변환
             .toList(); // 최종 List<ChatMessageRes> 반환
     }
 

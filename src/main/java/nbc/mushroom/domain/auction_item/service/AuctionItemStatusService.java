@@ -14,6 +14,7 @@ import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.repository.BidRepository;
+import nbc.mushroom.domain.chat.service.ChatRoomService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class AuctionItemStatusService {
 
     private final AuctionItemRepository auctionItemRepository;
     private final BidRepository bidRepository;
+    private final ChatRoomService chatRoomService;
 
     @Scheduled(cron = "0 */1 * * * *") // 매 5분마다 (정각 기준)
     @Transactional(readOnly = false)
@@ -85,6 +87,10 @@ public class AuctionItemStatusService {
             auctionItem.complete();
             log.info("auction ID : {}", auctionItem.getId().toString());
             log.info("auction Status : {}", auctionItem.getStatus());
+
+            // 채팅방 메시지 기록 만료 시간 설정
+            chatRoomService.setChatRoomStorageTTL(auctionItem.getId());
+
         }
     }
 }
