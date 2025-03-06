@@ -14,7 +14,7 @@ public interface BidRepositoryCustom {
 
     Optional<Bid> findBidByUserAndAuctionItem(User bidder, AuctionItem auctionItem);
 
-    Bid findPotentiallySucceededBidByAuctionItem(AuctionItem auctionItem);
+    Optional<Bid> findMaxPriceBidInAuctionItem(AuctionItem auctionItem);
 
     Boolean existsBidByAuctionItem(AuctionItem auctionItem);
 
