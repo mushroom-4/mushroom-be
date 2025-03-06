@@ -135,9 +135,11 @@ public class AuctionItem extends Timestamped {
         this.isDeleted = true;
     }
 
-    public void throwIfNotInProgress() {
+    public AuctionItem throwIfNotInProgress() {
         if (this.status != PROGRESSING) {
             throw new CustomException(AUCTION_ITEM_NOT_IN_PROGRESS);
         }
+
+        return this;
     }
 }

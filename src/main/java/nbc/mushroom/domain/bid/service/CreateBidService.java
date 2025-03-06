@@ -5,6 +5,7 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BIDDING
 import static nbc.mushroom.domain.common.exception.ExceptionType.SELF_BIDDING_NOT_ALLOWED;
 
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
@@ -31,26 +32,27 @@ public class CreateBidService {
 
     @Transactional(readOnly = false)
     public CreateBidRes createOrUpdateBid(
-        User loginUser,
+        User bidder,
         Long auctionItemId,
         CreateBidReq createBidReq
     ) {
-        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId)
+            .throwIfNotInProgress();
+        validateBidder(bidder, auctionItem);
 
-        validateBidRequest(loginUser, auctionItem, createBidReq.biddingPrice());
+        Optional<Bid> maxBid = bidRepository.findMaxPriceBidInAuctionItem(auctionItem);
+        validateBidReq(createBidReq, maxBid, auctionItem);
 
-        Bid findBid = bidRepository.findBidByUserAndAuctionItem(loginUser, auctionItem)
-            .orElseGet(() -> createBid(loginUser, auctionItem, createBidReq.biddingPrice())
-            );
-
-        if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
-            findBid.updateBiddingPrice(createBidReq.biddingPrice());
+        Bid prevBid = bidRepository.findBidByUserAndAuctionItem(bidder, auctionItem)
+            .orElseGet(() -> createBid(bidder, auctionItem, createBidReq.biddingPrice()));
+        if (!createBidReq.biddingPrice().equals(prevBid.getBiddingPrice())) {
+            prevBid.updateBiddingPrice(createBidReq.biddingPrice());
         }
 
-        chatService.sendBidAnnouncementMessage(auctionItem.getId(), findBid.getBidder(),
-            findBid.getBiddingPrice());
+        chatService.sendBidAnnouncementMessage(auctionItem.getId(), prevBid.getBidder(),
+            prevBid.getBiddingPrice());
 
-        return CreateBidRes.from(findBid);
+        return CreateBidRes.from(prevBid);
     }
 
     private Bid createBid(User bidder, AuctionItem auctionItem, Long biddingPrice) {
@@ -63,19 +65,20 @@ public class CreateBidService {
         return bidRepository.save(bid);
     }
 
-    private void validateBidRequest(User bidder, AuctionItem auctionItem, Long biddingPrice) {
-        auctionItem.throwIfNotInProgress();
-
+    private void validateBidder(User bidder, AuctionItem auctionItem) {
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
+    }
 
-        //  경매물품 입찰내역중 최고가 반환, 조회되는 bid 데이터가 없으면 시작가를 최고가로 설정
-        Long highestBiddingPrice = bidRepository.findMaxPriceBidInAuctionItem(auctionItem)
+    private void validateBidReq(CreateBidReq bidReq, Optional<Bid> maxBid,
+        AuctionItem auctionItem) {
+        //  경매물품 입찰내역중 최고가, 조회되는 bid 데이터가 없으면 시작가를 최고가로 설정
+        Long highestBiddingPrice = maxBid
             .map(Bid::getBiddingPrice)
             .orElse(auctionItem.getStartPrice());
 
-        if (highestBiddingPrice >= biddingPrice) {
+        if (highestBiddingPrice >= bidReq.biddingPrice()) {
             throw new CustomException(INVALID_BIDDING_PRICE);
         }
     }
