@@ -54,6 +54,19 @@
       margin: 0;
     }
 
+    /* ✅ 메시지 목록 스타일 개선 */
+    #messages {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      overflow-y: auto; /* 스크롤 가능하도록 설정 */
+      max-height: 400px; /* 필요 시 최대 높이 지정 가능 */
+    }
+
     /* ✅ 개별 사용자 항목 */
     .user-item {
       display: flex;
@@ -75,6 +88,17 @@
       color: #333;
     }
 
+    /* 개별 메시지 스타일 */
+    .message-item {
+      display: flex;
+      max-width: 70%;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 15px;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
     /* 내 메시지 (오른쪽 정렬, 배경색) */
     .my-message {
       align-self: flex-end;
@@ -91,16 +115,22 @@
       background-color: #f1f1f1; /* 예시 배경색 추가 */
     }
 
-    /* 날짜 헤더 스타일 */
+    /* ✅ 날짜 헤더 스타일 개선 */
     .date-header {
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      font-size: 14px;
       font-weight: bold;
-      margin: 10px 0;
-      background-color: #fff;
-      color: #888;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      color: #666;
+      margin: 15px 0 10px 0; /* 날짜 헤더의 여백 조정 */
+      padding: 5px 0;
+      background-color: #f5f5f5;
+      border-radius: 5px;
+      text-align: center;
     }
+
 
     /* 둥근 이미지 예시 */
     .chat-img {
@@ -310,8 +340,6 @@
    */
   function appendMessage(msg) {
     const messagesList = document.getElementById("messages");
-    // 실제 메시지 표시
-    const messageElement = document.createElement('li');
 
     // 날짜 키 추출 (YYYY-MM-DD)
     const dateKey = formatDateKey(msg.sendDateTime);
@@ -329,13 +357,18 @@
     // 내 메시지 여부: myUserId와 msg.senderId 비교
     const isMyMessage = myUserId !== null && msg.senderId === myUserId;
 
+    // 실제 메시지 표시
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message-item");
+    messageElement.classList.add(isMyMessage ? "my-message" : "other-message");
+
     // 메시지 텍스트 구성
     messageElement.textContent = `[${timeString}] ${msg.nickname || '익명'}: ${msg.message}`;
 
-    // 내 메시지와 타 메시지 구분 (CSS 클래스 적용)
-    messageElement.className = isMyMessage ? "my-message" : "other-message";
-
     messagesList.appendChild(messageElement);
+
+    // ✅ 스크롤을 최신 메시지로 이동
+    messagesList.scrollTop = messagesList.scrollHeight;
     console.log("메시지 추가:", msg);
   }
 
