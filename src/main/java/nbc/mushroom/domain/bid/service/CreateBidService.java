@@ -36,30 +36,42 @@ public class CreateBidService {
         Long auctionItemId,
         CreateBidReq createBidReq
     ) {
+        // bidder 검증
         AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId)
             .throwIfNotInProgress();
         validateBidder(bidder, auctionItem);
 
+        // createBidReq 검증
         Optional<Bid> maxBid = bidRepository.findMaxPriceBidInAuctionItem(auctionItem);
         validateBidReq(createBidReq, maxBid, auctionItem);
 
-        Bid prevBid = bidRepository.findBidByUserAndAuctionItem(bidder, auctionItem)
-            .orElseGet(() -> createBid(bidder, auctionItem, createBidReq.biddingPrice()));
-        if (!createBidReq.biddingPrice().equals(prevBid.getBiddingPrice())) {
-            prevBid.updateBiddingPrice(createBidReq.biddingPrice());
-        }
+        // 이전 입찰이 조회되면 업데이트, 없으면 생성
+        Optional<Bid> prevBid = bidRepository.findBidByUserAndAuctionItem(bidder, auctionItem);
+        Bid newBid = upsertBid(bidder, auctionItem, createBidReq, maxBid, prevBid);
 
-        chatService.sendBidAnnouncementMessage(auctionItem.getId(), prevBid.getBidder(),
-            prevBid.getBiddingPrice());
+        // 입찰되었다는 메시지 전송
+        chatService.sendBidAnnouncementMessage(
+            auctionItem.getId(),
+            newBid.getBidder(),
+            newBid.getBiddingPrice()
+        );
 
-        return CreateBidRes.from(prevBid);
+        return CreateBidRes.from(newBid);
     }
 
-    private Bid createBid(User bidder, AuctionItem auctionItem, Long biddingPrice) {
+    private Bid upsertBid(
+        User bidder,
+        AuctionItem auctionItem,
+        CreateBidReq bidReq,
+        Optional<Bid> maxBid,
+        Optional<Bid> prevBid
+    ) {
         Bid bid = Bid.builder()
+            .id(prevBid.map(Bid::getId).orElse(null))
             .auctionItem(auctionItem)
-            .biddingPrice(biddingPrice)
+            .biddingPrice(bidReq.biddingPrice())
             .bidder(bidder)
+            .parentId(maxBid.map(Bid::getParentId).orElse(null))
             .build();
 
         return bidRepository.save(bid);

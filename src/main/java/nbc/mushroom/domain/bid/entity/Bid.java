@@ -50,17 +50,17 @@ public class Bid extends Timestamped {
     @Column(name = "bidding_status", nullable = false)
     private BiddingStatus biddingStatus;
 
+    @Column(name = "parent_id", unique = true)
+    private Long parentId;
+
     @Builder
-    public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice) {
+    public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice, Long parentId) {
         this.id = id;
         this.auctionItem = auctionItem;
         this.bidder = bidder;
         this.biddingPrice = biddingPrice;
         this.biddingStatus = BIDDING;
-    }
-
-    public void updateBiddingPrice(Long biddingPrice) {
-        this.biddingPrice = biddingPrice;
+        this.parentId = parentId;
     }
 
     public void fail() {
