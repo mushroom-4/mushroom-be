@@ -122,6 +122,12 @@ public class ChatRoomService {
      */
     public void setChatRoomStorageTTL(Long chatRoomId) {
         String key = RedisChatRoomKey.getMessageStorageKey(chatRoomId);
+
+        Boolean hasKey = redisTemplate.hasKey(key);
+        if (!hasKey) {
+            return;
+        }
+
         Duration ttl = Duration.ofDays(7);
 
         redisTemplate.expire(key, ttl);
