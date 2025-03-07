@@ -71,7 +71,7 @@ public class CreateBidService {
             .auctionItem(auctionItem)
             .biddingPrice(bidReq.biddingPrice())
             .bidder(bidder)
-            .parentId(maxBid.map(Bid::getParentId).orElse(null))
+            .parentId(maxBid.map(Bid::getId).orElse(null))
             .build();
 
         return bidRepository.save(bid);
