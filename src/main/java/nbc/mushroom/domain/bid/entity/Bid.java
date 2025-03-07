@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +28,10 @@ import nbc.mushroom.domain.user.entity.User;
 
 @Getter
 @Entity
-@Table(name = "`bid`")
+@Table(name = "`bid`", uniqueConstraints = @UniqueConstraint(
+    name = "uq_auction_item_parent",
+    columnNames = {"auction_item_id", "prev_max_price"}
+))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bid extends Timestamped {
 
@@ -50,17 +54,18 @@ public class Bid extends Timestamped {
     @Column(name = "bidding_status", nullable = false)
     private BiddingStatus biddingStatus;
 
+    @Column(name = "prev_max_price")
+    private Long prevMaxPrice;
+
     @Builder
-    public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice) {
+    public Bid(Long id, AuctionItem auctionItem, User bidder, Long biddingPrice,
+        Long prevMaxPrice) {
         this.id = id;
         this.auctionItem = auctionItem;
         this.bidder = bidder;
         this.biddingPrice = biddingPrice;
         this.biddingStatus = BIDDING;
-    }
-
-    public void updateBiddingPrice(Long biddingPrice) {
-        this.biddingPrice = biddingPrice;
+        this.prevMaxPrice = prevMaxPrice;
     }
 
     public void fail() {

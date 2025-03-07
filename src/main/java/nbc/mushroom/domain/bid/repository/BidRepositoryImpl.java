@@ -47,8 +47,8 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
     }
 
     @Override
-    public Bid findPotentiallySucceededBidByAuctionItem(AuctionItem auctionItem) {
-        return queryFactory
+    public Optional<Bid> findMaxPriceBidInAuctionItem(AuctionItem auctionItem) {
+        return Optional.ofNullable(queryFactory
             .select(bid)
             .from(bid)
             .where(
@@ -57,7 +57,8 @@ public class BidRepositoryImpl implements BidRepositoryCustom {
             )
             .orderBy(bid.biddingPrice.desc())
             .limit(1)
-            .fetchOne();
+            .fetchOne()
+        );
     }
 
     @Override

@@ -4,6 +4,7 @@ import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.INSPECTI
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.PROGRESSING;
 import static nbc.mushroom.domain.auction_item.entity.AuctionItemStatus.WAITING;
 import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_ALREADY_INSPECTED;
+import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_AUCTION_ITEM_STATUS;
 
 import jakarta.persistence.Column;
@@ -132,5 +133,13 @@ public class AuctionItem extends Timestamped {
 
     public void delete() {
         this.isDeleted = true;
+    }
+
+    public AuctionItem throwIfNotInProgress() {
+        if (this.status != PROGRESSING) {
+            throw new CustomException(AUCTION_ITEM_NOT_IN_PROGRESS);
+        }
+
+        return this;
     }
 }

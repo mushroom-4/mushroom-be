@@ -1,7 +1,6 @@
 package nbc.mushroom.domain.bid.service;
 
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.AUCTION_ITEM_NOT_IN_PROGRESS;
 import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_BIDDING_PRICE;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SELF_BIDDING_NOT_ALLOWED;
 
@@ -10,7 +9,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
-import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.dto.request.CreateBidReq;
 import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
@@ -34,61 +32,65 @@ public class CreateBidService {
 
     @Transactional(readOnly = false)
     public CreateBidRes createOrUpdateBid(
-        User loginUser,
+        User bidder,
         Long auctionItemId,
         CreateBidReq createBidReq
     ) {
+        // bidder 검증
+        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId)
+            .throwIfNotInProgress();
+        validateBidder(bidder, auctionItem);
 
-        AuctionItem findAuctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+        // createBidReq 검증
+        Optional<Bid> maxBid = bidRepository.findMaxPriceBidInAuctionItem(auctionItem);
+        validateBidReq(createBidReq, maxBid, auctionItem);
 
-        validateBidRequest(loginUser, findAuctionItem, createBidReq.biddingPrice());
+        // 이전 입찰이 조회되면 업데이트, 없으면 생성
+        Optional<Bid> prevBid = bidRepository.findBidByUserAndAuctionItem(bidder, auctionItem);
+        Bid newBid = upsertBid(bidder, auctionItem, createBidReq, maxBid, prevBid);
 
-        Bid findBid = bidRepository.findBidByUserAndAuctionItem(loginUser, findAuctionItem)
-            .orElseGet(() -> createBid(loginUser, findAuctionItem, createBidReq.biddingPrice())
-            );
+        // 입찰되었다는 메시지 전송
+        chatService.sendBidAnnouncementMessage(
+            auctionItem.getId(),
+            newBid.getBidder(),
+            newBid.getBiddingPrice()
+        );
 
-        if (!createBidReq.biddingPrice().equals(findBid.getBiddingPrice())) {
-            findBid.updateBiddingPrice(createBidReq.biddingPrice());
-        }
-
-        chatService.sendBidAnnouncementMessage(findAuctionItem.getId(), findBid.getBidder(),
-            findBid.getBiddingPrice());
-
-        return CreateBidRes.from(findBid);
+        return CreateBidRes.from(newBid);
     }
 
-    private Bid createBid(User bidder, AuctionItem auctionItem, Long biddingPrice) {
+    private Bid upsertBid(
+        User bidder,
+        AuctionItem auctionItem,
+        CreateBidReq bidReq,
+        Optional<Bid> maxBid,
+        Optional<Bid> prevBid
+    ) {
         Bid bid = Bid.builder()
+            .id(prevBid.map(Bid::getId).orElse(null))
             .auctionItem(auctionItem)
-            .biddingPrice(biddingPrice)
+            .biddingPrice(bidReq.biddingPrice())
             .bidder(bidder)
+            .prevMaxPrice(maxBid.map(Bid::getBiddingPrice).orElse(auctionItem.getStartPrice()))
             .build();
 
         return bidRepository.save(bid);
     }
 
-    private void validateBidRequest(User bidder, AuctionItem auctionItem, Long biddingPrice) {
-        if (auctionItem.getStatus() != AuctionItemStatus.PROGRESSING) {
-            throw new CustomException(AUCTION_ITEM_NOT_IN_PROGRESS);
-        }
-
-        log.info("bidder id : {}", bidder.getId());
-        log.info("seller id : {}", auctionItem.getSeller().getId());
+    private void validateBidder(User bidder, AuctionItem auctionItem) {
         if (Objects.equals(bidder.getId(), auctionItem.getSeller().getId())) {
             throw new CustomException(SELF_BIDDING_NOT_ALLOWED);
         }
+    }
 
-        if (auctionItem.getStartPrice() > biddingPrice) {
-            throw new CustomException(INVALID_BIDDING_PRICE);
-        }
-
-        //  경매물품 Bid의 최고가 반환, 조회되는 bid 데이터가 없으면 acutionItem을 최고가로 설정
-        Long highestBiddingPrice = Optional.ofNullable(
-                bidRepository.findPotentiallySucceededBidByAuctionItem(auctionItem))
+    private void validateBidReq(CreateBidReq bidReq, Optional<Bid> maxBid,
+        AuctionItem auctionItem) {
+        //  경매물품 입찰내역중 최고가, 조회되는 bid 데이터가 없으면 시작가를 최고가로 설정
+        Long highestBiddingPrice = maxBid
             .map(Bid::getBiddingPrice)
             .orElse(auctionItem.getStartPrice());
 
-        if (highestBiddingPrice >= biddingPrice) {
+        if (highestBiddingPrice >= bidReq.biddingPrice()) {
             throw new CustomException(INVALID_BIDDING_PRICE);
         }
     }

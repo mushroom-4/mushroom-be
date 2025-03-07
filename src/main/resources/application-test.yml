@@ -19,3 +19,13 @@ spring:
 jwt:
   secret:
     key: testtesttesttesttesttesttesttesttesttesttest # prod는 .env 빼서 다른 값으로 해야됨
+image:
+  s3:
+    bucket: test
+    region: test
+    access-key: test
+    secret-key: test
+    endpoint: test
+  file:
+    path: test
+    endpoint: test
