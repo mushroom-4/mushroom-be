@@ -285,7 +285,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         }
 
         if (keyword != null && !keyword.isBlank()) {
-            builder.or(auctionItem.name.startsWith(keyword)
+            builder.and(auctionItem.name.startsWith(keyword)
                 .or(auctionItem.description.startsWith(keyword))
                 .or(auctionItem.brand.startsWith(keyword)));
         }
