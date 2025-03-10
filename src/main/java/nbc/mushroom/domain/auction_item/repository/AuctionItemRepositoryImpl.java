@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.admin.dto.response.QAuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.dto.response.SearchAuctionItemRes;
@@ -29,6 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
@@ -65,6 +67,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         AuctionItemSize size, LocalDateTime startDate, LocalDateTime endDate, Long minPrice,
         Long maxPrice, AuctionItemStatus status, Pageable pageable) {
 
+        log.info("findAuctionItemsByKeywordAndFiltering");
         BooleanBuilder builder = auctionItemsBuilder(
             keyword, brand, category, size, startDate, endDate, minPrice, maxPrice, status
         );
@@ -84,14 +87,14 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                 auctionItem.status
             ))
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), builder)
+            .where(builder)
             .orderBy(getSortOrders(pageable))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize());
 
         JPAQuery<Long> countQuery = queryFactory.select(auctionItem.count())
             .from(auctionItem)
-            .where(auctionItem.isDeleted.eq(false), builder);
+            .where(builder);
 
         List<SearchAuctionItemRes> content = query.fetch();
 
@@ -194,6 +197,8 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         }
 
         List<OrderSpecifier<?>> orders = new ArrayList<>();
+        boolean hasCustomSort = false;  // 커스텀 정렬이 있는지 확인
+
         for (Sort.Order order : pageable.getSort()) {
             String property = order.getProperty();
             boolean isAscending = order.isAscending();
@@ -212,9 +217,23 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
                     isAscending ? auctionItem.startPrice.asc() : auctionItem.startPrice.desc();
                 case "status" -> isAscending ? auctionItem.status.asc() : auctionItem.status.desc();
 
-                default -> auctionItem.createdAt.desc();
+                // `default`에서는 createdAt.desc()를 처리x
+                default -> null;
             };
+
+            // 커스텀 정렬이 없으면 기본값(createdAt.desc())을 사용
+            if (orderSpecifier == null) {
+                orderSpecifier = auctionItem.createdAt.desc();
+            } else {
+                hasCustomSort = true;
+            }
+
             orders.add(orderSpecifier);
+        }
+
+        // 만약 커스텀 정렬이 하나도 없으면 기본 정렬(createdAt.desc())만 사용
+        if (!hasCustomSort) {
+            return new OrderSpecifier[]{auctionItem.createdAt.desc()};
         }
 
         return orders.toArray(new OrderSpecifier[0]);
@@ -227,6 +246,8 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         Long minPrice, Long maxPrice, AuctionItemStatus status) {
 
         BooleanBuilder builder = new BooleanBuilder();
+
+        builder.and(auctionItem.isDeleted.eq(false));
 
         if (brand != null && !brand.isBlank()) {
             builder.and(auctionItem.brand.eq(brand));
@@ -244,8 +265,7 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
             builder.and(auctionItem.status.eq(status));
         } else {
             builder.and(
-                auctionItem.status.eq(AuctionItemStatus.WAITING)
-                    .or(auctionItem.status.eq(AuctionItemStatus.PROGRESSING)));
+                auctionItem.status.in(AuctionItemStatus.WAITING, AuctionItemStatus.PROGRESSING));
         }
 
         if (startDate != null) {
@@ -265,8 +285,8 @@ public class AuctionItemRepositoryImpl implements AuctionItemRepositoryCustom {
         }
 
         if (keyword != null && !keyword.isBlank()) {
-            builder.or(auctionItem.name.startsWith(keyword)
-                .or(auctionItem.description.contains(keyword))
+            builder.and(auctionItem.name.startsWith(keyword)
+                .or(auctionItem.description.startsWith(keyword))
                 .or(auctionItem.brand.startsWith(keyword)));
         }
 
