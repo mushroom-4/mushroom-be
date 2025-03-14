@@ -66,6 +66,14 @@ public class BidService {
         bid.paymentComplete(paymentReq.amount());
     }
 
+    @Transactional
+    public void paymentCancel(PaymentReq paymentReq) {
+        Long bidId = Long.valueOf(paymentReq.orderId().substring(20));
+        Bid bid = bidRepository.findById(bidId)
+            .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
+        bid.paymentCancel();
+    }
+
     private void validateBidCancellation(User loginUser, Bid bid) {
         LocalDateTime now = LocalDateTime.now();
 

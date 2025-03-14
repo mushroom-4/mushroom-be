@@ -15,14 +15,12 @@ public class PaymentFacade {
     private final BidService bidService;
 
     public PaymentRes confirmPayment(AuthUser authUser, PaymentReq paymentReq) {
-        PaymentRes paymentRes = PaymentRes.from(paymentService.sendPayment(paymentReq));
+        bidService.paymentConfirm(authUser, paymentReq);
         try {
-            bidService.paymentConfirm(authUser, paymentReq);
+            return PaymentRes.from(paymentService.sendPayment(paymentReq));
         } catch (Exception e) {
-            paymentService.cancelPayment(paymentRes.paymentKey(), e.getMessage(),
-                paymentRes.amount());
+            bidService.paymentCancel(paymentReq);
             throw e;
         }
-        return paymentRes;
     }
 }
