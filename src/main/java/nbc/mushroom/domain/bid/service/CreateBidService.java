@@ -7,20 +7,16 @@ import static nbc.mushroom.domain.common.exception.ExceptionType.SELF_BIDDING_NO
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.repository.AuctionItemRepository;
 import nbc.mushroom.domain.bid.dto.request.CreateBidReq;
-import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
-import nbc.mushroom.domain.chat.service.ChatService;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -28,10 +24,10 @@ public class CreateBidService {
 
     private final BidRepository bidRepository;
     private final AuctionItemRepository auctionItemRepository;
-    private final ChatService chatService;
+
 
     @Transactional(readOnly = false)
-    public CreateBidRes createOrUpdateBid(
+    public Bid createOrUpdateBid(
         User bidder,
         Long auctionItemId,
         CreateBidReq createBidReq
@@ -47,16 +43,8 @@ public class CreateBidService {
 
         // 이전 입찰이 조회되면 업데이트, 없으면 생성
         Optional<Bid> prevBid = bidRepository.findBidByUserAndAuctionItem(bidder, auctionItem);
-        Bid newBid = upsertBid(bidder, auctionItem, createBidReq, maxBid, prevBid);
 
-        // 입찰되었다는 메시지 전송
-        chatService.sendBidAnnouncementMessage(
-            auctionItem.getId(),
-            newBid.getBidder(),
-            newBid.getBiddingPrice()
-        );
-
-        return CreateBidRes.from(newBid);
+        return upsertBid(bidder, auctionItem, createBidReq, maxBid, prevBid);
     }
 
     private Bid upsertBid(

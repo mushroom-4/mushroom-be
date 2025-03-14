@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.bid.dto.request.CreateBidReq;
 import nbc.mushroom.domain.bid.dto.response.CreateBidRes;
-import nbc.mushroom.domain.bid.service.CreateBidService;
+import nbc.mushroom.domain.bid.service.CreateBidFacade;
 import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
 import nbc.mushroom.domain.common.dto.AuthUser;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auction-items/{auctionItemId}/bids")
 public class CreateBidController {
 
-    private final CreateBidService createBidService;
+    private final CreateBidFacade createBidFacade;
 
     @PostMapping
     public ResponseEntity<ApiResponse<CreateBidRes>> createOrUpdateBid(
@@ -30,7 +30,7 @@ public class CreateBidController {
         @PathVariable Long auctionItemId,
         @Valid @RequestBody CreateBidReq createBidReq
     ) {
-        CreateBidRes createBidRes = createBidService.createOrUpdateBid(
+        CreateBidRes createBidRes = createBidFacade.createOrUpdateBid(
             User.fromAuthUser(authUser),
             auctionItemId,
             createBidReq);
