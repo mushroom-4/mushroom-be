@@ -5,6 +5,8 @@ import static nbc.mushroom.domain.bid.entity.BiddingStatus.CANCELED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_CANCELLATION_LIMIT_EXCEEDED;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_CANNOT_CANCEL_NON_BIDDING;
 import static nbc.mushroom.domain.common.exception.ExceptionType.BID_CANNOT_CANCEL_WITHIN_24HOURS;
+import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
+import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_PAYMENT_USER;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +14,9 @@ import nbc.mushroom.domain.bid.dto.response.BidInfoRes;
 import nbc.mushroom.domain.bid.dto.response.BidRes;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.repository.BidRepository;
+import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.common.exception.CustomException;
+import nbc.mushroom.domain.payment.dto.request.PaymentReq;
 import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +50,20 @@ public class BidService {
 
     public Boolean hasBid(Long bidderId, Long auctionItemId) {
         return bidRepository.existBidByBidderIdAndAuctionItemId(bidderId, auctionItemId);
+    }
+
+    @Transactional
+    public void paymentConfirm(AuthUser authUser, PaymentReq paymentReq) {
+        User user = User.fromAuthUser(authUser);
+        Long bidId = Long.valueOf(paymentReq.orderId().substring(20));
+        Bid bid = bidRepository.findById(bidId)
+            .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
+
+        if (!user.getId().equals(bid.getBidder().getId())) {
+            throw new CustomException(INVALID_PAYMENT_USER);
+        }
+
+        bid.paymentComplete(paymentReq.amount());
     }
 
     private void validateBidCancellation(User loginUser, Bid bid) {

@@ -1,7 +1,5 @@
 package nbc.mushroom.domain.payment.service;
 
-import static nbc.mushroom.domain.common.exception.ExceptionType.BID_NOT_FOUND;
-import static nbc.mushroom.domain.common.exception.ExceptionType.INVALID_PAYMENT_USER;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_CANCEL_FAIL;
 import static nbc.mushroom.domain.common.exception.ExceptionType.SERVER_PAYMENT_FAIL;
 
@@ -9,13 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import nbc.mushroom.domain.bid.entity.Bid;
-import nbc.mushroom.domain.bid.repository.BidRepository;
-import nbc.mushroom.domain.common.dto.AuthUser;
 import nbc.mushroom.domain.common.exception.CustomException;
 import nbc.mushroom.domain.payment.dto.request.PaymentReq;
-import nbc.mushroom.domain.payment.dto.response.PaymentRes;
-import nbc.mushroom.domain.user.entity.User;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +16,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,32 +39,8 @@ public class PaymentService {
     private static final String WIDGET_SECRET_KEY_ENCODED = Base64.getEncoder()
         .encodeToString((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
 
-    private final BidRepository bidRepository;
-
-    @Transactional
-    public PaymentRes confirmPayment(AuthUser authUser, PaymentReq paymentReq) {
-        PaymentRes paymentRes = PaymentRes.from(sendPayment(paymentReq));
-
-        try {
-            User user = User.fromAuthUser(authUser);
-            Long bidId = Long.valueOf(paymentRes.orderId().substring(20));
-            Bid bid = bidRepository.findById(bidId)
-                .orElseThrow(() -> new CustomException(BID_NOT_FOUND));
-
-            if (!user.getId().equals(bid.getBidder().getId())) {
-                throw new CustomException(INVALID_PAYMENT_USER);
-            }
-
-            bid.paymentComplete(paymentRes.amount());
-            return paymentRes;
-        } catch (Exception e) {
-            cancelPayment(paymentRes.paymentKey(), e.getMessage(), paymentRes.amount());
-            throw e;
-        }
-    }
-
     // 토스서버에 결제 승인 요청
-    private Map<String, Object> sendPayment(PaymentReq paymentReq) {
+    public Map<String, Object> sendPayment(PaymentReq paymentReq) {
         // 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -99,7 +67,7 @@ public class PaymentService {
     }
 
     // 에러가 날 경우 결제를 취소
-    private void cancelPayment(String paymentKey, String reason, Long cancelAmount) {
+    public void cancelPayment(String paymentKey, String reason, Long cancelAmount) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Basic " + WIDGET_SECRET_KEY_ENCODED);
