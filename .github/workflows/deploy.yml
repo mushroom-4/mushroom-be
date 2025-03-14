@@ -17,12 +17,12 @@ jobs:
       - name: Login to Public ECR
         env:
           AWS_REGION: us-east-1
-          run: |
-            aws ecr-public get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin public.ecr.aws/p5g9k3t8/mutt
+        run: |
+          aws ecr-public get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin public.ecr.aws/p5g9k3t8/mutt-api
       - name: Build and Push Docker image
         env:
           ECR_REGISTRY: public.ecr.aws
-          ECR_REPOSITORY: p5g9k3t8/mutt
+          ECR_REPOSITORY: p5g9k3t8/mutt-api
           IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
