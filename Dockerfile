@@ -11,4 +11,4 @@ WORKDIR /app
 ARG JAR_FILE=build/libs/*.jar
 COPY --from=builder /build/${JAR_FILE} app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar", "-Duser.timezone=Asia/Seoul"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
