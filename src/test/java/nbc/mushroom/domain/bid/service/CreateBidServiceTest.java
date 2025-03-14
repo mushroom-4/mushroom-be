@@ -2,8 +2,6 @@ package nbc.mushroom.domain.bid.service;
 
 import static nbc.mushroom.domain.user.entity.UserRole.USER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +16,6 @@ import nbc.mushroom.domain.bid.dto.request.CreateBidReq;
 import nbc.mushroom.domain.bid.entity.Bid;
 import nbc.mushroom.domain.bid.entity.BiddingStatus;
 import nbc.mushroom.domain.bid.repository.BidRepository;
-import nbc.mushroom.domain.chat.service.ChatService;
 import nbc.mushroom.domain.user.entity.User;
 import nbc.mushroom.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -33,16 +30,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 class CreateBidServiceTest {
-
-    @MockitoBean
-    private ChatService chatService;
 
     @Autowired
     private BidRepository bidRepository;
@@ -95,9 +88,6 @@ class CreateBidServiceTest {
         auctionItem.approve();
         auctionItem.start();
         auctionItemRepository.saveAndFlush(auctionItem);
-
-        // chatService 함수 호출이 redis 에 접근하지 않도록 설정
-        doNothing().when(chatService).sendBidAnnouncementMessage(any(), any(), any());
     }
 
     @AfterEach
