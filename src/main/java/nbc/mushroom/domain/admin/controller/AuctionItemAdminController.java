@@ -4,10 +4,15 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import nbc.mushroom.domain.admin.dto.request.UpdateAuctionItemStatusReq;
+import nbc.mushroom.domain.admin.dto.request.UpdateAuctionItemTimeReq;
 import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.admin.service.AuctionItemAdminService;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
+import nbc.mushroom.domain.chat.service.ChatService;
+import nbc.mushroom.domain.common.annotation.Auth;
 import nbc.mushroom.domain.common.dto.ApiResponse;
+import nbc.mushroom.domain.common.dto.AuthUser;
+import nbc.mushroom.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionItemAdminController {
 
     private final AuctionItemAdminService auctionItemAdminService;
+    private final ChatService chatService;
 
     @PatchMapping("/{auctionItemId}")
     public ResponseEntity<ApiResponse<Void>> updateAuctionItemStatus(
@@ -37,6 +43,21 @@ public class AuctionItemAdminController {
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ApiResponse.success("물품 검수가 완료되었습니다."));
+    }
+
+    @PatchMapping("/{auctionItemId}/time")
+    public ResponseEntity<ApiResponse<Void>> updateAuctionItemTime(
+        @Auth AuthUser authUser,
+        @PathVariable Long auctionItemId,
+        @Valid @RequestBody UpdateAuctionItemTimeReq updateAuctionItemTimeReq
+    ) {
+        auctionItemAdminService.updateAuctionItemTime(auctionItemId, updateAuctionItemTimeReq);
+        chatService.sendAdminMessage(
+            auctionItemId,
+            User.fromAuthUser(authUser)
+        );
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.success("상품 시간이 변경되었습니다."));
     }
 
     // 관리자 경매 물품 상태 목록 전체 조회 + 필터링 조회 기능 API

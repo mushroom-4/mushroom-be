@@ -142,4 +142,13 @@ public class AuctionItem extends Timestamped {
 
         return this;
     }
+
+    public void updateTime(LocalDateTime startTime, LocalDateTime endTime) {
+        if (startTime != null) {
+            this.startTime = startTime;
+        }
+        if (endTime != null) {
+            this.endTime = endTime;
+        }
+    }
 }
