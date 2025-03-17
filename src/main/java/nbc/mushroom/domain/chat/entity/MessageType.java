@@ -1,5 +1,5 @@
 package nbc.mushroom.domain.chat.entity;
 
 public enum MessageType {
-    MESSAGE, ANNOUNCEMENT, ERROR
+    MESSAGE, ANNOUNCEMENT, ERROR, ADMIN
 }

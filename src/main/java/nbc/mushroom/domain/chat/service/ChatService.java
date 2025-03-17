@@ -44,6 +44,12 @@ public class ChatService {
             stompHeaderAccessor);
     }
 
+    public void sendAdminMessage(Long chatRoomId, User adminUser) {
+        String message = "시간이 변경되었습니다.";
+
+        sendMessage(chatRoomId, MessageType.ADMIN, message, adminUser, null);
+    }
+
     public void sendBidAnnouncementMessage(Long chatRoomId, User bidder,
         Long biddingPrice) {
 
@@ -56,8 +62,7 @@ public class ChatService {
     }
 
     /**
-     * 실질적으로 메시지를 전송하는 메서드
-     * hasErrorMessage가 true면 에러메시지 생성, false면 일반 메시지 생성
+     * 실질적으로 메시지를 전송하는 메서드 hasErrorMessage가 true면 에러메시지 생성, false면 일반 메시지 생성
      */
     private ChatMessageRes sendMessage(Long chatRoomId, MessageType messageType,
         String message, User sender,
@@ -157,7 +162,7 @@ public class ChatService {
 
     /**
      * 에러 메시지가 존재하는지 확인
-     *
+     * <p>
      * stompHeaderAccessor가 null이면 에러메시지도 없음. (입찰 메시지일 경우)
      */
     private boolean hasErrorMessage(StompHeaderAccessor stompHeaderAccessor) {

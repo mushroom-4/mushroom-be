@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nbc.mushroom.domain.admin.dto.request.UpdateAuctionItemStatusReq;
+import nbc.mushroom.domain.admin.dto.request.UpdateAuctionItemTimeReq;
 import nbc.mushroom.domain.admin.dto.response.AuctionItemStatusRes;
 import nbc.mushroom.domain.auction_item.entity.AuctionItem;
 import nbc.mushroom.domain.auction_item.entity.AuctionItemStatus;
@@ -19,6 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionItemAdminService {
 
     private final AuctionItemRepository auctionItemRepository;
+
+    // 경매 물품 시간 변경
+    @Transactional
+    public void updateAuctionItemTime(
+        Long auctionItemId,
+        UpdateAuctionItemTimeReq updateAuctionItemTimeReq
+    ) {
+        AuctionItem auctionItem = auctionItemRepository.findAuctionItemById(auctionItemId);
+
+        auctionItem.updateTime(
+            updateAuctionItemTimeReq.startTime(),
+            updateAuctionItemTimeReq.endTime()
+        );
+    }
 
     // 경매 물품 검수
     @Transactional
