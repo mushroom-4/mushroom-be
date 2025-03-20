@@ -18,9 +18,6 @@
 - [5. 인프라 아키텍처 \& 적용 기술](#5-인프라-아키텍처--적용-기술)
   - [🏰 인프라 아키텍처](#인프라-아키텍처)
   - [💎 적용 기술](#적용-기술)
-    - [Backend](#backend)
-    - [Infra](#infra)
-    - [Collaborative Tool](#collaborative-tool)
 - [6. 성과 및 회고](#6-성과-및-회고)
   - [👍🏻 잘된 점](#잘된-점)
   - [👀 아쉬운 점](#아쉬운-점)
@@ -29,7 +26,8 @@
   - [🤼‍♂️ 역할 분담](#️-역할-분담)
   - [🌱 Ground Rule](#-ground-rule)
   - [✨ Core Value](#-core-value)
-
+- [8. 최우수 프로젝트 선정](#8-최우수-프로젝트-선정)
+<br/>
 
 ## 1. 프로젝트 소개
 
@@ -93,8 +91,8 @@
 
 <details>
     <summary>채팅</summary>
-    
-![Image](https://github.com/user-attachments/assets/bc56cdb7-f75d-4a64-98cb-b2523da06609)
+
+![Image](https://github.com/user-attachments/assets/a348b6f9-960f-467c-abb8-9cb7d253620b)
 
 - 입찰자 실시간 채팅 기능
     - 입찰에 참여한 유저들끼리 실시간으로 채팅을 할 수 있습니다.
@@ -479,6 +477,13 @@
 
 ### 🏰 인프라 아키텍처
 
+<div align="center">
+    <a href="https://yeim.notion.site/v1-25-02-27-1a716458a6bf806687a7f8771dc46d66"><code>🔍 인프라 구조 ver1 (25-02-27)</code></a>
+    <a href="https://yeim.notion.site/v2-25-03-12-1b416458a6bf800b98e8edd3810ed1e4"><code>🔍 인프라 구조 ver2 (25-03-12)</code></a>
+</div>
+
+<br/>
+
 <div align="center"><img src="https://github.com/user-attachments/assets/71999528-6d49-466d-8cb2-446c7a613805" width="800"/></div>
 
 <div align="center"><img src="https://github.com/user-attachments/assets/0403c8b5-2c33-4ad5-99f2-e4116a46b23f" width="800"/></div>
@@ -687,4 +692,10 @@
 ### ✨ Core Value
 
 <img width="700" alt="Image" src="https://github.com/user-attachments/assets/86640dc2-0bb2-4d6c-9f53-4946adaa6cec" />
+
+<br/>
+
+## 8. 최우수 프로젝트 선정
+
+<div align="center"><img width="700" alt="Image" src="https://github.com/user-attachments/assets/7df640e2-466c-438b-92cd-3a483685b68a" /></div>
 
